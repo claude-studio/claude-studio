@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.0](https://github.com/FRONT-JB/claude-studio/compare/claude-studio-v1.4.0...claude-studio-v1.5.0) (2026-03-04)
+
+
+### Other Changes
+
+* eslint import-order 설정 및 react namespace import 정리 ([dff72a2](https://github.com/FRONT-JB/claude-studio/commit/dff72a291e830c1173b81160bfe3fdb145a34676))
+* 미사용 export 및 dead code 제거 ([b152b69](https://github.com/FRONT-JB/claude-studio/commit/b152b69175f3e623398ad519c0f991d6d3030f43))
+
+
+### Features
+
+* teams 페이지 inbox 메시지 및 태스크 아코디언 추가 ([e836549](https://github.com/FRONT-JB/claude-studio/commit/e8365493d9c7dbef093f4e71d72d80b65e072b9d))
+
 ## [1.4.0](https://github.com/FRONT-JB/claude-studio/compare/claude-studio-v1.3.1...claude-studio-v1.4.0) (2026-03-04)
 
 
