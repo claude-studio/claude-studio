@@ -655,22 +655,11 @@ export function getClaudeLifetime(claudeDir?: string): ClaudeLifetime {
   const longestSessionDurationMs = typeof longest?.duration === 'number' ? longest.duration : 0;
   const longestSessionMessageCount = typeof longest?.messageCount === 'number' ? longest.messageCount : 0;
 
-  const modelUsage = sc?.modelUsage as Record<string, Record<string, unknown>> | undefined;
-  const totalWebSearchRequests = modelUsage
-    ? Object.values(modelUsage).reduce((sum, m) => sum + (typeof m.webSearchRequests === 'number' ? m.webSearchRequests : 0), 0)
-    : 0;
-
-  const totalSpeculationTimeSavedMs = typeof sc?.totalSpeculationTimeSavedMs === 'number'
-    ? sc.totalSpeculationTimeSavedMs
-    : 0;
-
   return {
     firstSessionDate,
     daysActive,
     longestSessionDurationMs,
     longestSessionMessageCount,
-    totalWebSearchRequests,
-    totalSpeculationTimeSavedMs,
   };
 }
 

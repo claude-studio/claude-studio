@@ -151,8 +151,6 @@ export const ClaudeLifetimeSchema = z.object({
   daysActive: z.number(),           // D+N (days since first session)
   longestSessionDurationMs: z.number(),
   longestSessionMessageCount: z.number(),
-  totalWebSearchRequests: z.number(),
-  totalSpeculationTimeSavedMs: z.number(),
 });
 
 export type ClaudeLifetime = z.infer<typeof ClaudeLifetimeSchema>;
@@ -179,7 +177,7 @@ export const DashboardStatsSchema = z.object({
   cacheStats: CacheStatsSchema,
   toolUsage: z.array(ToolUsageItemSchema),
   conversationStats: ConversationStatsSchema,
-  lifetime: ClaudeLifetimeSchema,
+  lifetime: ClaudeLifetimeSchema.optional(),
 });
 
 export type DashboardStats = z.infer<typeof DashboardStatsSchema>;

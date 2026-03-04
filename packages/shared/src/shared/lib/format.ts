@@ -1,4 +1,5 @@
 export function formatTokens(tokens: number): string {
+  if (!tokens || isNaN(tokens)) return '0';
   if (tokens >= 1_000_000_000) return `${(tokens / 1_000_000_000).toFixed(1)}B`;
   if (tokens >= 1_000_000) return `${(tokens / 1_000_000).toFixed(1)}M`;
   if (tokens >= 1_000) return `${(tokens / 1_000).toFixed(1)}K`;
@@ -39,6 +40,7 @@ export function formatDuration(ms: number): string {
 }
 
 export function formatNumber(n: number): string {
+  if (!n || isNaN(n)) return '0';
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
   return n.toString();

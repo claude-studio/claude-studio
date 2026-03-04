@@ -1,13 +1,15 @@
 'use client';
 import * as React from 'react';
 import type { ClaudeLifetime } from '@repo/shared';
-import { formatDuration, formatDate } from '@repo/shared';
+import { formatDuration, formatDate, formatNumber } from '@repo/shared';
 
 interface ClaudeLifetimeCardProps {
   data: ClaudeLifetime;
+  totalMessages: number;
+  totalToolCalls: number;
 }
 
-export function ClaudeLifetimeCard({ data }: ClaudeLifetimeCardProps) {
+export function ClaudeLifetimeCard({ data, totalMessages, totalToolCalls }: ClaudeLifetimeCardProps) {
   const items = [
     {
       label: '사용 시작일',
@@ -24,17 +26,13 @@ export function ClaudeLifetimeCard({ data }: ClaudeLifetimeCardProps) {
         : '',
     },
     {
-      label: '웹 검색 횟수',
-      value: data.totalWebSearchRequests > 0
-        ? `${data.totalWebSearchRequests.toLocaleString()}회`
-        : '-',
+      label: '총 메시지 수',
+      value: formatNumber(totalMessages),
       sub: '',
     },
     {
-      label: '스트리밍 절약 시간',
-      value: data.totalSpeculationTimeSavedMs > 0
-        ? formatDuration(data.totalSpeculationTimeSavedMs)
-        : '-',
+      label: '총 툴 호출 수',
+      value: formatNumber(totalToolCalls),
       sub: '',
     },
   ];

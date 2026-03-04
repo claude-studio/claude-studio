@@ -9,13 +9,12 @@ import {
   CacheStatsCard,
   ToolUsageChart,
   ConversationStatsCard,
-  ClaudeLifetimeCard,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from '@repo/ui';
-import { formatCost, formatTokens, formatNumber, timeAgo, formatDateShort } from '@repo/shared';
+import { formatCost, formatTokens, formatNumber, timeAgo, formatDateShort, formatDate } from '@repo/shared';
 import { DollarSign, Zap, MessageSquare, FolderOpen } from 'lucide-react';
 
 export const Route = createFileRoute('/')({
@@ -38,11 +37,20 @@ function OverviewPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">개요</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Claude Code 사용량 요약
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">개요</h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            Claude Code 사용량 요약
+          </p>
+        </div>
+        {stats.lifetime?.firstSessionDate && (
+          <div className="flex items-center gap-2 text-sm">
+            <p className="text-muted-foreground">사용 시작일</p>
+            <p className="font-semibold">{formatDate(stats.lifetime.firstSessionDate)}</p>
+            <p className="text-primary">D+{stats.lifetime.daysActive}</p>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -143,15 +151,6 @@ function OverviewPage() {
         </CardHeader>
         <CardContent>
           <ConversationStatsCard data={stats.conversationStats} />
-        </CardContent>
-      </Card>
-
-      <Card className="border-border/50">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Claude Code와 함께한 시간</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ClaudeLifetimeCard data={stats.lifetime} />
         </CardContent>
       </Card>
 
