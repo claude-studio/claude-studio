@@ -19,6 +19,7 @@ export type {
   TeamInfo,
   TaskInfo,
   TeamDetail,
+  InboxMessage,
 } from './shared/types/index';
 
 export {

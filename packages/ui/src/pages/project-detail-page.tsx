@@ -67,9 +67,7 @@ export function ProjectDetailPage({ id }: ProjectDetailPageProps) {
             </div>
 
             <div className="relative pl-6 space-y-3">
-              <div className="absolute left-[7px] top-2 bottom-2 w-px bg-border/50" />
-
-              {daySessions.map((session) => (
+              {daySessions.map((session, idx) => (
                 <Link
                   key={session.id}
                   to="/sessions/$id"
@@ -77,7 +75,10 @@ export function ProjectDetailPage({ id }: ProjectDetailPageProps) {
                   className="block"
                 >
                   <div className="relative">
-                    <div className="absolute -left-[22px] top-3 h-2.5 w-2.5 rounded-full border-2 border-primary bg-background" />
+                    <div className="absolute -left-[22px] top-2.5 h-3 w-3 rounded-full bg-primary/20 border-2 border-primary shadow-[0_0_0_3px_hsl(var(--primary)/0.1)]" />
+                    {idx < daySessions.length - 1 && (
+                      <div className="absolute -left-[16px] top-[22px] bottom-[-14px] w-px bg-border" />
+                    )}
 
                     <Card className="border-border/50 hover:border-primary/40 hover:bg-muted/20 transition-colors cursor-pointer">
                       <CardContent className="p-3">

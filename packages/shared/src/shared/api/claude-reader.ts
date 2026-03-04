@@ -873,7 +873,35 @@ export function getTeams(claudeDir?: string): import('../types/index').TeamDetai
           } catch { /* skip */ }
         }
 
-        results.push({ team, tasks: tasks.sort((a, b) => Number(a.id) - Number(b.id)) });
+        // Read inboxes
+        const inboxes: Record<string, import('../types/index').InboxMessage[]> = {};
+        const inboxesDir = path.join(teamsDir, entry, 'inboxes');
+        if (fs.existsSync(inboxesDir)) {
+          try {
+            const inboxFiles = fs.readdirSync(inboxesDir).filter((f) => f.endsWith('.json'));
+            for (const inboxFile of inboxFiles) {
+              const agentName = path.basename(inboxFile, '.json');
+              try {
+                const raw = JSON.parse(
+                  fs.readFileSync(path.join(inboxesDir, inboxFile), 'utf-8')
+                ) as unknown;
+                if (Array.isArray(raw)) {
+                  inboxes[agentName] = (raw as AnyMessage[])
+                    .filter((item) => !!item && typeof item === 'object')
+                    .map((item) => ({
+                      from: typeof item.from === 'string' ? item.from : '',
+                      text: typeof item.text === 'string' ? item.text : '',
+                      timestamp: typeof item.timestamp === 'string' ? item.timestamp : '',
+                      color: typeof item.color === 'string' ? item.color : undefined,
+                      read: typeof item.read === 'boolean' ? item.read : undefined,
+                    }));
+                }
+              } catch { /* skip */ }
+            }
+          } catch { /* skip */ }
+        }
+
+        results.push({ team, tasks: tasks.sort((a, b) => Number(a.id) - Number(b.id)), inboxes });
       } catch { continue; }
     }
   } catch { return []; }

@@ -48,7 +48,7 @@ export function ProjectCostChart({ data }: ProjectCostChartProps) {
             props.payload?.fullName ?? props.payload?.name ?? '비용',
           ]}
         />
-        <Bar dataKey="cost" fill="var(--chart-1)" radius={[0, 4, 4, 0]} cursor={{ fill: 'var(--muted-foreground)', opacity: 0.04 }} />
+        <Bar dataKey="cost" fill="var(--chart-1)" radius={[0, 4, 4, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );

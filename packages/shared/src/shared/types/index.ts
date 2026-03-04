@@ -207,9 +207,20 @@ export const TaskInfoSchema = z.object({
 
 export type TaskInfo = z.infer<typeof TaskInfoSchema>;
 
+export const InboxMessageSchema = z.object({
+  from: z.string(),
+  text: z.string(),
+  timestamp: z.string(),
+  color: z.string().optional(),
+  read: z.boolean().optional(),
+});
+
+export type InboxMessage = z.infer<typeof InboxMessageSchema>;
+
 export const TeamDetailSchema = z.object({
   team: TeamInfoSchema,
   tasks: z.array(TaskInfoSchema),
+  inboxes: z.record(z.string(), z.array(InboxMessageSchema)).default({}),
 });
 
 export type TeamDetail = z.infer<typeof TeamDetailSchema>;

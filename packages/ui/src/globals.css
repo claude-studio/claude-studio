@@ -52,6 +52,15 @@
   --color-claude-warm: #F5F0EB;
 }
 
+@keyframes accordion-down {
+  from { height: 0 }
+  to { height: var(--radix-accordion-content-height) }
+}
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height) }
+  to { height: 0 }
+}
+
 :root {
   --radius: 0.75rem;
   --background: #FAF9F6;
