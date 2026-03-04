@@ -1,8 +1,9 @@
 name: Build & Release
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - 'claude-studio-v*'
 
 permissions:
   contents: write
