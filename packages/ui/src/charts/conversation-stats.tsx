@@ -28,12 +28,12 @@ export function ConversationStatsCard({ data }: ConversationStatsCardProps) {
           <p className="text-lg font-semibold mt-1">{Math.round(data.avgMessagesPerSession)}개</p>
         </div>
         <div className="rounded-lg bg-muted/50 p-3">
-          <p className="text-xs text-muted-foreground">메시지당 입력 토큰</p>
-          <p className="text-lg font-semibold mt-1">{formatTokens(data.avgInputTokensPerMessage)}</p>
+          <p className="text-xs text-muted-foreground">입력 토큰/메시지</p>
+          <p className="text-lg font-semibold mt-1">{formatTokens(Math.round(data.avgInputTokensPerMessage))}</p>
         </div>
         <div className="rounded-lg bg-muted/50 p-3">
-          <p className="text-xs text-muted-foreground">메시지당 출력 토큰</p>
-          <p className="text-lg font-semibold mt-1">{formatTokens(data.avgOutputTokensPerMessage)}</p>
+          <p className="text-xs text-muted-foreground">출력 토큰/메시지</p>
+          <p className="text-lg font-semibold mt-1">{formatTokens(Math.round(data.avgOutputTokensPerMessage))}</p>
         </div>
       </div>
 
