@@ -22,6 +22,7 @@ import {
   getModelDisplayName,
   getModelColor,
   getModelShortName,
+  getPricing,
 } from '../config/pricing';
 
 function toLocalDateStr(d: Date): string {
@@ -564,13 +565,21 @@ export function getDashboardStats(claudeDir?: string): DashboardStats {
   }
 
   // Cache stats
+  // 적중률 = 캐시 읽기 / 전체 캐시 관련 토큰 (생성+읽기)
   const totalCacheTokens = totalCacheCreation + totalCacheRead;
   const cacheHitRate = totalCacheTokens > 0
     ? Math.round((totalCacheRead / totalCacheTokens) * 100)
     : 0;
-  // Cache read is charged at ~10% — savings = 90% of what full input would cost
-  const avgInputPricePerMillion = 3; // Sonnet default
-  const estimatedSavingsUsd = (totalCacheRead * avgInputPricePerMillion * 0.9) / 1_000_000;
+  // 실제 모델별 가중평균 입력 단가로 절약 비용 계산
+  // 캐시 읽기는 일반 입력의 ~10% 과금 → 절약 = 캐시 읽기 토큰 × 입력 단가 × 90%
+  const totalModelTokens = Array.from(modelMap.values()).reduce((s, m) => s + m.inputTokens, 0);
+  const weightedInputPrice = totalModelTokens > 0
+    ? Array.from(modelMap.values()).reduce((s, m) => {
+        const pricing = getPricing(m.model);
+        return s + (m.inputTokens / totalModelTokens) * pricing.input;
+      }, 0)
+    : 3; // fallback: Sonnet 기본값
+  const estimatedSavingsUsd = (totalCacheRead * weightedInputPrice * 0.9) / 1_000_000;
   const cacheStats: CacheStats = {
     totalCacheCreationTokens: totalCacheCreation,
     totalCacheReadTokens: totalCacheRead,
