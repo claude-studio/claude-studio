@@ -9,6 +9,7 @@ import {
   ModelBreakdown,
 } from '@repo/ui';
 import { formatCost, formatTokens, formatNumber, timeAgo, formatDuration } from '@repo/shared';
+import * as React from 'react';
 
 export const Route = createFileRoute('/sessions/$id')({
   component: SessionDetailPage,
@@ -17,6 +18,8 @@ export const Route = createFileRoute('/sessions/$id')({
 function SessionDetailPage() {
   const { id } = Route.useParams();
   const { data: session, isLoading } = useSessionDetail(id);
+  const [hideErrors, setHideErrors] = React.useState(false);
+  const [hideSidechain, setHideSidechain] = React.useState(false);
 
   if (isLoading) {
     return (
@@ -94,7 +97,27 @@ function SessionDetailPage() {
 
       <Card className="border-border/50">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">대화 내용</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm font-medium">대화 내용</CardTitle>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setHideErrors((v) => !v)}
+                className={`text-xs px-2 py-1 rounded-md transition-colors ${
+                  hideErrors ? 'bg-red-500/20 text-red-400' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+              >
+                오류 {hideErrors ? '표시' : '숨기기'}
+              </button>
+              <button
+                onClick={() => setHideSidechain((v) => !v)}
+                className={`text-xs px-2 py-1 rounded-md transition-colors ${
+                  hideSidechain ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+              >
+                서브에이전트 {hideSidechain ? '표시' : '숨기기'}
+              </button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -105,6 +128,11 @@ function SessionDetailPage() {
               const content = inner.content ?? raw.content;
               const model = inner.model as string | undefined;
               const timestamp = raw.timestamp as string | undefined;
+              const isApiError = !!(raw.isApiErrorMessage);
+              const isSidechain = !!(raw.isSidechain);
+
+              if (hideErrors && isApiError) return null;
+              if (hideSidechain && isSidechain) return null;
 
               if (!content || (Array.isArray(content) && content.length === 0)) return null;
 
@@ -113,7 +141,6 @@ function SessionDetailPage() {
 
               let text: string;
               if (typeof content === 'string') {
-                // 시스템 태그만 있는 메시지는 건너뜀
                 const stripped = content.replace(/<[^>]+>[\s\S]*?<\/[^>]+>/g, '').trim();
                 if (!stripped) return null;
                 text = stripped;
@@ -132,13 +159,23 @@ function SessionDetailPage() {
               return (
                 <div key={i} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[80%] ${isUser ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
-                    <div className={`flex items-center gap-2 ${isUser ? 'flex-row-reverse' : ''}`}>
+                    <div className={`flex items-center gap-2 flex-wrap ${isUser ? 'flex-row-reverse' : ''}`}>
                       <Badge
                         variant={isUser ? 'secondary' : 'default'}
                         className="text-xs"
                       >
                         {isUser ? '사용자' : '어시스턴트'}
                       </Badge>
+                      {isSidechain && (
+                        <Badge variant="secondary" className="text-xs bg-primary/15 text-primary border-0">
+                          서브에이전트
+                        </Badge>
+                      )}
+                      {isApiError && (
+                        <Badge variant="secondary" className="text-xs bg-red-500/15 text-red-400 border-0">
+                          API 오류
+                        </Badge>
+                      )}
                       {model && (
                         <span className="text-xs text-muted-foreground">{model}</span>
                       )}
@@ -147,7 +184,11 @@ function SessionDetailPage() {
                       )}
                     </div>
                     <div className={`rounded-lg px-3 py-2 text-sm whitespace-pre-wrap ${
-                      isUser ? 'bg-primary/15 text-foreground' : 'bg-muted text-foreground'
+                      isApiError
+                        ? 'bg-red-500/10 text-red-400 border border-red-500/20'
+                        : isUser
+                          ? 'bg-primary/15 text-foreground'
+                          : 'bg-muted text-foreground'
                     }`}>
                       {text.length > 500 ? text.slice(0, 500) + '...' : text}
                     </div>
