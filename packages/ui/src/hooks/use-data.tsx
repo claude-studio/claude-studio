@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useQuery, type UseQueryResult } from '@tanstack/react-query';
+import { useQuery, keepPreviousData, type UseQueryResult } from '@tanstack/react-query';
 import type {
   DashboardStats,
   ProjectInfo,
@@ -36,6 +36,7 @@ export function useStats(): UseQueryResult<DashboardStats> {
     queryKey: ['stats'],
     queryFn: () => provider.getStats(),
     staleTime: 30_000,
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -45,6 +46,7 @@ export function useProjects(): UseQueryResult<ProjectInfo[]> {
     queryKey: ['projects'],
     queryFn: () => provider.getProjects(),
     staleTime: 30_000,
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -54,6 +56,7 @@ export function useSessions(limit?: number): UseQueryResult<SessionInfo[]> {
     queryKey: ['sessions', limit],
     queryFn: () => provider.getSessions(limit),
     staleTime: 30_000,
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -64,6 +67,7 @@ export function useSessionDetail(sessionId: string): UseQueryResult<SessionDetai
     queryFn: () => provider.getSessionDetail(sessionId),
     enabled: !!sessionId,
     staleTime: 60_000,
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -74,5 +78,6 @@ export function useProjectSessions(projectId: string): UseQueryResult<SessionInf
     queryFn: () => provider.getProjectSessions(projectId),
     enabled: !!projectId,
     staleTime: 30_000,
+    placeholderData: keepPreviousData,
   });
 }

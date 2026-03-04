@@ -126,6 +126,11 @@ interface ParsedSession {
 }
 
 function getSessionsFromDir(projectsDir: string): ParsedSession[] {
+  // Reuse cached raw sessions to avoid double disk scan within same TTL window
+  const cacheKey = `raw:${projectsDir}`;
+  const cached = getCached<ParsedSession[]>(cacheKey);
+  if (cached) return cached;
+
   if (!fs.existsSync(projectsDir)) return [];
 
   const sessions: ParsedSession[] = [];
@@ -170,6 +175,7 @@ function getSessionsFromDir(projectsDir: string): ParsedSession[] {
     return [];
   }
 
+  setCached(cacheKey, sessions);
   return sessions;
 }
 
@@ -282,6 +288,11 @@ export function getSessions(claudeDir?: string): SessionInfo[] {
   const projectsDir = path.join(claudeDir ?? getClaudeDir(), 'projects');
   const rawSessions = getSessionsFromDir(projectsDir);
 
+  // Pre-populate filePath index so getSessionDetail can skip full scan
+  for (const raw of rawSessions) {
+    setCached(`filepath:${raw.id}`, raw.filePath);
+  }
+
   const sessions = rawSessions
     .map(extractSessionStats)
     .filter((s): s is SessionInfo => s !== null)
@@ -300,8 +311,39 @@ export function getSessionDetail(
   if (cached) return cached;
 
   const projectsDir = path.join(claudeDir ?? getClaudeDir(), 'projects');
-  const rawSessions = getSessionsFromDir(projectsDir);
-  const session = rawSessions.find((s) => s.id === sessionId);
+
+  // Fast path: if raw sessions are already cached, look up by id directly
+  // instead of scanning the entire directory again
+  const rawCached = getCached<ParsedSession[]>(`raw:${projectsDir}`);
+  let session: ParsedSession | undefined;
+  if (rawCached) {
+    session = rawCached.find((s) => s.id === sessionId);
+  } else {
+    // filePath index: try to locate the session file without full scan
+    // by checking the known filePath cache key
+    const filePathCacheKey = `filepath:${sessionId}`;
+    const knownFilePath = getCached<string>(filePathCacheKey);
+    if (knownFilePath && fs.existsSync(knownFilePath)) {
+      const messages = parseJsonlFile(knownFilePath);
+      // Reconstruct minimal ParsedSession from file path
+      const parts = knownFilePath.split(path.sep);
+      const projectDir = parts[parts.length - 2] ?? '';
+      session = {
+        id: sessionId,
+        projectPath: decodeProjectPath(projectDir),
+        projectDirName: projectDir,
+        filePath: knownFilePath,
+        messages,
+      };
+    } else {
+      const rawSessions = getSessionsFromDir(projectsDir);
+      session = rawSessions.find((s) => s.id === sessionId);
+      // Cache the filePath for future direct lookups
+      if (session) {
+        setCached(`filepath:${sessionId}`, session.filePath);
+      }
+    }
+  }
 
   if (!session) return null;
 
