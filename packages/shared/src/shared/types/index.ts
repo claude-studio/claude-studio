@@ -1,0 +1,142 @@
+import { z } from 'zod';
+
+export const TokenUsageSchema = z.object({
+  inputTokens: z.number().default(0),
+  outputTokens: z.number().default(0),
+  cacheCreationInputTokens: z.number().default(0),
+  cacheReadInputTokens: z.number().default(0),
+});
+
+export type TokenUsage = z.infer<typeof TokenUsageSchema>;
+
+export const ModelUsageSchema = z.object({
+  model: z.string(),
+  displayName: z.string(),
+  inputTokens: z.number(),
+  outputTokens: z.number(),
+  totalTokens: z.number(),
+  cost: z.number(),
+  messageCount: z.number(),
+  color: z.string(),
+});
+
+export type ModelUsage = z.infer<typeof ModelUsageSchema>;
+
+export const DailyUsageSchema = z.object({
+  date: z.string(), // YYYY-MM-DD
+  cost: z.number(),
+  inputTokens: z.number(),
+  outputTokens: z.number(),
+  messages: z.number(),
+  sessions: z.number(),
+  toolCalls: z.number(),
+  modelCosts: z.record(z.string(), z.number()).default({}),
+});
+
+export type DailyUsage = z.infer<typeof DailyUsageSchema>;
+
+export const PeakHourSchema = z.object({
+  hour: z.number(), // 0-23
+  messages: z.number(),
+  sessions: z.number(),
+});
+
+export type PeakHour = z.infer<typeof PeakHourSchema>;
+
+export const SessionInfoSchema = z.object({
+  id: z.string(),
+  projectPath: z.string(),
+  projectName: z.string(),
+  startTime: z.coerce.date(),
+  lastTime: z.coerce.date(),
+  duration: z.number(), // ms
+  messageCount: z.number(),
+  toolCallCount: z.number(),
+  cost: z.number(),
+  inputTokens: z.number(),
+  outputTokens: z.number(),
+  models: z.array(z.string()),
+});
+
+export type SessionInfo = z.infer<typeof SessionInfoSchema>;
+
+export const MessageSchema = z.object({
+  uuid: z.string().optional(),
+  type: z.string(),
+  role: z.enum(['user', 'assistant']).optional(),
+  content: z.any(),
+  timestamp: z.string().optional(),
+  model: z.string().optional(),
+  costUSD: z.number().optional(),
+  usage: z
+    .object({
+      input_tokens: z.number().optional(),
+      output_tokens: z.number().optional(),
+      cache_creation_input_tokens: z.number().optional(),
+      cache_read_input_tokens: z.number().optional(),
+    })
+    .optional(),
+  isSidechain: z.boolean().optional(),
+  isApiErrorMessage: z.boolean().optional(),
+});
+
+export type Message = z.infer<typeof MessageSchema>;
+
+export const SessionDetailSchema = z.object({
+  id: z.string(),
+  projectPath: z.string(),
+  projectName: z.string(),
+  startTime: z.coerce.date(),
+  lastTime: z.coerce.date(),
+  duration: z.number(),
+  messageCount: z.number(),
+  toolCallCount: z.number(),
+  cost: z.number(),
+  inputTokens: z.number(),
+  outputTokens: z.number(),
+  models: z.array(z.string()),
+  messages: z.array(MessageSchema),
+  modelBreakdown: z.array(ModelUsageSchema),
+});
+
+export type SessionDetail = z.infer<typeof SessionDetailSchema>;
+
+export const ProjectInfoSchema = z.object({
+  id: z.string(),
+  path: z.string(),
+  name: z.string(),
+  sessionCount: z.number(),
+  totalCost: z.number(),
+  totalTokens: z.number(),
+  inputTokens: z.number(),
+  outputTokens: z.number(),
+  messageCount: z.number(),
+  toolCallCount: z.number(),
+  lastActivity: z.coerce.date(),
+  models: z.array(z.string()),
+});
+
+export type ProjectInfo = z.infer<typeof ProjectInfoSchema>;
+
+export const DashboardStatsSchema = z.object({
+  totalCost: z.number(),
+  totalTokens: z.number(),
+  inputTokens: z.number(),
+  outputTokens: z.number(),
+  totalSessions: z.number(),
+  totalProjects: z.number(),
+  totalMessages: z.number(),
+  totalToolCalls: z.number(),
+  modelBreakdown: z.array(ModelUsageSchema),
+  dailyUsage: z.array(DailyUsageSchema),
+  peakHours: z.array(PeakHourSchema),
+  recentSessions: z.array(SessionInfoSchema),
+  activityData: z.array(
+    z.object({
+      date: z.string(),
+      count: z.number(),
+    })
+  ),
+});
+
+export type DashboardStats = z.infer<typeof DashboardStatsSchema>;

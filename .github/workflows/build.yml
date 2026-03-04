@@ -1,0 +1,60 @@
+name: Build & Release
+
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: write
+
+jobs:
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm --filter @repo/shared build; pnpm --filter @repo/ui build; true
+
+      - name: Build & publish Electron app (macOS)
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: pnpm --filter @repo/studio build && cd apps/studio && pnpm exec electron-builder --mac --publish always
+
+  build-win:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm --filter @repo/shared build; pnpm --filter @repo/ui build; true
+        shell: bash
+
+      - name: Build & publish Electron app (Windows)
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: pnpm --filter @repo/studio build && cd apps/studio && pnpm exec electron-builder --win --publish always

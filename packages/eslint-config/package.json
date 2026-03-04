@@ -1,0 +1,21 @@
+{
+  "name": "@repo/eslint-config",
+  "version": "0.0.1",
+  "private": true,
+  "files": ["*.js", "*.cjs"],
+  "exports": {
+    "./base": "./base.js",
+    "./react-internal": "./react-internal.js"
+  },
+  "dependencies": {
+    "@eslint/js": "^9.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "typescript-eslint": "^8.0.0"
+  },
+  "devDependencies": {
+    "eslint": "catalog:",
+    "typescript": "catalog:"
+  }
+}

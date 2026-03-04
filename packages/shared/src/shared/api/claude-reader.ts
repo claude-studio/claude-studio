@@ -1,0 +1,578 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
+import type {
+  DashboardStats,
+  SessionInfo,
+  SessionDetail,
+  DailyUsage,
+  PeakHour,
+  ModelUsage,
+  ProjectInfo,
+  Message,
+} from '../types/index';
+import {
+  calculateCost,
+  getModelDisplayName,
+  getModelColor,
+  getModelShortName,
+} from '../config/pricing';
+
+function toLocalDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+export function getClaudeDir(): string {
+  return path.join(os.homedir(), '.claude');
+}
+
+export function getProjectsDir(): string {
+  return path.join(getClaudeDir(), 'projects');
+}
+
+// --- Cache ---
+
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
+const cache = new Map<string, CacheEntry<unknown>>();
+const CACHE_TTL = 30_000; // 30 seconds
+
+function getCached<T>(key: string): T | null {
+  const entry = cache.get(key) as CacheEntry<T> | undefined;
+  if (!entry) return null;
+  if (Date.now() - entry.timestamp > CACHE_TTL) {
+    cache.delete(key);
+    return null;
+  }
+  return entry.data;
+}
+
+function setCached<T>(key: string, data: T): void {
+  cache.set(key, { data, timestamp: Date.now() });
+}
+
+export function clearCache(): void {
+  cache.clear();
+}
+
+// --- Path helpers ---
+
+export function decodeProjectPath(dirName: string): string {
+  // Claude encodes project paths by replacing / with -
+  // e.g. -Users-genie-Desktop-project -> /Users/genie/Desktop/project
+  if (dirName.startsWith('-')) {
+    return dirName.replace(/-/g, '/');
+  }
+  return dirName;
+}
+
+export function getProjectName(projectPath: string): string {
+  const parts = projectPath.split('/').filter(Boolean);
+  return parts[parts.length - 1] ?? projectPath;
+}
+
+// --- JSONL parsing ---
+
+function parseJsonlFile(filePath: string): unknown[] {
+  try {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const lines = content.split('\n').filter((line) => line.trim());
+    return lines
+      .map((line) => {
+        try {
+          return JSON.parse(line) as unknown;
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+interface ParsedSession {
+  id: string;
+  projectPath: string;
+  filePath: string;
+  messages: unknown[];
+}
+
+function getSessionsFromDir(projectsDir: string): ParsedSession[] {
+  if (!fs.existsSync(projectsDir)) return [];
+
+  const sessions: ParsedSession[] = [];
+
+  try {
+    const projectDirs = fs.readdirSync(projectsDir);
+
+    for (const projectDir of projectDirs) {
+      const projectDirPath = path.join(projectsDir, projectDir);
+      let stat: fs.Stats;
+      try {
+        stat = fs.statSync(projectDirPath);
+      } catch {
+        continue;
+      }
+      if (!stat.isDirectory()) continue;
+
+      const projectPath = decodeProjectPath(projectDir);
+
+      try {
+        const files = fs.readdirSync(projectDirPath);
+        const jsonlFiles = files.filter((f) => f.endsWith('.jsonl'));
+
+        for (const jsonlFile of jsonlFiles) {
+          const sessionId = path.basename(jsonlFile, '.jsonl');
+          const filePath = path.join(projectDirPath, jsonlFile);
+          const messages = parseJsonlFile(filePath);
+
+          sessions.push({
+            id: sessionId,
+            projectPath,
+            filePath,
+            messages,
+          });
+        }
+      } catch {
+        // skip inaccessible project dirs
+      }
+    }
+  } catch {
+    return [];
+  }
+
+  return sessions;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyMessage = Record<string, any>;
+
+/**
+ * Calculate cost from usage object.
+ * Claude JSONL doesn't always have costUSD — calculate from token usage.
+ * Cache read tokens are charged at ~10% of input price.
+ */
+function calcCostFromUsage(model: string, usage: AnyMessage): number {
+  const inputTokens = (usage.input_tokens as number) || 0;
+  const outputTokens = (usage.output_tokens as number) || 0;
+  const cacheCreation = (usage.cache_creation_input_tokens as number) || 0;
+  const cacheRead = (usage.cache_read_input_tokens as number) || 0;
+
+  // Base cost
+  let cost = calculateCost(model, inputTokens + cacheCreation, outputTokens);
+  // Cache read is ~10% of input price
+  cost += calculateCost(model, cacheRead, 0) * 0.1;
+  return cost;
+}
+
+function extractSessionStats(session: ParsedSession): SessionInfo | null {
+  const { messages } = session;
+  if (messages.length === 0) return null;
+
+  let inputTokens = 0;
+  let outputTokens = 0;
+  let cost = 0;
+  let messageCount = 0;
+  let toolCallCount = 0;
+  const models = new Set<string>();
+  let startTime: Date | null = null;
+  let lastTime: Date | null = null;
+
+  for (const msg of messages) {
+    const m = msg as AnyMessage;
+
+    // timestamp is at top level
+    if (m.timestamp) {
+      const t = new Date(m.timestamp as string);
+      if (!isNaN(t.getTime())) {
+        if (!startTime || t < startTime) startTime = t;
+        if (!lastTime || t > lastTime) lastTime = t;
+      }
+    }
+
+    if (m.type === 'assistant') {
+      messageCount++;
+
+      const model: string | undefined = m.message?.model ?? m.model;
+      if (model && model !== '<synthetic>') models.add(model);
+
+      const usage = m.message?.usage ?? m.usage;
+      if (usage) {
+        inputTokens += (usage.input_tokens as number) || 0;
+        outputTokens += (usage.output_tokens as number) || 0;
+
+        // Calculate cost — costUSD may not exist in newer Claude Code versions
+        if (typeof m.costUSD === 'number' && m.costUSD > 0) {
+          cost += m.costUSD as number;
+        } else if (model) {
+          cost += calcCostFromUsage(model, usage);
+        }
+      }
+
+      // Count tool_use blocks in assistant content
+      const content = m.message?.content ?? m.content;
+      if (Array.isArray(content)) {
+        for (const block of content) {
+          if ((block as AnyMessage)?.type === 'tool_use') toolCallCount++;
+        }
+      }
+    } else if (m.type === 'user') {
+      messageCount++;
+    }
+    // skip: system, progress, file-history-snapshot, queue-operation
+  }
+
+  // Only skip sessions with literally no parseable content
+  if (messageCount === 0 && !startTime) return null;
+
+  if (!startTime) startTime = new Date();
+  if (!lastTime) lastTime = startTime;
+
+  const duration = lastTime.getTime() - startTime.getTime();
+
+  return {
+    id: session.id,
+    projectPath: session.projectPath,
+    projectName: getProjectName(session.projectPath),
+    startTime,
+    lastTime,
+    duration,
+    messageCount,
+    toolCallCount,
+    cost,
+    inputTokens,
+    outputTokens,
+    models: Array.from(models),
+  };
+}
+
+export function getSessions(claudeDir?: string): SessionInfo[] {
+  const cached = getCached<SessionInfo[]>('sessions');
+  if (cached) return cached;
+
+  const projectsDir = path.join(claudeDir ?? getClaudeDir(), 'projects');
+  const rawSessions = getSessionsFromDir(projectsDir);
+
+  const sessions = rawSessions
+    .map(extractSessionStats)
+    .filter((s): s is SessionInfo => s !== null)
+    .sort((a, b) => b.lastTime.getTime() - a.lastTime.getTime());
+
+  setCached('sessions', sessions);
+  return sessions;
+}
+
+export function getSessionDetail(
+  sessionId: string,
+  claudeDir?: string
+): SessionDetail | null {
+  const cacheKey = `session:${sessionId}`;
+  const cached = getCached<SessionDetail>(cacheKey);
+  if (cached) return cached;
+
+  const projectsDir = path.join(claudeDir ?? getClaudeDir(), 'projects');
+  const rawSessions = getSessionsFromDir(projectsDir);
+  const session = rawSessions.find((s) => s.id === sessionId);
+
+  if (!session) return null;
+
+  const info = extractSessionStats(session);
+  if (!info) return null;
+
+  // Build model breakdown
+  const modelMap = new Map<string, ModelUsage>();
+  const messages = session.messages as AnyMessage[];
+
+  for (const m of messages) {
+    if (m.type === 'assistant') {
+      const model: string = (m.message?.model ?? m.model ?? 'unknown') as string;
+      const usage = m.message?.usage ?? m.usage;
+
+      let msgCost = 0;
+      if (typeof m.costUSD === 'number' && m.costUSD > 0) {
+        msgCost = m.costUSD as number;
+      } else if (usage && model) {
+        msgCost = calcCostFromUsage(model, usage);
+      }
+
+      if (!modelMap.has(model)) {
+        modelMap.set(model, {
+          model,
+          displayName: getModelDisplayName(model),
+          inputTokens: 0,
+          outputTokens: 0,
+          totalTokens: 0,
+          cost: 0,
+          messageCount: 0,
+          color: getModelColor(model),
+        });
+      }
+
+      const entry = modelMap.get(model)!;
+      if (usage) {
+        const inp = (usage.input_tokens as number) || 0;
+        const out = (usage.output_tokens as number) || 0;
+        entry.inputTokens += inp;
+        entry.outputTokens += out;
+        entry.totalTokens += inp + out;
+      }
+      entry.cost += msgCost;
+      entry.messageCount++;
+    }
+  }
+
+  const detail: SessionDetail = {
+    ...info,
+    messages: messages as unknown as Message[],
+    modelBreakdown: Array.from(modelMap.values()).filter((m) => m.model !== '<synthetic>'),
+  };
+
+  setCached(cacheKey, detail);
+  return detail;
+}
+
+export function getProjects(claudeDir?: string): ProjectInfo[] {
+  const cached = getCached<ProjectInfo[]>('projects');
+  if (cached) return cached;
+
+  const sessions = getSessions(claudeDir);
+  const projectMap = new Map<string, ProjectInfo>();
+
+  for (const session of sessions) {
+    const projectId = session.projectPath;
+
+    if (!projectMap.has(projectId)) {
+      projectMap.set(projectId, {
+        id: projectId,
+        path: session.projectPath,
+        name: session.projectName,
+        sessionCount: 0,
+        totalCost: 0,
+        totalTokens: 0,
+        inputTokens: 0,
+        outputTokens: 0,
+        messageCount: 0,
+        toolCallCount: 0,
+        lastActivity: session.lastTime,
+        models: [],
+      });
+    }
+
+    const project = projectMap.get(projectId)!;
+    project.sessionCount++;
+    project.totalCost += session.cost;
+    project.inputTokens += session.inputTokens;
+    project.outputTokens += session.outputTokens;
+    project.totalTokens += session.inputTokens + session.outputTokens;
+    project.messageCount += session.messageCount;
+    project.toolCallCount += session.toolCallCount;
+    if (session.lastTime > project.lastActivity) {
+      project.lastActivity = session.lastTime;
+    }
+    for (const m of session.models) {
+      if (!project.models.includes(m)) project.models.push(m);
+    }
+  }
+
+  const projects = Array.from(projectMap.values()).sort(
+    (a, b) => b.lastActivity.getTime() - a.lastActivity.getTime()
+  );
+
+  setCached('projects', projects);
+  return projects;
+}
+
+export function getProjectSessions(
+  projectId: string,
+  claudeDir?: string
+): SessionInfo[] {
+  const sessions = getSessions(claudeDir);
+  return sessions.filter((s) => s.projectPath === projectId);
+}
+
+export function getDashboardStats(claudeDir?: string): DashboardStats {
+  const cached = getCached<DashboardStats>('stats');
+  if (cached) return cached;
+
+  const sessions = getSessions(claudeDir);
+  const projects = getProjects(claudeDir);
+
+  let totalCost = 0;
+  let totalInputTokens = 0;
+  let totalOutputTokens = 0;
+  let totalMessages = 0;
+  let totalToolCalls = 0;
+
+  const modelMap = new Map<string, ModelUsage>();
+  const dailyMap = new Map<string, DailyUsage>();
+  const hourMap = new Map<number, PeakHour>();
+
+  // Initialize hours
+  for (let h = 0; h < 24; h++) {
+    hourMap.set(h, { hour: h, messages: 0, sessions: 0 });
+  }
+
+  for (const session of sessions) {
+    totalCost += session.cost;
+    totalInputTokens += session.inputTokens;
+    totalOutputTokens += session.outputTokens;
+    totalMessages += session.messageCount;
+    totalToolCalls += session.toolCallCount;
+
+    const dateKey = toLocalDateStr(session.startTime);
+    if (!dailyMap.has(dateKey)) {
+      dailyMap.set(dateKey, {
+        date: dateKey,
+        cost: 0,
+        inputTokens: 0,
+        outputTokens: 0,
+        messages: 0,
+        sessions: 0,
+        toolCalls: 0,
+        modelCosts: {},
+      });
+    }
+    const daily = dailyMap.get(dateKey)!;
+    daily.cost += session.cost;
+    daily.inputTokens += session.inputTokens;
+    daily.outputTokens += session.outputTokens;
+    daily.messages += session.messageCount;
+    daily.sessions++;
+    daily.toolCalls += session.toolCallCount;
+
+    // Peak hours
+    const hour = session.startTime.getHours();
+    const hourEntry = hourMap.get(hour)!;
+    hourEntry.messages += session.messageCount;
+    hourEntry.sessions++;
+
+    // Initialize model entries from session
+    for (const model of session.models) {
+      if (!modelMap.has(model)) {
+        modelMap.set(model, {
+          model,
+          displayName: getModelShortName(model),
+          inputTokens: 0,
+          outputTokens: 0,
+          totalTokens: 0,
+          cost: 0,
+          messageCount: 0,
+          color: getModelColor(model),
+        });
+      }
+    }
+  }
+
+  // Deep parse for accurate per-model token+cost stats
+  const projectsDir = path.join(claudeDir ?? getClaudeDir(), 'projects');
+  const rawSessions = getSessionsFromDir(projectsDir);
+
+  for (const rawSession of rawSessions) {
+    for (const msg of rawSession.messages) {
+      const m = msg as AnyMessage;
+      if (m.type !== 'assistant') continue;
+
+      const model: string | undefined = m.message?.model ?? m.model;
+      if (!model) continue;
+
+      const usage = m.message?.usage ?? m.usage;
+      let msgCost = 0;
+      if (typeof m.costUSD === 'number' && m.costUSD > 0) {
+        msgCost = m.costUSD as number;
+      } else if (usage) {
+        msgCost = calcCostFromUsage(model, usage);
+      }
+
+      if (!modelMap.has(model)) {
+        modelMap.set(model, {
+          model,
+          displayName: getModelShortName(model),
+          inputTokens: 0,
+          outputTokens: 0,
+          totalTokens: 0,
+          cost: 0,
+          messageCount: 0,
+          color: getModelColor(model),
+        });
+      }
+      const entry = modelMap.get(model)!;
+      if (usage) {
+        const inp = (usage.input_tokens as number) || 0;
+        const out = (usage.output_tokens as number) || 0;
+        entry.inputTokens += inp;
+        entry.outputTokens += out;
+        entry.totalTokens += inp + out;
+      }
+      entry.cost += msgCost;
+      entry.messageCount++;
+
+      // Update daily model costs
+      if (m.timestamp) {
+        const dateKey = toLocalDateStr(new Date(m.timestamp as string));
+        const dailyEntry = dailyMap.get(dateKey);
+        if (dailyEntry) {
+          dailyEntry.modelCosts[model] =
+            (dailyEntry.modelCosts[model] ?? 0) + msgCost;
+          // Also update daily total cost with more accurate per-message cost
+        }
+      }
+    }
+  }
+
+  // Activity data (for heatmap) — use message count per day
+  const activityMap = new Map<string, number>();
+  for (const session of sessions) {
+    const dateKey = toLocalDateStr(session.startTime);
+    activityMap.set(dateKey, (activityMap.get(dateKey) ?? 0) + session.messageCount);
+  }
+
+  // Use model-level cost as source of truth for total cost (more accurate)
+  const modelTotalCost = Array.from(modelMap.values()).reduce((sum, m) => sum + m.cost, 0);
+  const finalTotalCost = modelTotalCost > 0 ? modelTotalCost : totalCost;
+
+  const stats: DashboardStats = {
+    totalCost: finalTotalCost,
+    totalTokens: totalInputTokens + totalOutputTokens,
+    inputTokens: totalInputTokens,
+    outputTokens: totalOutputTokens,
+    totalSessions: sessions.length,
+    totalProjects: projects.length,
+    totalMessages,
+    totalToolCalls,
+    modelBreakdown: Array.from(modelMap.values())
+      .filter((m) => m.messageCount > 0 && m.model !== '<synthetic>')
+      .sort((a, b) => b.cost - a.cost),
+    dailyUsage: Array.from(dailyMap.values()).sort((a, b) =>
+      a.date.localeCompare(b.date)
+    ),
+    peakHours: Array.from(hourMap.values()),
+    recentSessions: sessions.slice(0, 10),
+    activityData: Array.from(activityMap.entries()).map(([date, count]) => ({
+      date,
+      count,
+    })),
+  };
+
+  setCached('stats', stats);
+  return stats;
+}
+
+export function searchSessions(
+  query: string,
+  claudeDir?: string
+): SessionInfo[] {
+  const sessions = getSessions(claudeDir);
+  if (!query.trim()) return sessions;
+
+  const q = query.toLowerCase();
+  return sessions.filter(
+    (s) =>
+      s.projectName.toLowerCase().includes(q) ||
+      s.projectPath.toLowerCase().includes(q) ||
+      s.id.toLowerCase().includes(q)
+  );
+}

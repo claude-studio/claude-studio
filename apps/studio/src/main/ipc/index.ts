@@ -1,0 +1,11 @@
+import { registerStatsHandlers } from './stats.ipc';
+import { registerProjectHandlers } from './projects.ipc';
+import { registerSessionHandlers } from './sessions.ipc';
+import { registerDataSourceHandlers } from './data-source.ipc';
+
+export function registerAllIpcHandlers(): void {
+  registerStatsHandlers();
+  registerProjectHandlers();
+  registerSessionHandlers();
+  registerDataSourceHandlers();
+}

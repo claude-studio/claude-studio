@@ -1,0 +1,43 @@
+{
+  "name": "@repo/studio",
+  "version": "0.0.1",
+  "description": "Claude Code usage dashboard desktop app",
+  "author": "Claude Studio",
+  "private": true,
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p src/renderer/tsconfig.json",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@repo/shared": "workspace:*",
+    "@repo/ui": "workspace:*",
+    "@tanstack/react-router": "catalog:",
+    "@tanstack/react-query": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "@fontsource/geist-sans": "catalog:",
+    "@fontsource/geist-mono": "catalog:",
+    "lucide-react": "catalog:"
+  },
+  "devDependencies": {
+    "electron": "catalog:",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@tanstack/router-plugin": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "catalog:",
+    "eslint": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "electron-vite": "catalog:",
+    "electron-builder": "catalog:"
+  }
+}
