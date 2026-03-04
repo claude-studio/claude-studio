@@ -25,6 +25,9 @@ export { ModelBreakdown } from './charts/model-breakdown';
 export { ActivityHeatmap } from './charts/activity-heatmap';
 export { PeakHours } from './charts/peak-hours';
 export { CostChart } from './charts/cost-chart';
+export { CacheStatsCard } from './charts/cache-stats';
+export { ToolUsageChart } from './charts/tool-usage';
+export { ConversationStatsCard } from './charts/conversation-stats';
 
 // Hooks / Provider
 export { DataProviderWrapper, useStats, useProjects, useSessions, useSessionDetail, useProjectSessions } from './hooks/use-data';
