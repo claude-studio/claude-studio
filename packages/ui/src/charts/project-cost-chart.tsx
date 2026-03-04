@@ -5,6 +5,7 @@ import { formatCost } from '@repo/shared';
 
 interface ProjectCostItem {
   name: string;
+  fullName?: string;
   cost: number;
 }
 
@@ -42,7 +43,10 @@ export function ProjectCostChart({ data }: ProjectCostChartProps) {
             fontSize: '12px',
             color: 'var(--card-foreground)',
           }}
-          formatter={(v: number) => [formatCost(v), '비용']}
+          formatter={(v: number, _name: string, props: { payload?: ProjectCostItem }) => [
+            formatCost(v),
+            props.payload?.fullName ?? props.payload?.name ?? '비용',
+          ]}
         />
         <Bar dataKey="cost" fill="var(--chart-1)" radius={[0, 4, 4, 0]} />
       </BarChart>

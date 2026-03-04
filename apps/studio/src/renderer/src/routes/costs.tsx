@@ -115,7 +115,11 @@ function CostsPage() {
   const topProjects = [...projects]
     .sort((a, b) => b.totalCost - a.totalCost)
     .slice(0, 10)
-    .map(p => ({ name: p.name.length > 16 ? p.name.slice(0, 16) + '…' : p.name, cost: p.totalCost }));
+    .map(p => ({
+      name: p.name.length > 16 ? p.name.slice(0, 16) + '…' : p.name,
+      fullName: p.name,
+      cost: p.totalCost,
+    }));
 
   return (
     <div className="space-y-6">

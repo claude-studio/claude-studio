@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useProjects, Card, CardContent, Badge } from '@repo/ui';
-import { formatCost, formatTokens, formatNumber, timeAgo } from '@repo/shared';
+import { formatCost, formatTokens, formatNumber, timeAgo, getModelShortName } from '@repo/shared';
 
 export const Route = createFileRoute('/projects/')({
   component: ProjectsPage,
@@ -35,7 +35,7 @@ function ProjectsPage() {
                   <p className="font-medium">{project.name}</p>
                   {project.models.slice(0, 3).map((model) => (
                     <Badge key={model} variant="secondary" className="text-xs">
-                      {model}
+                      {getModelShortName(model)}
                     </Badge>
                   ))}
                 </div>
