@@ -12,6 +12,7 @@ export type {
   CacheStats,
   ToolUsageItem,
   ConversationStats,
+  ClaudeLifetime,
 } from './shared/types/index';
 
 export {
@@ -27,6 +28,7 @@ export {
   CacheStatsSchema,
   ToolUsageItemSchema,
   ConversationStatsSchema,
+  ClaudeLifetimeSchema,
 } from './shared/types/index';
 
 export { IpcChannel } from './shared/types/ipc';
@@ -70,6 +72,7 @@ export {
   getProjects,
   getProjectSessions,
   getDashboardStats,
+  getClaudeLifetime,
   searchSessions,
   clearCache,
   decodeProjectPath,

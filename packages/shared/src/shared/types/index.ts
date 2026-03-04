@@ -146,6 +146,17 @@ export const ConversationStatsSchema = z.object({
 
 export type ConversationStats = z.infer<typeof ConversationStatsSchema>;
 
+export const ClaudeLifetimeSchema = z.object({
+  firstSessionDate: z.coerce.date().nullable(),
+  daysActive: z.number(),           // D+N (days since first session)
+  longestSessionDurationMs: z.number(),
+  longestSessionMessageCount: z.number(),
+  totalWebSearchRequests: z.number(),
+  totalSpeculationTimeSavedMs: z.number(),
+});
+
+export type ClaudeLifetime = z.infer<typeof ClaudeLifetimeSchema>;
+
 export const DashboardStatsSchema = z.object({
   totalCost: z.number(),
   totalTokens: z.number(),
@@ -168,6 +179,7 @@ export const DashboardStatsSchema = z.object({
   cacheStats: CacheStatsSchema,
   toolUsage: z.array(ToolUsageItemSchema),
   conversationStats: ConversationStatsSchema,
+  lifetime: ClaudeLifetimeSchema,
 });
 
 export type DashboardStats = z.infer<typeof DashboardStatsSchema>;

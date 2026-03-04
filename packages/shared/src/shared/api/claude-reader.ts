@@ -13,6 +13,7 @@ import type {
   CacheStats,
   ToolUsageItem,
   ConversationStats,
+  ClaudeLifetime,
 } from '../types/index';
 import {
   calculateCost,
@@ -594,6 +595,8 @@ export function getDashboardStats(claudeDir?: string): DashboardStats {
   const modelTotalCost = Array.from(modelMap.values()).reduce((sum, m) => sum + m.cost, 0);
   const finalTotalCost = modelTotalCost > 0 ? modelTotalCost : totalCost;
 
+  const lifetime = getClaudeLifetime(claudeDir);
+
   const stats: DashboardStats = {
     totalCost: finalTotalCost,
     totalTokens: totalInputTokens + totalOutputTokens,
@@ -618,10 +621,57 @@ export function getDashboardStats(claudeDir?: string): DashboardStats {
     cacheStats,
     toolUsage,
     conversationStats,
+    lifetime,
   };
 
   setCached('stats', stats);
   return stats;
+}
+
+// --- stats-cache.json reader ---
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function readStatsCache(claudeDir?: string): Record<string, any> | null {
+  const filePath = path.join(claudeDir ?? getClaudeDir(), 'stats-cache.json');
+  try {
+    const raw = fs.readFileSync(filePath, 'utf-8');
+    return JSON.parse(raw) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+export function getClaudeLifetime(claudeDir?: string): ClaudeLifetime {
+  const sc = readStatsCache(claudeDir);
+
+  const firstSessionDate = sc?.firstSessionDate
+    ? new Date(sc.firstSessionDate as string)
+    : null;
+  const daysActive = firstSessionDate
+    ? Math.floor((Date.now() - firstSessionDate.getTime()) / (1000 * 60 * 60 * 24))
+    : 0;
+
+  const longest = sc?.longestSession as Record<string, unknown> | undefined;
+  const longestSessionDurationMs = typeof longest?.duration === 'number' ? longest.duration : 0;
+  const longestSessionMessageCount = typeof longest?.messageCount === 'number' ? longest.messageCount : 0;
+
+  const modelUsage = sc?.modelUsage as Record<string, Record<string, unknown>> | undefined;
+  const totalWebSearchRequests = modelUsage
+    ? Object.values(modelUsage).reduce((sum, m) => sum + (typeof m.webSearchRequests === 'number' ? m.webSearchRequests : 0), 0)
+    : 0;
+
+  const totalSpeculationTimeSavedMs = typeof sc?.totalSpeculationTimeSavedMs === 'number'
+    ? sc.totalSpeculationTimeSavedMs
+    : 0;
+
+  return {
+    firstSessionDate,
+    daysActive,
+    longestSessionDurationMs,
+    longestSessionMessageCount,
+    totalWebSearchRequests,
+    totalSpeculationTimeSavedMs,
+  };
 }
 
 export function searchSessions(

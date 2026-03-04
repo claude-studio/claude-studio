@@ -9,6 +9,7 @@ import {
   CacheStatsCard,
   ToolUsageChart,
   ConversationStatsCard,
+  ClaudeLifetimeCard,
   Card,
   CardContent,
   CardHeader,
@@ -142,6 +143,15 @@ function OverviewPage() {
         </CardHeader>
         <CardContent>
           <ConversationStatsCard data={stats.conversationStats} />
+        </CardContent>
+      </Card>
+
+      <Card className="border-border/50">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Claude Code와 함께한 시간</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ClaudeLifetimeCard data={stats.lifetime} />
         </CardContent>
       </Card>
 
