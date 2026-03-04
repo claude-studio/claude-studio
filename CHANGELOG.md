@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.3.0](https://github.com/FRONT-JB/claude-studio/compare/claude-studio-v1.2.0...claude-studio-v1.3.0) (2026-03-04)
+
+
+### Features
+
+* 세션 목록 검색, 오류/서브에이전트 필터 동기화, 에러 상태 처리 ([ffcebb4](https://github.com/FRONT-JB/claude-studio/commit/ffcebb4466769c4afbbd2e8bd6b4e74f3ff6221b))
+
+
+### Bug Fixes
+
+* 모델 뱃지 short name 표시, 프로젝트 비용 툴팁 전체 이름 노출 ([54da216](https://github.com/FRONT-JB/claude-studio/commit/54da216577e99e3ff919ebda51d30287db0e6045))
+* 캐시 절약 비용을 모델 가중평균 단가로 계산 ([482c4ba](https://github.com/FRONT-JB/claude-studio/commit/482c4ba19061142e08da306b9bdc7ad95ef42989))
+
+
+### Performance Improvements
+
+* 중복 디스크 스캔 제거 및 페이지 전환 속도 개선 ([9efa49b](https://github.com/FRONT-JB/claude-studio/commit/9efa49b2a4ac05abd6a4e671f227d7ba4dd52f91))
+
 ## [1.2.0](https://github.com/FRONT-JB/claude-studio/compare/claude-studio-v1.1.0...claude-studio-v1.2.0) (2026-03-04)
 
 
