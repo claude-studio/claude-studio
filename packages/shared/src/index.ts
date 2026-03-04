@@ -22,21 +22,6 @@ export type {
   InboxMessage,
 } from './shared/types/index';
 
-export {
-  TokenUsageSchema,
-  ModelUsageSchema,
-  DailyUsageSchema,
-  PeakHourSchema,
-  SessionInfoSchema,
-  MessageSchema,
-  SessionDetailSchema,
-  ProjectInfoSchema,
-  DashboardStatsSchema,
-  CacheStatsSchema,
-  ToolUsageItemSchema,
-  ConversationStatsSchema,
-  ClaudeLifetimeSchema,
-} from './shared/types/index';
 
 export { IpcChannel } from './shared/types/ipc';
 export type { DataSource, DataProvider, DataSourceType } from './shared/types/data-source';

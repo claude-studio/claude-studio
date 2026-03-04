@@ -24,29 +24,8 @@ export {
 } from './components/ui/dialog';
 export { Input } from './components/ui/input';
 export { ScrollArea, ScrollBar } from './components/ui/scroll-area';
-export { Separator } from './components/ui/separator';
-export {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-  TableCaption,
-} from './components/ui/table';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './components/ui/tooltip';
-export { Progress } from './components/ui/progress';
-export {
-  Select,
-  SelectGroup,
-  SelectValue,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectLabel,
-  SelectSeparator,
-} from './components/ui/select';
 
 // Layout
 export { Sidebar } from './layout/sidebar';

@@ -4,25 +4,33 @@ import { homedir } from 'os';
 import { BrowserWindow } from 'electron';
 import { clearCache } from '@repo/shared';
 
-let watcher: FSWatcher | null = null;
+let watchers: FSWatcher[] = [];
 
-export function startFileWatcher(): void {
-  const claudeDir = join(homedir(), '.claude', 'projects');
-
-  try {
-    watcher = watch(claudeDir, { recursive: true }, (_eventType, _filename) => {
-      clearCache();
-      const windows = BrowserWindow.getAllWindows();
-      for (const win of windows) {
-        win.webContents.send('data-changed');
-      }
-    });
-  } catch {
-    console.log('File watcher: could not watch', claudeDir);
+function broadcast(source: 'projects' | 'teams'): void {
+  clearCache(source);
+  const windows = BrowserWindow.getAllWindows();
+  for (const win of windows) {
+    win.webContents.send('data-changed', source);
   }
 }
 
+function watchDir(dirPath: string, source: 'projects' | 'teams'): void {
+  try {
+    const w = watch(dirPath, { recursive: true }, () => broadcast(source));
+    watchers.push(w);
+  } catch {
+    console.log('File watcher: could not watch', dirPath);
+  }
+}
+
+export function startFileWatcher(): void {
+  const base = join(homedir(), '.claude');
+  watchDir(join(base, 'projects'), 'projects');
+  watchDir(join(base, 'teams'), 'teams');
+  watchDir(join(base, 'tasks'), 'teams');
+}
+
 export function stopFileWatcher(): void {
-  watcher?.close();
-  watcher = null;
+  for (const w of watchers) w.close();
+  watchers = [];
 }

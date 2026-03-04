@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { useProjectSessions } from '../hooks/use-data';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { formatCost, formatTokens, formatNumber, formatDuration } from '@repo/shared';
+import { formatCost, formatTokens, formatNumber, formatDuration, getModelShortName } from '@repo/shared';
 import type { SessionInfo } from '@repo/shared';
 import { PageSpinner } from './page-spinner';
 
@@ -107,13 +107,7 @@ export function ProjectDetailPage({ id }: ProjectDetailPageProps) {
                                   variant="secondary"
                                   className="text-[10px] px-1.5 py-0"
                                 >
-                                  {m.includes('opus')
-                                    ? 'Opus'
-                                    : m.includes('sonnet')
-                                      ? 'Sonnet'
-                                      : m.includes('haiku')
-                                        ? 'Haiku'
-                                        : m}
+                                  {getModelShortName(m)}
                                 </Badge>
                               ))}
                             </div>

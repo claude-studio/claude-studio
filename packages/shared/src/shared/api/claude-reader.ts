@@ -61,8 +61,18 @@ function setCached<T>(key: string, data: T): void {
   cache.set(key, { data, timestamp: Date.now() });
 }
 
-export function clearCache(): void {
-  cache.clear();
+export function clearCache(scope?: 'projects' | 'teams'): void {
+  if (!scope) {
+    cache.clear();
+    return;
+  }
+  if (scope === 'projects') {
+    for (const key of cache.keys()) {
+      if (key !== 'teams') cache.delete(key);
+    }
+  } else if (scope === 'teams') {
+    cache.delete('teams');
+  }
 }
 
 // --- Path helpers ---
