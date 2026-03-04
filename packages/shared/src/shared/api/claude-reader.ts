@@ -477,7 +477,7 @@ export function getDashboardStats(claudeDir?: string): DashboardStats {
       if (m.type !== 'assistant') continue;
 
       const model: string | undefined = m.message?.model ?? m.model;
-      if (!model) continue;
+      if (!model || model === '<synthetic>') continue;
 
       const usage = m.message?.usage ?? m.usage;
       let msgCost = 0;

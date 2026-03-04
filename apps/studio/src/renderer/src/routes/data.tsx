@@ -33,9 +33,9 @@ function DataPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Data Management</h1>
+        <h1 className="text-2xl font-semibold">데이터 관리</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Export and manage your usage data
+          사용량 데이터를 내보내고 관리합니다
         </p>
       </div>
 
@@ -44,12 +44,12 @@ function DataPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <Database className="h-4 w-4" />
-              Data Source
+              데이터 소스
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              Data is read directly from ~/.claude/ on your local machine.
+              로컬 머신의 ~/.claude/ 디렉토리에서 직접 데이터를 읽어옵니다.
             </p>
           </CardContent>
         </Card>
@@ -58,16 +58,16 @@ function DataPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <Download className="h-4 w-4" />
-              Export Data
+              데이터 내보내기
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              Export all your usage data as a JSON file.
+              전체 사용량 데이터를 JSON 파일로 내보냅니다.
             </p>
             <Button onClick={handleExport} variant="outline" size="sm">
               <Download className="h-4 w-4 mr-2" />
-              Export JSON
+              JSON 내보내기
             </Button>
           </CardContent>
         </Card>
@@ -76,16 +76,16 @@ function DataPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <Upload className="h-4 w-4" />
-              Import Data
+              데이터 가져오기
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              Import previously exported data.
+              이전에 내보낸 데이터를 가져옵니다.
             </p>
             <Button variant="outline" size="sm" disabled>
               <Upload className="h-4 w-4 mr-2" />
-              Import JSON
+              JSON 가져오기
             </Button>
           </CardContent>
         </Card>
@@ -94,16 +94,16 @@ function DataPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <Trash2 className="h-4 w-4" />
-              Clear Imported Data
+              가져온 데이터 초기화
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              Reset to local data source and clear any imported data.
+              로컬 데이터 소스로 초기화하고 가져온 데이터를 삭제합니다.
             </p>
             <Button onClick={handleClearImport} variant="outline" size="sm">
               <Trash2 className="h-4 w-4 mr-2" />
-              Clear Import
+              데이터 초기화
             </Button>
           </CardContent>
         </Card>
