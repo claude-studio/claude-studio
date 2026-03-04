@@ -21,6 +21,12 @@ jobs:
           node-version: 22
           cache: pnpm
 
+      - name: Set version from tag
+        run: |
+          VERSION=${GITHUB_REF_NAME#claude-studio-v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('apps/studio/package.json')); p.version='$VERSION'; fs.writeFileSync('apps/studio/package.json', JSON.stringify(p, null, 2)+'\n');"
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -43,6 +49,13 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+
+      - name: Set version from tag
+        shell: bash
+        run: |
+          VERSION=${GITHUB_REF_NAME#claude-studio-v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('apps/studio/package.json')); p.version='$VERSION'; fs.writeFileSync('apps/studio/package.json', JSON.stringify(p, null, 2)+'\n');"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
