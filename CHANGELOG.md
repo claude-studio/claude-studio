@@ -1,5 +1,38 @@
 # Changelog
 
+## [1.2.0](https://github.com/FRONT-JB/claude-studio/compare/claude-studio-v1.1.0...claude-studio-v1.2.0) (2026-03-04)
+
+
+### Features
+
+* cacheStats, toolUsage, conversationStats 타입 추가 ([736c46f](https://github.com/FRONT-JB/claude-studio/commit/736c46fcaad76cfa74304ca1ec3bd81dc0466db4))
+* stats-cache.json 기반 claude code 사용 기간 통계 추가 ([19d40bf](https://github.com/FRONT-JB/claude-studio/commit/19d40bfd6ae8fb25294726ce50862d0bae1da39b))
+* stats-cache.json 기반 사용 시작일 및 D+N 표시 추가 ([8ce60d2](https://github.com/FRONT-JB/claude-studio/commit/8ce60d2e6dd0d627703100c9a238240fe1aada2f))
+* 개요 페이지에 모델별 일별 비용 차트 추가 ([546a9cc](https://github.com/FRONT-JB/claude-studio/commit/546a9cc054053b6130f784aee2a6c47a2bbd7c3e))
+* 개요 페이지에 캐시 절약, 툴 사용량, 대화 패턴 섹션 추가 ([27f19d5](https://github.com/FRONT-JB/claude-studio/commit/27f19d547d38b55eb078f1e3870c2fd893e32212))
+* 비용 페이지에 월별 비교 및 프로젝트별 비용 순위 추가 ([e83d9ba](https://github.com/FRONT-JB/claude-studio/commit/e83d9bada09810549a82bce7c4def2100ad85d9a))
+* 사이드바 버전 v1.1.0 업데이트 및 GitHub 링크 추가 ([ea86390](https://github.com/FRONT-JB/claude-studio/commit/ea86390078631d908c6478cd29f2e9adc06d36a8))
+* 세션 상세에 API 오류 및 서브에이전트 메시지 구분 추가 ([a0b6e97](https://github.com/FRONT-JB/claude-studio/commit/a0b6e9739e64d15aa67ba8ee5ba6533880b81039))
+* 스킬 페이지 및 Dialog 추가, 설정 페이지 구성 ([f55be1d](https://github.com/FRONT-JB/claude-studio/commit/f55be1da0a8acb1dd948d27c3d993694ab478159))
+* 스킬 페이지 및 Dialog 추가, 설정 페이지 구성 ([bd13990](https://github.com/FRONT-JB/claude-studio/commit/bd13990a749cb6ebd74e90232b35e62a948fc34a))
+* 캐시 절약 현황 필드에 툴팁 추가 ([e1bdbcb](https://github.com/FRONT-JB/claude-studio/commit/e1bdbcb8c9fbb932fbc3866514467f3d73b153a5))
+* 캐시 절약, 툴 사용량, 대화 패턴 ui 컴포넌트 추가 ([3b8d0f9](https://github.com/FRONT-JB/claude-studio/commit/3b8d0f998ab4f9fd87c895f35041ef72e7bfb209))
+* 캐시 토큰, 툴 사용량, 대화 패턴 데이터 수집 추가 ([3362efe](https://github.com/FRONT-JB/claude-studio/commit/3362efe53d2c06e97e9696c49662de72d018769a))
+* 프로젝트 상세 날짜별 세션 타임라인 뷰 추가 ([321e71a](https://github.com/FRONT-JB/claude-studio/commit/321e71a8e3e21d21062834a1f6f44d80ae7e8602))
+
+
+### Bug Fixes
+
+* 대화 패턴 라벨 줄이기 및 툴 사용 순위 레이아웃 개선 ([a8771fa](https://github.com/FRONT-JB/claude-studio/commit/a8771fa5f0c366211862de96fad2f2384d487ea3))
+* 데이터 페이지 한글화 및 synthetic 모델 필터링 강화 ([52ec46d](https://github.com/FRONT-JB/claude-studio/commit/52ec46db401486cad2b0bb115626667747218103))
+* 신규 섹션 레이아웃 변경 - 캐시/툴 2열, 대화 패턴 전체 너비 ([66df4a6](https://github.com/FRONT-JB/claude-studio/commit/66df4a6a79d4849f8605cb42d463dd62ed2fb9b9))
+* 프로젝트명에 worktree, 서브디렉토리 suffix 표시 ([e6506ad](https://github.com/FRONT-JB/claude-studio/commit/e6506add43b54021800692511defa04eb9beb9f7))
+
+
+### Documentation
+
+* update README with latest features ([d378548](https://github.com/FRONT-JB/claude-studio/commit/d378548b8dd4968f41de14ca36433b9f164bd7f4))
+
 ## [1.1.0](https://github.com/FRONT-JB/claude-studio/compare/claude-studio-v1.0.0...claude-studio-v1.1.0) (2026-03-04)
 
 
