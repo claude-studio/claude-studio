@@ -6,6 +6,9 @@ import {
   ModelBreakdown,
   ActivityHeatmap,
   PeakHours,
+  CacheStatsCard,
+  ToolUsageChart,
+  ConversationStatsCard,
   Card,
   CardContent,
   CardHeader,
@@ -110,6 +113,33 @@ function OverviewPage() {
           </CardHeader>
           <CardContent>
             <PeakHours data={stats.peakHours} />
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <Card className="border-border/50">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">캐시 절약 현황</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CacheStatsCard data={stats.cacheStats} />
+          </CardContent>
+        </Card>
+        <Card className="border-border/50">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">툴 사용 순위</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ToolUsageChart data={stats.toolUsage} />
+          </CardContent>
+        </Card>
+        <Card className="border-border/50">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">대화 패턴 분석</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ConversationStatsCard data={stats.conversationStats} />
           </CardContent>
         </Card>
       </div>
