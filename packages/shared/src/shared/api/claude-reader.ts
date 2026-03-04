@@ -10,6 +10,9 @@ import type {
   ModelUsage,
   ProjectInfo,
   Message,
+  CacheStats,
+  ToolUsageItem,
+  ConversationStats,
 } from '../types/index';
 import {
   calculateCost,
@@ -467,9 +470,13 @@ export function getDashboardStats(claudeDir?: string): DashboardStats {
     }
   }
 
-  // Deep parse for accurate per-model token+cost stats
+  // Deep parse for accurate per-model token+cost stats + cache + tool usage
   const projectsDir = path.join(claudeDir ?? getClaudeDir(), 'projects');
   const rawSessions = getSessionsFromDir(projectsDir);
+
+  let totalCacheCreation = 0;
+  let totalCacheRead = 0;
+  const toolCountMap = new Map<string, number>();
 
   for (const rawSession of rawSessions) {
     for (const msg of rawSession.messages) {
@@ -506,9 +513,22 @@ export function getDashboardStats(claudeDir?: string): DashboardStats {
         entry.inputTokens += inp;
         entry.outputTokens += out;
         entry.totalTokens += inp + out;
+        totalCacheCreation += (usage.cache_creation_input_tokens as number) || 0;
+        totalCacheRead += (usage.cache_read_input_tokens as number) || 0;
       }
       entry.cost += msgCost;
       entry.messageCount++;
+
+      // Tool usage
+      const content = m.message?.content ?? m.content;
+      if (Array.isArray(content)) {
+        for (const block of content as AnyMessage[]) {
+          if (block?.type === 'tool_use' && block?.name) {
+            const toolName = block.name as string;
+            toolCountMap.set(toolName, (toolCountMap.get(toolName) ?? 0) + 1);
+          }
+        }
+      }
 
       // Update daily model costs
       if (m.timestamp) {
@@ -517,11 +537,51 @@ export function getDashboardStats(claudeDir?: string): DashboardStats {
         if (dailyEntry) {
           dailyEntry.modelCosts[model] =
             (dailyEntry.modelCosts[model] ?? 0) + msgCost;
-          // Also update daily total cost with more accurate per-message cost
         }
       }
     }
   }
+
+  // Cache stats
+  const totalCacheTokens = totalCacheCreation + totalCacheRead;
+  const cacheHitRate = totalCacheTokens > 0
+    ? Math.round((totalCacheRead / totalCacheTokens) * 100)
+    : 0;
+  // Cache read is charged at ~10% — savings = 90% of what full input would cost
+  const avgInputPricePerMillion = 3; // Sonnet default
+  const estimatedSavingsUsd = (totalCacheRead * avgInputPricePerMillion * 0.9) / 1_000_000;
+  const cacheStats: CacheStats = {
+    totalCacheCreationTokens: totalCacheCreation,
+    totalCacheReadTokens: totalCacheRead,
+    cacheHitRate,
+    estimatedSavingsUsd,
+  };
+
+  // Tool usage ranking
+  const toolUsage: ToolUsageItem[] = Array.from(toolCountMap.entries())
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+
+  // Conversation stats
+  const sessionsWithDuration = sessions.filter((s) => s.duration > 0);
+  const avgSessionDurationMs = sessionsWithDuration.length > 0
+    ? sessionsWithDuration.reduce((sum, s) => sum + s.duration, 0) / sessionsWithDuration.length
+    : 0;
+  const avgMessagesPerSession = sessions.length > 0
+    ? totalMessages / sessions.length
+    : 0;
+  const TEN_MIN = 10 * 60 * 1000;
+  const ONE_HOUR = 60 * 60 * 1000;
+  const conversationStats: ConversationStats = {
+    avgSessionDurationMs,
+    avgMessagesPerSession,
+    avgInputTokensPerMessage: totalMessages > 0 ? totalInputTokens / totalMessages : 0,
+    avgOutputTokensPerMessage: totalMessages > 0 ? totalOutputTokens / totalMessages : 0,
+    shortSessions: sessions.filter((s) => s.duration < TEN_MIN).length,
+    mediumSessions: sessions.filter((s) => s.duration >= TEN_MIN && s.duration < ONE_HOUR).length,
+    longSessions: sessions.filter((s) => s.duration >= ONE_HOUR).length,
+  };
 
   // Activity data (for heatmap) — use message count per day
   const activityMap = new Map<string, number>();
@@ -555,6 +615,9 @@ export function getDashboardStats(claudeDir?: string): DashboardStats {
       date,
       count,
     })),
+    cacheStats,
+    toolUsage,
+    conversationStats,
   };
 
   setCached('stats', stats);
