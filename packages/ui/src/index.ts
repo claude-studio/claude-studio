@@ -6,66 +6,66 @@ export { Badge, badgeVariants } from './components/ui/badge';
 export { Button, buttonVariants } from './components/ui/button';
 export {
   Card,
-  CardHeader,
-  CardFooter,
-  CardTitle,
-  CardDescription,
   CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from './components/ui/card';
 export {
   Dialog,
-  DialogTrigger,
-  DialogOverlay,
   DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
   DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogTitle,
+  DialogTrigger,
 } from './components/ui/dialog';
 export { Input } from './components/ui/input';
 export { ScrollArea, ScrollBar } from './components/ui/scroll-area';
-export { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './components/ui/tooltip';
+export { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
+export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './components/ui/tooltip';
 
 // Layout
 export { Sidebar } from './layout/sidebar';
 export { StatCard } from './layout/stat-card';
 
 // Charts
-export { UsageOverTime } from './charts/usage-over-time';
-export { ModelBreakdown } from './charts/model-breakdown';
 export { ActivityHeatmap } from './charts/activity-heatmap';
-export { PeakHours } from './charts/peak-hours';
-export { CostChart } from './charts/cost-chart';
 export { CacheStatsCard } from './charts/cache-stats';
-export { ToolUsageChart } from './charts/tool-usage';
-export { ConversationStatsCard } from './charts/conversation-stats';
 export { ClaudeLifetimeCard } from './charts/claude-lifetime';
+export { ConversationStatsCard } from './charts/conversation-stats';
+export { CostChart } from './charts/cost-chart';
+export { ModelBreakdown } from './charts/model-breakdown';
+export { PeakHours } from './charts/peak-hours';
 export { ProjectCostChart } from './charts/project-cost-chart';
+export { ToolUsageChart } from './charts/tool-usage';
+export { UsageOverTime } from './charts/usage-over-time';
 
 // Hooks / Provider
 export {
   DataProviderWrapper,
-  useStats,
-  useProjects,
-  useSessions,
-  useSessionDetail,
-  useProjectSessions,
   TeamsProviderWrapper,
+  useProjects,
+  useProjectSessions,
+  useSessionDetail,
+  useSessions,
+  useStats,
   useTeams,
 } from './hooks/use-data';
 
 // Pages
 export {
-  OverviewPage,
   CostsPage,
-  SessionsPage,
-  SessionDetailPage,
-  ProjectsPage,
-  ProjectDetailPage,
-  TeamsPage,
-  SkillsPage,
   DataPage,
+  OverviewPage,
+  ProjectDetailPage,
+  ProjectsPage,
+  SessionDetailPage,
+  SessionsPage,
+  SkillsPage,
+  TeamsPage,
 } from './pages/index';
 
 // CSS (consumers must import separately)

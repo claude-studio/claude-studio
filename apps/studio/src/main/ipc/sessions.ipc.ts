@@ -1,6 +1,8 @@
+import { getSessionDetail, getSessions, searchSessions } from '@repo/shared';
+
 import { ipcMain } from 'electron';
+
 import { IpcChannel } from './channels';
-import { getSessions, getSessionDetail, searchSessions } from '@repo/shared';
 
 export function registerSessionHandlers(): void {
   ipcMain.handle(IpcChannel.GetSessions, async (_event, limit?: number) => {

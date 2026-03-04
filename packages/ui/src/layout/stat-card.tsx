@@ -1,12 +1,13 @@
-import * as React from 'react';
-import { cn } from '../lib/utils';
+import { type ReactNode } from 'react';
+
 import { Card, CardContent } from '../components/ui/card';
+import { cn } from '../lib/utils';
 
 interface StatCardProps {
   title: string;
-  value: React.ReactNode;
+  value: ReactNode;
   description?: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   trend?: {
     value: number;
     label: string;

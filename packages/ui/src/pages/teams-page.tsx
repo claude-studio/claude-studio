@@ -1,17 +1,19 @@
-import * as React from 'react';
+import { useState } from 'react';
+
 import type { InboxMessage } from '@repo/shared';
-import { useTeams } from '../hooks/use-data';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
-import { ScrollArea } from '../components/ui/scroll-area';
+import { getModelShortName } from '@repo/shared';
+
 import {
   Accordion,
+  AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  AccordionContent,
 } from '../components/ui/accordion';
-import { getModelShortName } from '@repo/shared';
+import { Badge } from '../components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
+import { ScrollArea } from '../components/ui/scroll-area';
+import { useTeams } from '../hooks/use-data';
 import { PageSpinner } from './page-spinner';
 
 const STATUS_LABEL: Record<string, string> = {
@@ -131,7 +133,7 @@ function InboxDialog({
 
 export function TeamsPage() {
   const { data: teams, isLoading, isError, error } = useTeams();
-  const [selectedInbox, setSelectedInbox] = React.useState<{
+  const [selectedInbox, setSelectedInbox] = useState<{
     agentName: string;
     messages: InboxMessage[];
   } | null>(null);

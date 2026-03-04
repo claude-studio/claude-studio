@@ -1,6 +1,8 @@
-import { ipcMain } from 'electron';
-import { IpcChannel } from './channels';
 import { getClaudeSettings, getSkills, getTeams } from '@repo/shared';
+
+import { ipcMain } from 'electron';
+
+import { IpcChannel } from './channels';
 
 export function registerSettingsHandlers(): void {
   ipcMain.handle(IpcChannel.GetClaudeSettings, async () => {

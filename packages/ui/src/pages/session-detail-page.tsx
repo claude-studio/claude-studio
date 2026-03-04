@@ -1,11 +1,14 @@
-import * as React from 'react';
+import { useMemo, useState } from 'react';
+
+import { formatCost, formatDuration, formatNumber, formatTokens, timeAgo } from '@repo/shared';
 import { Link } from '@tanstack/react-router';
-import { useSessionDetail } from '../hooks/use-data';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
-import { ModelBreakdown } from '../charts/model-breakdown';
-import { formatCost, formatTokens, formatNumber, timeAgo, formatDuration } from '@repo/shared';
+
 import { AlertCircle } from 'lucide-react';
+
+import { ModelBreakdown } from '../charts/model-breakdown';
+import { Badge } from '../components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { useSessionDetail } from '../hooks/use-data';
 import { PageSpinner } from './page-spinner';
 
 interface SessionDetailPageProps {
@@ -14,10 +17,10 @@ interface SessionDetailPageProps {
 
 export function SessionDetailPage({ id }: SessionDetailPageProps) {
   const { data: session, isLoading, isError } = useSessionDetail(id);
-  const [hideErrors, setHideErrors] = React.useState(false);
-  const [hideSidechain, setHideSidechain] = React.useState(false);
+  const [hideErrors, setHideErrors] = useState(false);
+  const [hideSidechain, setHideSidechain] = useState(false);
 
-  const reversedMessages = React.useMemo(
+  const reversedMessages = useMemo(
     () => (session ? [...session.messages].reverse() : []),
     [session],
   );

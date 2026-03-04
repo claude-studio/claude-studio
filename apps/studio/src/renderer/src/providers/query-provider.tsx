@@ -1,6 +1,9 @@
 import * as React from 'react';
-import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
+
+import type { DataChangeSource } from '@repo/shared';
 import { DataProviderWrapper, TeamsProviderWrapper } from '@repo/ui';
+import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
+
 import { electronProvider } from './electron-provider';
 
 const queryClient = new QueryClient({
@@ -35,23 +38,41 @@ function prefetchCoreData() {
 
 prefetchCoreData();
 
-function debounce<T extends () => void>(fn: T, ms: number): T {
+function debounce<T extends (...args: Parameters<T>) => void>(
+  fn: T,
+  ms: number,
+): (...args: Parameters<T>) => void {
   let timer: ReturnType<typeof setTimeout> | null = null;
-  return (() => {
+  return (...args: Parameters<T>) => {
     if (timer) clearTimeout(timer);
-    timer = setTimeout(fn, ms);
-  }) as T;
+    timer = setTimeout(() => fn(...args), ms);
+  };
 }
+
+const SOURCE_QUERY_KEYS: Record<DataChangeSource, string[]> = {
+  projects: ['stats', 'projects', 'sessions'],
+  teams: ['teams'],
+};
 
 function DataChangedListener() {
   const qc = useQueryClient();
   React.useEffect(() => {
     if (!window.electronAPI?.onDataChanged) return;
-    // Debounce: avoid thundering herd when multiple files change at once
-    const invalidate = debounce(() => {
-      qc.invalidateQueries();
+
+    const invalidateProjects = debounce(() => {
+      for (const key of SOURCE_QUERY_KEYS.projects) {
+        qc.invalidateQueries({ queryKey: [key] });
+      }
     }, 2_000);
-    const unsub = window.electronAPI.onDataChanged(invalidate);
+
+    const invalidateTeams = debounce(() => {
+      qc.invalidateQueries({ queryKey: ['teams'] });
+    }, 500);
+
+    const unsub = window.electronAPI.onDataChanged((source) => {
+      if (source === 'teams') invalidateTeams();
+      else invalidateProjects();
+    });
     return unsub;
   }, [qc]);
   return null;

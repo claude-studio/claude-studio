@@ -1,18 +1,28 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import {
+  type ButtonHTMLAttributes,
+  createContext,
+  forwardRef,
+  type HTMLAttributes,
+  type ReactNode,
+  useContext,
+  useEffect,
+} from 'react';
+
 import { X } from 'lucide-react';
+import { createPortal } from 'react-dom';
+
 import { cn } from '../../lib/utils';
 
 interface DialogProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-const DialogContext = React.createContext<{ onClose: () => void }>({ onClose: () => {} });
+const DialogContext = createContext<{ onClose: () => void }>({ onClose: () => {} });
 
 function Dialog({ open, onOpenChange, children }: DialogProps) {
-  React.useEffect(() => {
+  useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onOpenChange?.(false);
@@ -29,13 +39,13 @@ function Dialog({ open, onOpenChange, children }: DialogProps) {
   );
 }
 
-function DialogTrigger({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+function DialogTrigger({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return <button {...props}>{children}</button>;
 }
 
-const DialogOverlay = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+const DialogOverlay = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
-    const { onClose } = React.useContext(DialogContext);
+    const { onClose } = useContext(DialogContext);
     return (
       <div
         ref={ref}
@@ -48,11 +58,11 @@ const DialogOverlay = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
 );
 DialogOverlay.displayName = 'DialogOverlay';
 
-const DialogContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+const DialogContent = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, children, ...props }, ref) => {
-    const { onClose } = React.useContext(DialogContext);
+    const { onClose } = useContext(DialogContext);
 
-    return ReactDOM.createPortal(
+    return createPortal(
       <div className="fixed inset-0 z-[200]">
         <DialogOverlay />
         <div
@@ -80,12 +90,12 @@ const DialogContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
 );
 DialogContent.displayName = 'DialogContent';
 
-const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+const DialogHeader = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div className={cn('flex flex-col space-y-1.5 text-center sm:text-left', className)} {...props} />
 );
 DialogHeader.displayName = 'DialogHeader';
 
-const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+const DialogFooter = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)}
     {...props}
@@ -93,7 +103,7 @@ const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivEleme
 );
 DialogFooter.displayName = 'DialogFooter';
 
-const DialogTitle = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+const DialogTitle = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
@@ -104,7 +114,7 @@ const DialogTitle = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
 );
 DialogTitle.displayName = 'DialogTitle';
 
-const DialogDescription = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+const DialogDescription = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div ref={ref} className={cn('text-sm text-muted-foreground', className)} {...props} />
   ),
@@ -113,11 +123,11 @@ DialogDescription.displayName = 'DialogDescription';
 
 export {
   Dialog,
-  DialogTrigger,
-  DialogOverlay,
   DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
   DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogTitle,
+  DialogTrigger,
 };

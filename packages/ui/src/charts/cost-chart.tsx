@@ -1,16 +1,15 @@
-'use client';
-import * as React from 'react';
+import type { DailyUsage } from '@repo/shared';
+import { formatCostKrw, formatDateShort } from '@repo/shared';
+
 import {
-  AreaChart,
   Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from 'recharts';
-import type { DailyUsage } from '@repo/shared';
-import { formatDateShort, formatCostKrw } from '@repo/shared';
 
 interface CostChartProps {
   data: DailyUsage[];

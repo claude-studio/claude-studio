@@ -1,29 +1,30 @@
 import * as fs from 'fs';
-import * as path from 'path';
 import * as os from 'os';
-import type {
-  DashboardStats,
-  SessionInfo,
-  SessionDetail,
-  DailyUsage,
-  PeakHour,
-  ModelUsage,
-  ProjectInfo,
-  Message,
-  CacheStats,
-  ToolUsageItem,
-  ConversationStats,
-  ClaudeLifetime,
-  ClaudeSettings,
-  SkillInfo,
-} from '../types/index';
+import * as path from 'path';
+
 import {
   calculateCost,
-  getModelDisplayName,
   getModelColor,
+  getModelDisplayName,
   getModelShortName,
   getPricing,
 } from '../config/pricing';
+import type {
+  CacheStats,
+  ClaudeLifetime,
+  ClaudeSettings,
+  ConversationStats,
+  DailyUsage,
+  DashboardStats,
+  Message,
+  ModelUsage,
+  PeakHour,
+  ProjectInfo,
+  SessionDetail,
+  SessionInfo,
+  SkillInfo,
+  ToolUsageItem,
+} from '../types/index';
 
 function toLocalDateStr(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -61,14 +62,24 @@ function setCached<T>(key: string, data: T): void {
   cache.set(key, { data, timestamp: Date.now() });
 }
 
-export function clearCache(scope?: 'projects' | 'teams'): void {
+export function clearCache(scope?: import('../types/index').DataChangeSource): void {
   if (!scope) {
     cache.clear();
     return;
   }
   if (scope === 'projects') {
+    // projects 변경: stats/sessions/projects 관련 캐시만 삭제, teams 캐시는 보존
     for (const key of cache.keys()) {
-      if (key !== 'teams') cache.delete(key);
+      if (
+        key === 'stats' ||
+        key === 'projects' ||
+        key === 'sessions' ||
+        key.startsWith('session:') ||
+        key.startsWith('raw:') ||
+        key.startsWith('filepath:')
+      ) {
+        cache.delete(key);
+      }
     }
   } else if (scope === 'teams') {
     cache.delete('teams');
@@ -756,7 +767,7 @@ export function getSkills(claudeDir?: string): SkillInfo[] {
         const name = nameMatch?.[1]?.trim() ?? entry;
 
         // Parse description (handles block scalar with |)
-        const descMatch = fm.match(/^description:\s*\|?\n?([\s\S]*?)(?=\n\w|\n---|\Z)/m);
+        const descMatch = fm.match(/^description:\s*\|?\n?([\s\S]*?)(?=\n\w|\n---|$)/m);
         const rawDesc = descMatch?.[1] ?? '';
         const description = rawDesc
           .split('\n')

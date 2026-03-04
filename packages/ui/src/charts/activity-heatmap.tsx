@@ -1,5 +1,4 @@
-'use client';
-import * as React from 'react';
+import type { CSSProperties } from 'react';
 
 interface ActivityData {
   date: string;
@@ -10,7 +9,7 @@ interface ActivityHeatmapProps {
   data: ActivityData[];
 }
 
-function getIntensityStyle(count: number, max: number): React.CSSProperties {
+function getIntensityStyle(count: number, max: number): CSSProperties {
   if (count === 0) return { backgroundColor: 'rgba(58, 58, 60, 0.8)' }; // --muted dark
   const ratio = count / max;
   const opacity =

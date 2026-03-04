@@ -1,11 +1,12 @@
 import type {
-  DataProvider,
-  DashboardStats,
-  ProjectInfo,
-  SessionInfo,
-  SessionDetail,
-  DataSource,
   ClaudeSettings,
+  DashboardStats,
+  DataChangeSource,
+  DataProvider,
+  DataSource,
+  ProjectInfo,
+  SessionDetail,
+  SessionInfo,
   SkillInfo,
   TeamDetail,
 } from '@repo/shared';
@@ -25,7 +26,7 @@ declare global {
       exportData: () => Promise<string>;
       importData: (data: string) => Promise<void>;
       clearImport: () => Promise<void>;
-      onDataChanged: (callback: () => void) => () => void;
+      onDataChanged: (callback: (source: DataChangeSource) => void) => () => void;
       getClaudeSettings: () => Promise<ClaudeSettings>;
       getSkills: () => Promise<SkillInfo[]>;
       getTeams: () => Promise<TeamDetail[]>;

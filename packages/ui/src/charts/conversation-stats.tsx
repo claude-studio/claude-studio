@@ -1,7 +1,5 @@
-'use client';
-import * as React from 'react';
 import type { ConversationStats } from '@repo/shared';
-import { formatTokens, formatDuration } from '@repo/shared';
+import { formatDuration, formatTokens } from '@repo/shared';
 
 interface ConversationStatsCardProps {
   data: ConversationStats;

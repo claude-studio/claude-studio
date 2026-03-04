@@ -1,14 +1,16 @@
-import { ipcMain } from 'electron';
-import { IpcChannel } from './channels';
 import {
-  getActiveDataSource,
-  setDataSource,
-  clearImportedData,
   clearCache,
+  clearImportedData,
+  getActiveDataSource,
   getDashboardStats,
-  getSessions,
   getProjects,
+  getSessions,
+  setDataSource,
 } from '@repo/shared';
+
+import { ipcMain } from 'electron';
+
+import { IpcChannel } from './channels';
 
 export function registerDataSourceHandlers(): void {
   ipcMain.handle(IpcChannel.GetDataSource, async () => {

@@ -253,3 +253,5 @@ export const DashboardStatsSchema = z.object({
 });
 
 export type DashboardStats = z.infer<typeof DashboardStatsSchema>;
+
+export type DataChangeSource = 'projects' | 'teams';

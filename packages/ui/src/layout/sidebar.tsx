@@ -1,22 +1,25 @@
-import * as React from 'react';
+import { type ReactNode } from 'react';
+
 import { Link, useRouterState } from '@tanstack/react-router';
-import { cn } from '../lib/utils';
+
 import {
-  LayoutDashboard,
-  FolderOpen,
-  MessageSquare,
   DollarSign,
+  FolderOpen,
+  LayoutDashboard,
+  MessageSquare,
   Settings,
+  Users,
   Wand2,
   Zap,
-  Users,
 } from 'lucide-react';
+
 import { useTeams } from '../hooks/use-data';
+import { cn } from '../lib/utils';
 
 interface NavItem {
   href: string;
   label: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
 }
 
 const navItems: NavItem[] = [

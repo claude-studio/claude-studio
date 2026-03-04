@@ -1,8 +1,9 @@
+import { formatCost, formatNumber, formatTokens, getModelShortName, timeAgo } from '@repo/shared';
 import { Link } from '@tanstack/react-router';
-import { useProjects } from '../hooks/use-data';
-import { Card, CardContent } from '../components/ui/card';
+
 import { Badge } from '../components/ui/badge';
-import { formatCost, formatTokens, formatNumber, timeAgo, getModelShortName } from '@repo/shared';
+import { Card, CardContent } from '../components/ui/card';
+import { useProjects } from '../hooks/use-data';
 import { PageSpinner } from './page-spinner';
 
 export function ProjectsPage() {

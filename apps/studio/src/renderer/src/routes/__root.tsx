@@ -1,5 +1,6 @@
-import { createRootRoute, Outlet, useRouter } from '@tanstack/react-router';
 import { Sidebar } from '@repo/ui';
+import { createRootRoute, Outlet, useRouter } from '@tanstack/react-router';
+
 import { ArrowLeft } from 'lucide-react';
 
 function ErrorComponent({ error }: { error: Error }) {

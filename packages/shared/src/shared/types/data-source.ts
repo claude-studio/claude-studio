@@ -1,4 +1,4 @@
-import type { DashboardStats, ProjectInfo, SessionInfo, SessionDetail } from './index';
+import type { DashboardStats, ProjectInfo, SessionDetail, SessionInfo } from './index';
 
 export type DataSourceType = 'local' | 'imported';
 

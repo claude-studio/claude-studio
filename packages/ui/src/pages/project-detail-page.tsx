@@ -1,9 +1,16 @@
-import { Link } from '@tanstack/react-router';
-import { useProjectSessions } from '../hooks/use-data';
-import { Card, CardContent } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
-import { formatCost, formatTokens, formatNumber, formatDuration, getModelShortName } from '@repo/shared';
 import type { SessionInfo } from '@repo/shared';
+import {
+  formatCost,
+  formatDuration,
+  formatNumber,
+  formatTokens,
+  getModelShortName,
+} from '@repo/shared';
+import { Link } from '@tanstack/react-router';
+
+import { Badge } from '../components/ui/badge';
+import { Card, CardContent } from '../components/ui/card';
+import { useProjectSessions } from '../hooks/use-data';
 import { PageSpinner } from './page-spinner';
 
 function formatDateLabel(dateStr: string): string {

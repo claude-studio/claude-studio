@@ -1,5 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router';
 import { SessionDetailPage } from '@repo/ui';
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/sessions/$id')({
   component: function SessionDetailRoute() {

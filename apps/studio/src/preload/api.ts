@@ -1,14 +1,16 @@
-import { ipcRenderer } from 'electron';
 import type {
-  DashboardStats,
-  ProjectInfo,
-  SessionInfo,
-  SessionDetail,
-  DataSource,
   ClaudeSettings,
+  DashboardStats,
+  DataChangeSource,
+  DataSource,
+  ProjectInfo,
+  SessionDetail,
+  SessionInfo,
   SkillInfo,
   TeamDetail,
 } from '@repo/shared';
+
+import { ipcRenderer } from 'electron';
 
 function createInvoker<TReturn, TArgs extends unknown[] = []>(channel: string) {
   return (...args: TArgs): Promise<TReturn> => ipcRenderer.invoke(channel, ...args);
@@ -41,10 +43,12 @@ export const electronAPI = {
   clearImport: createInvoker<void>('data:clear-import'),
 
   // File watcher events
-  onDataChanged: (callback: () => void) => {
-    ipcRenderer.on('data-changed', callback);
+  onDataChanged: (callback: (source: DataChangeSource) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, source: DataChangeSource) =>
+      callback(source);
+    ipcRenderer.on('data-changed', handler);
     return () => {
-      ipcRenderer.off('data-changed', callback);
+      ipcRenderer.off('data-changed', handler);
     };
   },
 };

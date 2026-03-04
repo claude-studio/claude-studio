@@ -1,7 +1,5 @@
-'use client';
-import * as React from 'react';
 import type { ClaudeLifetime } from '@repo/shared';
-import { formatDuration, formatDate, formatNumber } from '@repo/shared';
+import { formatDate, formatDuration, formatNumber } from '@repo/shared';
 
 interface ClaudeLifetimeCardProps {
   data: ClaudeLifetime;

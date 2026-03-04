@@ -1,12 +1,13 @@
-import { watch, type FSWatcher } from 'fs';
-import { join } from 'path';
-import { homedir } from 'os';
+import { clearCache, type DataChangeSource } from '@repo/shared';
+
 import { BrowserWindow } from 'electron';
-import { clearCache } from '@repo/shared';
+import { type FSWatcher, watch } from 'fs';
+import { homedir } from 'os';
+import { join } from 'path';
 
 let watchers: FSWatcher[] = [];
 
-function broadcast(source: 'projects' | 'teams'): void {
+function broadcast(source: DataChangeSource): void {
   clearCache(source);
   const windows = BrowserWindow.getAllWindows();
   for (const win of windows) {
@@ -14,7 +15,7 @@ function broadcast(source: 'projects' | 'teams'): void {
   }
 }
 
-function watchDir(dirPath: string, source: 'projects' | 'teams'): void {
+function watchDir(dirPath: string, source: DataChangeSource): void {
   try {
     const w = watch(dirPath, { recursive: true }, () => broadcast(source));
     watchers.push(w);
@@ -24,6 +25,8 @@ function watchDir(dirPath: string, source: 'projects' | 'teams'): void {
 }
 
 export function startFileWatcher(): void {
+  if (watchers.length > 0) return;
+
   const base = join(homedir(), '.claude');
   watchDir(join(base, 'projects'), 'projects');
   watchDir(join(base, 'teams'), 'teams');

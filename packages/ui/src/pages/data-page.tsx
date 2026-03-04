@@ -1,7 +1,9 @@
 import type { ClaudeSettings } from '@repo/shared';
+
+import { Bot, Puzzle, ShieldCheck } from 'lucide-react';
+
 import { Badge } from '../components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Bot, Puzzle, ShieldCheck } from 'lucide-react';
 
 interface DataPageProps {
   settings: ClaudeSettings | undefined;

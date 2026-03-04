@@ -1,8 +1,8 @@
-'use client';
-import * as React from 'react';
 import type { CacheStats } from '@repo/shared';
-import { formatTokens, formatCost } from '@repo/shared';
+import { formatCost, formatTokens } from '@repo/shared';
+
 import { Info } from 'lucide-react';
+
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 
 interface CacheStatsCardProps {

@@ -1,25 +1,28 @@
-import * as React from 'react';
-import { Link } from '@tanstack/react-router';
-import { useSessions } from '../hooks/use-data';
-import { Card, CardContent } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
-import { Input } from '../components/ui/input';
+import { useMemo, useState } from 'react';
+
 import {
   formatCost,
-  formatTokens,
-  formatNumber,
-  timeAgo,
   formatDuration,
+  formatNumber,
+  formatTokens,
   getModelShortName,
+  timeAgo,
 } from '@repo/shared';
+import { Link } from '@tanstack/react-router';
+
 import { Search } from 'lucide-react';
+
+import { Badge } from '../components/ui/badge';
+import { Card, CardContent } from '../components/ui/card';
+import { Input } from '../components/ui/input';
+import { useSessions } from '../hooks/use-data';
 import { PageSpinner } from './page-spinner';
 
 export function SessionsPage() {
   const { data: sessions, isLoading } = useSessions();
-  const [query, setQuery] = React.useState('');
+  const [query, setQuery] = useState('');
 
-  const filtered = React.useMemo(() => {
+  const filtered = useMemo(() => {
     if (!sessions) return [];
     const nonZero = sessions.filter((s) => s.cost > 0);
     if (!query.trim()) return nonZero;

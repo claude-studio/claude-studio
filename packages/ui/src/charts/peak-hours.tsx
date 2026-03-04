@@ -1,7 +1,6 @@
-'use client';
-import * as React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import type { PeakHour } from '@repo/shared';
+
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 interface PeakHoursProps {
   data: PeakHour[];

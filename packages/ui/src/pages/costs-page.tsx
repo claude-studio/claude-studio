@@ -1,16 +1,19 @@
-import * as React from 'react';
-import { useStats, useProjects } from '../hooks/use-data';
-import { StatCard } from '../layout/stat-card';
-import { UsageOverTime } from '../charts/usage-over-time';
-import { ModelBreakdown } from '../charts/model-breakdown';
-import { CostChart } from '../charts/cost-chart';
-import { ProjectCostChart } from '../charts/project-cost-chart';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { formatTokens, formatDateShort } from '@repo/shared';
+import { useMemo, useState } from 'react';
+
 import type { DailyUsage } from '@repo/shared';
-import { DollarSign, TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { PageSpinner } from './page-spinner';
+import { formatDateShort, formatTokens } from '@repo/shared';
+
+import { DollarSign, Minus, TrendingDown, TrendingUp } from 'lucide-react';
+
+import { CostChart } from '../charts/cost-chart';
+import { ModelBreakdown } from '../charts/model-breakdown';
+import { ProjectCostChart } from '../charts/project-cost-chart';
+import { UsageOverTime } from '../charts/usage-over-time';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { useProjects, useStats } from '../hooks/use-data';
+import { StatCard } from '../layout/stat-card';
 import { CostValue } from './cost-value';
+import { PageSpinner } from './page-spinner';
 
 type PeriodFilter = 'all' | 'month' | 'week';
 
@@ -73,26 +76,26 @@ function getMonthStr(offset: number): string {
 export function CostsPage() {
   const { data: stats, isLoading } = useStats();
   const { data: projects = [] } = useProjects();
-  const [period, setPeriod] = React.useState<PeriodFilter>('all');
+  const [period, setPeriod] = useState<PeriodFilter>('all');
 
-  const thisMonth = React.useMemo(() => getMonthStr(0), []);
-  const lastMonth = React.useMemo(() => getMonthStr(-1), []);
+  const thisMonth = useMemo(() => getMonthStr(0), []);
+  const lastMonth = useMemo(() => getMonthStr(-1), []);
 
-  const filteredDaily = React.useMemo(
+  const filteredDaily = useMemo(
     () => (stats ? filterByPeriod(stats.dailyUsage, period) : []),
     [stats, period],
   );
-  const totals = React.useMemo(() => sumDailyUsage(filteredDaily), [filteredDaily]);
-  const periodDesc = React.useMemo(
+  const totals = useMemo(() => sumDailyUsage(filteredDaily), [filteredDaily]);
+  const periodDesc = useMemo(
     () => getPeriodDescription(filteredDaily, period),
     [filteredDaily, period],
   );
-  const thisMonthCost = React.useMemo(
+  const thisMonthCost = useMemo(
     () =>
       stats ? sumDailyUsage(stats.dailyUsage.filter((d) => d.date.startsWith(thisMonth))).cost : 0,
     [stats, thisMonth],
   );
-  const lastMonthCost = React.useMemo(
+  const lastMonthCost = useMemo(
     () =>
       stats ? sumDailyUsage(stats.dailyUsage.filter((d) => d.date.startsWith(lastMonth))).cost : 0,
     [stats, lastMonth],
@@ -100,7 +103,7 @@ export function CostsPage() {
   const monthDiff =
     lastMonthCost > 0 ? ((thisMonthCost - lastMonthCost) / lastMonthCost) * 100 : null;
 
-  const topProjects = React.useMemo(
+  const topProjects = useMemo(
     () =>
       [...projects]
         .sort((a, b) => b.totalCost - a.totalCost)

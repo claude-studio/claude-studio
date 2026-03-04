@@ -1,13 +1,17 @@
 import React from 'react';
+
+import { createHashHistory, createRouter, RouterProvider } from '@tanstack/react-router';
+
 import ReactDOM from 'react-dom/client';
-import { RouterProvider, createRouter, createHashHistory } from '@tanstack/react-router';
+
+import { Providers } from './providers/query-provider';
+import { routeTree } from './routeTree.gen';
+
 import '@fontsource/geist-sans/400.css';
 import '@fontsource/geist-sans/500.css';
 import '@fontsource/geist-sans/600.css';
 import '@fontsource/geist-mono/400.css';
 import './globals.css';
-import { routeTree } from './routeTree.gen';
-import { Providers } from './providers/query-provider';
 
 const hashHistory = createHashHistory();
 const router = createRouter({ routeTree, history: hashHistory });

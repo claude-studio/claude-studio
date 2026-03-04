@@ -1,5 +1,6 @@
 import { app, BrowserWindow, shell } from 'electron';
 import { join } from 'path';
+
 import { registerAllIpcHandlers } from './ipc/index';
 import { startFileWatcher, stopFileWatcher } from './services/file-watcher';
 

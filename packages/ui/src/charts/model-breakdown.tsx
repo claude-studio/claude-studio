@@ -1,8 +1,9 @@
-'use client';
-import * as React from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { useState } from 'react';
+
 import type { ModelUsage } from '@repo/shared';
 import { formatCostKrw, formatTokens } from '@repo/shared';
+
+import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts';
 
 interface ModelBreakdownProps {
   data: ModelUsage[];
@@ -10,11 +11,14 @@ interface ModelBreakdownProps {
   onViewChange?: (view: 'cost' | 'tokens') => void;
 }
 
-export function ModelBreakdown({ data, view: externalView, onViewChange }: ModelBreakdownProps) {
-  const [internalView, setInternalView] = React.useState<'cost' | 'tokens'>('cost');
+export function ModelBreakdown({
+  data,
+  view: externalView,
+  onViewChange: _onViewChange,
+}: ModelBreakdownProps) {
+  const [internalView] = useState<'cost' | 'tokens'>('cost');
   const view = externalView ?? internalView;
-  const setView = onViewChange ?? setInternalView;
-  const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const chartData = data.map((m) => ({
     name: m.displayName,

@@ -1,9 +1,12 @@
-import * as React from 'react';
+import { useState } from 'react';
+
 import type { SkillInfo } from '@repo/shared';
+
+import { Wand2 } from 'lucide-react';
+
 import { Badge } from '../components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { ScrollArea } from '../components/ui/scroll-area';
-import { Wand2 } from 'lucide-react';
 import { PageSpinner } from './page-spinner';
 
 interface SkillsPageProps {
@@ -39,7 +42,7 @@ function SkillCard({ skill, onClick }: { skill: SkillInfo; onClick: () => void }
 }
 
 export function SkillsPage({ skills, isLoading, isError }: SkillsPageProps) {
-  const [selected, setSelected] = React.useState<SkillInfo | null>(null);
+  const [selected, setSelected] = useState<SkillInfo | null>(null);
 
   const invocable = skills.filter((s) => s.userInvocable);
   const others = skills.filter((s) => !s.userInvocable);
