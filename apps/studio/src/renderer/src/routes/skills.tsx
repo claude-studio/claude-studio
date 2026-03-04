@@ -81,7 +81,7 @@ function SkillsPage() {
               {selected?.name}
             </DialogTitle>
             {selected?.userInvocable && (
-              <Badge variant="secondary" className="text-[10px] px-1.5 py-0 w-fit">
+              <Badge variant="secondary" className="text-[10px] px-1.5 py-0 w-fit mt-2">
                 /{selected.name}
               </Badge>
             )}

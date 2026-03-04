@@ -59,7 +59,7 @@ const DialogContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
           ref={ref}
           className={cn(
             "fixed left-[50%] top-[50%] z-[201] grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg sm:rounded-lg",
-            "animate-in fade-in-0 zoom-in-95 slide-in-from-left-1/2 slide-in-from-top-[48%] duration-200",
+            "animate-in fade-in-0 zoom-in-95 slide-in-from-left-1/2 slide-in-from-bottom-4 duration-300",
             className
           )}
           {...props}
