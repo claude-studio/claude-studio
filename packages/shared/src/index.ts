@@ -9,6 +9,9 @@ export type {
   Message,
   ProjectInfo,
   DashboardStats,
+  CacheStats,
+  ToolUsageItem,
+  ConversationStats,
 } from './shared/types/index';
 
 export {
@@ -21,6 +24,9 @@ export {
   SessionDetailSchema,
   ProjectInfoSchema,
   DashboardStatsSchema,
+  CacheStatsSchema,
+  ToolUsageItemSchema,
+  ConversationStatsSchema,
 } from './shared/types/index';
 
 export { IpcChannel } from './shared/types/ipc';

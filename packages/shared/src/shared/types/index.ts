@@ -118,6 +118,34 @@ export const ProjectInfoSchema = z.object({
 
 export type ProjectInfo = z.infer<typeof ProjectInfoSchema>;
 
+export const CacheStatsSchema = z.object({
+  totalCacheCreationTokens: z.number(),
+  totalCacheReadTokens: z.number(),
+  cacheHitRate: z.number(), // 0-100
+  estimatedSavingsUsd: z.number(),
+});
+
+export type CacheStats = z.infer<typeof CacheStatsSchema>;
+
+export const ToolUsageItemSchema = z.object({
+  name: z.string(),
+  count: z.number(),
+});
+
+export type ToolUsageItem = z.infer<typeof ToolUsageItemSchema>;
+
+export const ConversationStatsSchema = z.object({
+  avgSessionDurationMs: z.number(),
+  avgMessagesPerSession: z.number(),
+  avgInputTokensPerMessage: z.number(),
+  avgOutputTokensPerMessage: z.number(),
+  shortSessions: z.number(),   // < 10분
+  mediumSessions: z.number(),  // 10분 ~ 1시간
+  longSessions: z.number(),    // > 1시간
+});
+
+export type ConversationStats = z.infer<typeof ConversationStatsSchema>;
+
 export const DashboardStatsSchema = z.object({
   totalCost: z.number(),
   totalTokens: z.number(),
@@ -137,6 +165,9 @@ export const DashboardStatsSchema = z.object({
       count: z.number(),
     })
   ),
+  cacheStats: CacheStatsSchema,
+  toolUsage: z.array(ToolUsageItemSchema),
+  conversationStats: ConversationStatsSchema,
 });
 
 export type DashboardStats = z.infer<typeof DashboardStatsSchema>;
