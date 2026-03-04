@@ -117,7 +117,7 @@ function OverviewPage() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card className="border-border/50">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">캐시 절약 현황</CardTitle>
@@ -134,15 +134,16 @@ function OverviewPage() {
             <ToolUsageChart data={stats.toolUsage} />
           </CardContent>
         </Card>
-        <Card className="border-border/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">대화 패턴 분석</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ConversationStatsCard data={stats.conversationStats} />
-          </CardContent>
-        </Card>
       </div>
+
+      <Card className="border-border/50">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">대화 패턴 분석</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ConversationStatsCard data={stats.conversationStats} />
+        </CardContent>
+      </Card>
 
       <Card className="border-border/50">
         <CardHeader className="pb-2">
