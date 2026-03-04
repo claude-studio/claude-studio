@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/FRONT-JB/claude-studio/compare/claude-studio-v1.3.0...claude-studio-v1.3.1) (2026-03-04)
+
+
+### Documentation
+
+* macOS 설치 안내 추가 및 릴리즈 노트 자동 업데이트 ([13edc0e](https://github.com/FRONT-JB/claude-studio/commit/13edc0e7854776c34126af08b968e5821124adbf))
+
 ## [1.3.0](https://github.com/FRONT-JB/claude-studio/compare/claude-studio-v1.2.0...claude-studio-v1.3.0) (2026-03-04)
 
 
