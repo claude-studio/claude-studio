@@ -29,6 +29,7 @@ export { CacheStatsCard } from './charts/cache-stats';
 export { ToolUsageChart } from './charts/tool-usage';
 export { ConversationStatsCard } from './charts/conversation-stats';
 export { ClaudeLifetimeCard } from './charts/claude-lifetime';
+export { ProjectCostChart } from './charts/project-cost-chart';
 
 // Hooks / Provider
 export { DataProviderWrapper, useStats, useProjects, useSessions, useSessionDetail, useProjectSessions } from './hooks/use-data';

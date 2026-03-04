@@ -1,10 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
 import {
   useStats,
+  useProjects,
   StatCard,
   UsageOverTime,
   ModelBreakdown,
   CostChart,
+  ProjectCostChart,
   Card,
   CardContent,
   CardHeader,
@@ -12,7 +14,7 @@ import {
 } from '@repo/ui';
 import { formatCost, formatTokens, formatDateShort } from '@repo/shared';
 import type { DailyUsage } from '@repo/shared';
-import { DollarSign, TrendingUp } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import * as React from 'react';
 
 export const Route = createFileRoute('/costs')({
@@ -77,8 +79,15 @@ function sumDailyUsage(data: DailyUsage[]) {
   );
 }
 
+function getMonthStr(offset: number): string {
+  const d = new Date();
+  d.setMonth(d.getMonth() + offset);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
 function CostsPage() {
   const { data: stats, isLoading } = useStats();
+  const { data: projects = [] } = useProjects();
   const [period, setPeriod] = React.useState<PeriodFilter>('all');
 
   if (isLoading) {
@@ -96,6 +105,17 @@ function CostsPage() {
   const filteredDaily = filterByPeriod(stats.dailyUsage, period);
   const totals = sumDailyUsage(filteredDaily);
   const periodDesc = getPeriodDescription(filteredDaily, period);
+
+  const thisMonth = getMonthStr(0);
+  const lastMonth = getMonthStr(-1);
+  const thisMonthCost = sumDailyUsage(stats.dailyUsage.filter(d => d.date.startsWith(thisMonth))).cost;
+  const lastMonthCost = sumDailyUsage(stats.dailyUsage.filter(d => d.date.startsWith(lastMonth))).cost;
+  const monthDiff = lastMonthCost > 0 ? ((thisMonthCost - lastMonthCost) / lastMonthCost) * 100 : null;
+
+  const topProjects = [...projects]
+    .sort((a, b) => b.totalCost - a.totalCost)
+    .slice(0, 10)
+    .map(p => ({ name: p.name.length > 16 ? p.name.slice(0, 16) + '…' : p.name, cost: p.totalCost }));
 
   return (
     <div className="space-y-6">
@@ -150,6 +170,34 @@ function CostsPage() {
         />
       </div>
 
+      {/* 월별 비교 */}
+      <div className="grid grid-cols-2 gap-4">
+        <Card className="border-border/50">
+          <CardContent className="p-4">
+            <p className="text-xs text-muted-foreground">이번 달</p>
+            <p className="text-xl font-semibold mt-1">{formatCost(thisMonthCost)}</p>
+            <p className="text-xs text-muted-foreground mt-1">{thisMonth}</p>
+          </CardContent>
+        </Card>
+        <Card className="border-border/50">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">지난 달</p>
+              {monthDiff !== null && (
+                <div className={`flex items-center gap-0.5 text-xs font-medium ${
+                  monthDiff > 0 ? 'text-red-400' : monthDiff < 0 ? 'text-green-400' : 'text-muted-foreground'
+                }`}>
+                  {monthDiff > 0 ? <TrendingUp className="h-3 w-3" /> : monthDiff < 0 ? <TrendingDown className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
+                  {Math.abs(monthDiff).toFixed(1)}%
+                </div>
+              )}
+            </div>
+            <p className="text-xl font-semibold mt-1">{formatCost(lastMonthCost)}</p>
+            <p className="text-xs text-muted-foreground mt-1">{lastMonth}</p>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card className="border-border/50">
           <CardHeader className="pb-2">
@@ -168,6 +216,17 @@ function CostsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {topProjects.length > 0 && (
+        <Card className="border-border/50">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">프로젝트별 비용 순위</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ProjectCostChart data={topProjects} />
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="border-border/50">
         <CardHeader className="pb-2">
