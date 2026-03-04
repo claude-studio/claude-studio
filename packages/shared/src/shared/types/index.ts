@@ -146,6 +146,26 @@ export const ConversationStatsSchema = z.object({
 
 export type ConversationStats = z.infer<typeof ConversationStatsSchema>;
 
+export const SkillInfoSchema = z.object({
+  name: z.string(),
+  description: z.string(),
+  userInvocable: z.boolean(),
+  body: z.string(), // SKILL.md frontmatter 제외 본문
+});
+
+export type SkillInfo = z.infer<typeof SkillInfoSchema>;
+
+export const ClaudeSettingsSchema = z.object({
+  model: z.string().optional(),
+  enabledPlugins: z.record(z.string(), z.boolean()).optional(),
+  permissions: z.object({
+    defaultMode: z.string().optional(),
+    allow: z.array(z.string()).optional(),
+  }).optional(),
+});
+
+export type ClaudeSettings = z.infer<typeof ClaudeSettingsSchema>;
+
 export const ClaudeLifetimeSchema = z.object({
   firstSessionDate: z.coerce.date().nullable(),
   daysActive: z.number(),           // D+N (days since first session)

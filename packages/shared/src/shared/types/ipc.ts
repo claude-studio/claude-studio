@@ -11,4 +11,5 @@ export enum IpcChannel {
   ImportData = 'data:import',
   ClearImport = 'data:clear-import',
   GetCostAnalysis = 'costs:get',
+  GetClaudeSettings = 'settings:get',
 }

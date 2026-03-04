@@ -5,6 +5,8 @@ import type {
   SessionInfo,
   SessionDetail,
   DataSource,
+  ClaudeSettings,
+  SkillInfo,
 } from '@repo/shared';
 
 declare global {
@@ -23,6 +25,8 @@ declare global {
       importData: (data: string) => Promise<void>;
       clearImport: () => Promise<void>;
       onDataChanged: (callback: () => void) => () => void;
+      getClaudeSettings: () => Promise<ClaudeSettings>;
+      getSkills: () => Promise<SkillInfo[]>;
     };
   }
 }

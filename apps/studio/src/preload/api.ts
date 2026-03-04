@@ -5,6 +5,8 @@ import type {
   SessionInfo,
   SessionDetail,
   DataSource,
+  ClaudeSettings,
+  SkillInfo,
 } from '@repo/shared';
 
 function createInvoker<TReturn, TArgs extends unknown[] = []>(channel: string) {
@@ -24,6 +26,10 @@ export const electronAPI = {
   getSessions: createInvoker<SessionInfo[], [number?]>('sessions:get'),
   getSessionDetail: createInvoker<SessionDetail, [string]>('sessions:detail'),
   searchSessions: createInvoker<SessionInfo[], [string]>('sessions:search'),
+
+  // Settings
+  getClaudeSettings: createInvoker<ClaudeSettings>('settings:get'),
+  getSkills: createInvoker<SkillInfo[]>('skills:get'),
 
   // Data source
   getDataSource: createInvoker<DataSource>('data-source:get'),

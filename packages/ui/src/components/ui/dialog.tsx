@@ -1,4 +1,6 @@
 import * as React from "react"
+import * as ReactDOM from "react-dom"
+import { X } from "lucide-react"
 import { cn } from "../../lib/utils"
 
 interface DialogProps {
@@ -7,9 +9,24 @@ interface DialogProps {
   children: React.ReactNode
 }
 
+const DialogContext = React.createContext<{ onClose: () => void }>({ onClose: () => {} });
+
 function Dialog({ open, onOpenChange, children }: DialogProps) {
-  if (!open) return null
-  return <>{children}</>
+  React.useEffect(() => {
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onOpenChange?.(false);
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [open, onOpenChange]);
+
+  if (!open) return null;
+  return (
+    <DialogContext.Provider value={{ onClose: () => onOpenChange?.(false) }}>
+      {children}
+    </DialogContext.Provider>
+  );
 }
 
 function DialogTrigger({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
@@ -17,29 +34,49 @@ function DialogTrigger({ children, ...props }: React.ButtonHTMLAttributes<HTMLBu
 }
 
 const DialogOverlay = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn("fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0", className)}
-      {...props}
-    />
-  )
+  ({ className, ...props }, ref) => {
+    const { onClose } = React.useContext(DialogContext);
+    return (
+      <div
+        ref={ref}
+        onClick={onClose}
+        className={cn("fixed inset-0 animate-in fade-in-0 bg-black/80", className)}
+        {...props}
+      />
+    );
+  }
 )
 DialogOverlay.displayName = "DialogOverlay"
 
-const DialogContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { onClose?: () => void }>(
-  ({ className, children, onClose, ...props }, ref) => (
-    <>
-      <DialogOverlay onClick={onClose} />
-      <div
-        ref={ref}
-        className={cn("fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg", className)}
-        {...props}
-      >
-        {children}
-      </div>
-    </>
-  )
+const DialogContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, children, ...props }, ref) => {
+    const { onClose } = React.useContext(DialogContext);
+
+    return ReactDOM.createPortal(
+      <div className="fixed inset-0 z-[200]">
+        <DialogOverlay />
+        <div
+          ref={ref}
+          className={cn(
+            "fixed left-[50%] top-[50%] z-[201] grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg sm:rounded-lg",
+            "animate-in fade-in-0 zoom-in-95 slide-in-from-left-1/2 slide-in-from-top-[48%] duration-200",
+            className
+          )}
+          {...props}
+        >
+          <button
+            onClick={onClose}
+            className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity"
+            aria-label="닫기"
+          >
+            <X className="h-4 w-4" />
+          </button>
+          {children}
+        </div>
+      </div>,
+      document.body
+    );
+  }
 )
 DialogContent.displayName = "DialogContent"
 

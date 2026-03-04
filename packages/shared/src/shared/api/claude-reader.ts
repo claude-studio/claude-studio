@@ -14,6 +14,8 @@ import type {
   ToolUsageItem,
   ConversationStats,
   ClaudeLifetime,
+  ClaudeSettings,
+  SkillInfo,
 } from '../types/index';
 import {
   calculateCost,
@@ -626,6 +628,84 @@ export function getDashboardStats(claudeDir?: string): DashboardStats {
 
   setCached('stats', stats);
   return stats;
+}
+
+// --- settings.json reader ---
+
+export function getClaudeSettings(claudeDir?: string): ClaudeSettings {
+  const filePath = path.join(claudeDir ?? getClaudeDir(), 'settings.json');
+  try {
+    const raw = fs.readFileSync(filePath, 'utf-8');
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    return {
+      model: typeof parsed.model === 'string' ? parsed.model : undefined,
+      enabledPlugins: typeof parsed.enabledPlugins === 'object' && parsed.enabledPlugins !== null
+        ? parsed.enabledPlugins as Record<string, boolean>
+        : undefined,
+      permissions: typeof parsed.permissions === 'object' && parsed.permissions !== null
+        ? parsed.permissions as { defaultMode?: string; allow?: string[] }
+        : undefined,
+    };
+  } catch {
+    return {};
+  }
+}
+
+// --- skills reader ---
+
+export function getSkills(claudeDir?: string): SkillInfo[] {
+  const skillsDir = path.join(claudeDir ?? getClaudeDir(), 'skills');
+  if (!fs.existsSync(skillsDir)) return [];
+
+  const skills: SkillInfo[] = [];
+
+  try {
+    const entries = fs.readdirSync(skillsDir);
+    for (const entry of entries) {
+      const entryPath = path.join(skillsDir, entry);
+      try {
+        if (!fs.statSync(entryPath).isDirectory()) continue;
+      } catch { continue; }
+
+      // Find SKILL.md or skill.md
+      let skillFile = path.join(entryPath, 'SKILL.md');
+      if (!fs.existsSync(skillFile)) skillFile = path.join(entryPath, 'skill.md');
+      if (!fs.existsSync(skillFile)) continue;
+
+      try {
+        const content = fs.readFileSync(skillFile, 'utf-8');
+        const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+        if (!fmMatch) continue;
+        const fm = fmMatch[1]!;
+
+        // Parse name
+        const nameMatch = fm.match(/^name:\s*(.+)$/m);
+        const name = nameMatch?.[1]?.trim() ?? entry;
+
+        // Parse description (handles block scalar with |)
+        const descMatch = fm.match(/^description:\s*\|?\n?([\s\S]*?)(?=\n\w|\n---|\Z)/m);
+        const rawDesc = descMatch?.[1] ?? '';
+        const description = rawDesc
+          .split('\n')
+          .map((l) => l.trim())
+          .filter(Boolean)
+          .join(' ')
+          .slice(0, 200);
+
+        // Parse user-invocable
+        const invocableMatch = fm.match(/^user-invocable:\s*(.+)$/m);
+        const userInvocable = invocableMatch?.[1]?.trim() === 'true';
+
+        // Body: everything after the closing ---
+        const bodyMatch = content.match(/^---\n[\s\S]*?\n---\n([\s\S]*)$/);
+        const body = bodyMatch?.[1]?.trim() ?? '';
+
+        skills.push({ name, description, userInvocable, body });
+      } catch { continue; }
+    }
+  } catch { return []; }
+
+  return skills.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 // --- stats-cache.json reader ---

@@ -6,7 +6,8 @@ import {
   FolderOpen,
   MessageSquare,
   DollarSign,
-  Database,
+  Settings,
+  Wand2,
   Zap,
 } from 'lucide-react';
 
@@ -21,7 +22,8 @@ const navItems: NavItem[] = [
   { href: '/projects', label: '프로젝트', icon: <FolderOpen className="h-4 w-4" /> },
   { href: '/sessions', label: '세션', icon: <MessageSquare className="h-4 w-4" /> },
   { href: '/costs', label: '비용', icon: <DollarSign className="h-4 w-4" /> },
-  { href: '/data', label: '데이터', icon: <Database className="h-4 w-4" /> },
+  { href: '/skills', label: '스킬', icon: <Wand2 className="h-4 w-4" /> },
+  { href: '/data', label: '설정', icon: <Settings className="h-4 w-4" /> },
 ];
 
 export function Sidebar() {

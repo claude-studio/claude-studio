@@ -13,6 +13,8 @@ export type {
   ToolUsageItem,
   ConversationStats,
   ClaudeLifetime,
+  ClaudeSettings,
+  SkillInfo,
 } from './shared/types/index';
 
 export {
@@ -73,6 +75,8 @@ export {
   getProjectSessions,
   getDashboardStats,
   getClaudeLifetime,
+  getClaudeSettings,
+  getSkills,
   searchSessions,
   clearCache,
   decodeProjectPath,
