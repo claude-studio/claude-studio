@@ -9,6 +9,7 @@ import {
   CacheStatsCard,
   ToolUsageChart,
   ConversationStatsCard,
+  CostChart,
   Card,
   CardContent,
   CardHeader,
@@ -144,6 +145,15 @@ function OverviewPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Card className="border-border/50">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">모델별 일별 비용</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <CostChart data={stats.dailyUsage} />
+        </CardContent>
+      </Card>
 
       <Card className="border-border/50">
         <CardHeader className="pb-2">
