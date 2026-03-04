@@ -32,7 +32,10 @@ export { ClaudeLifetimeCard } from './charts/claude-lifetime';
 export { ProjectCostChart } from './charts/project-cost-chart';
 
 // Hooks / Provider
-export { DataProviderWrapper, useStats, useProjects, useSessions, useSessionDetail, useProjectSessions } from './hooks/use-data';
+export { DataProviderWrapper, useStats, useProjects, useSessions, useSessionDetail, useProjectSessions, TeamsProviderWrapper, useTeams } from './hooks/use-data';
+
+// Pages
+export { OverviewPage, CostsPage, SessionsPage, SessionDetailPage, ProjectsPage, ProjectDetailPage, TeamsPage, SkillsPage, DataPage } from './pages/index';
 
 // CSS (consumers must import separately)
 // import '@repo/ui/globals.css'

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
-import { DataProviderWrapper } from '@repo/ui';
+import { DataProviderWrapper, TeamsProviderWrapper } from '@repo/ui';
 import { electronProvider } from './electron-provider';
 
 const queryClient = new QueryClient({
@@ -47,8 +47,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <DataProviderWrapper provider={electronProvider}>
-        <DataChangedListener />
-        {children}
+        <TeamsProviderWrapper provider={() => window.electronAPI.getTeams()}>
+          <DataChangedListener />
+          {children}
+        </TeamsProviderWrapper>
       </DataProviderWrapper>
     </QueryClientProvider>
   );

@@ -7,6 +7,7 @@ import type {
   DataSource,
   ClaudeSettings,
   SkillInfo,
+  TeamDetail,
 } from '@repo/shared';
 
 function createInvoker<TReturn, TArgs extends unknown[] = []>(channel: string) {
@@ -30,6 +31,7 @@ export const electronAPI = {
   // Settings
   getClaudeSettings: createInvoker<ClaudeSettings>('settings:get'),
   getSkills: createInvoker<SkillInfo[]>('skills:get'),
+  getTeams: createInvoker<TeamDetail[]>('teams:get'),
 
   // Data source
   getDataSource: createInvoker<DataSource>('data-source:get'),

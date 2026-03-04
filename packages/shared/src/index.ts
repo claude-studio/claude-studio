@@ -15,6 +15,10 @@ export type {
   ClaudeLifetime,
   ClaudeSettings,
   SkillInfo,
+  TeamMember,
+  TeamInfo,
+  TaskInfo,
+  TeamDetail,
 } from './shared/types/index';
 
 export {
@@ -77,6 +81,7 @@ export {
   getClaudeLifetime,
   getClaudeSettings,
   getSkills,
+  getTeams,
   searchSessions,
   clearCache,
   decodeProjectPath,

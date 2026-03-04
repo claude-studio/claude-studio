@@ -13,4 +13,5 @@ export enum IpcChannel {
   GetCostAnalysis = 'costs:get',
   GetClaudeSettings = 'settings:get',
   GetSkills = 'skills:get',
+  GetTeams = 'teams:get',
 }

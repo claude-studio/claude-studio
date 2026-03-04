@@ -6,9 +6,39 @@ import type {
   SessionInfo,
   SessionDetail,
   DataProvider,
+  TeamDetail,
 } from '@repo/shared';
 
 const DataProviderContext = React.createContext<DataProvider | null>(null);
+
+type TeamsProvider = () => Promise<TeamDetail[]>;
+const TeamsProviderContext = React.createContext<TeamsProvider | null>(null);
+
+export function TeamsProviderWrapper({
+  provider,
+  children,
+}: {
+  provider: TeamsProvider;
+  children: React.ReactNode;
+}) {
+  return (
+    <TeamsProviderContext.Provider value={provider}>
+      {children}
+    </TeamsProviderContext.Provider>
+  );
+}
+
+export function useTeams(): UseQueryResult<TeamDetail[]> {
+  const provider = React.useContext(TeamsProviderContext);
+  return useQuery({
+    queryKey: ['teams'],
+    queryFn: () => provider ? provider() : Promise.resolve([]),
+    staleTime: 10_000,
+    refetchInterval: 10_000,
+    placeholderData: keepPreviousData,
+    enabled: !!provider,
+  });
+}
 
 export function DataProviderWrapper({
   provider,

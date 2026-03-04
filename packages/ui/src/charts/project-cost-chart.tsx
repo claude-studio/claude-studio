@@ -30,7 +30,7 @@ export function ProjectCostChart({ data }: ProjectCostChartProps) {
         <YAxis
           type="category"
           dataKey="name"
-          width={110}
+          width={80}
           tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
           axisLine={false}
           tickLine={false}
@@ -48,7 +48,7 @@ export function ProjectCostChart({ data }: ProjectCostChartProps) {
             props.payload?.fullName ?? props.payload?.name ?? '비용',
           ]}
         />
-        <Bar dataKey="cost" fill="var(--chart-1)" radius={[0, 4, 4, 0]} />
+        <Bar dataKey="cost" fill="var(--chart-1)" radius={[0, 4, 4, 0]} cursor={{ fill: 'var(--muted-foreground)', opacity: 0.04 }} />
       </BarChart>
     </ResponsiveContainer>
   );

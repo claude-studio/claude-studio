@@ -36,7 +36,7 @@ export function UsageOverTime({ data }: UsageOverTimeProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2 flex-wrap justify-end">
         {METRICS.map(m => (
           <button
             key={m.key}

@@ -9,134 +9,38 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as DataRouteImport } from './routes/data'
-import { Route as CostsRouteImport } from './routes/costs'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SessionsIndexRouteImport } from './routes/sessions/index'
-import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
-import { Route as SessionsIdRouteImport } from './routes/sessions/$id'
-import { Route as ProjectsIdRouteImport } from './routes/projects/$id'
 
-const DataRoute = DataRouteImport.update({
-  id: '/data',
-  path: '/data',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CostsRoute = CostsRouteImport.update({
-  id: '/costs',
-  path: '/costs',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SessionsIndexRoute = SessionsIndexRouteImport.update({
-  id: '/sessions/',
-  path: '/sessions/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
-  id: '/projects/',
-  path: '/projects/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SessionsIdRoute = SessionsIdRouteImport.update({
-  id: '/sessions/$id',
-  path: '/sessions/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProjectsIdRoute = ProjectsIdRouteImport.update({
-  id: '/projects/$id',
-  path: '/projects/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/costs': typeof CostsRoute
-  '/data': typeof DataRoute
-  '/projects/$id': typeof ProjectsIdRoute
-  '/sessions/$id': typeof SessionsIdRoute
-  '/projects/': typeof ProjectsIndexRoute
-  '/sessions/': typeof SessionsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/costs': typeof CostsRoute
-  '/data': typeof DataRoute
-  '/projects/$id': typeof ProjectsIdRoute
-  '/sessions/$id': typeof SessionsIdRoute
-  '/projects': typeof ProjectsIndexRoute
-  '/sessions': typeof SessionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/costs': typeof CostsRoute
-  '/data': typeof DataRoute
-  '/projects/$id': typeof ProjectsIdRoute
-  '/sessions/$id': typeof SessionsIdRoute
-  '/projects/': typeof ProjectsIndexRoute
-  '/sessions/': typeof SessionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/costs'
-    | '/data'
-    | '/projects/$id'
-    | '/sessions/$id'
-    | '/projects/'
-    | '/sessions/'
+  fullPaths: '/'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/costs'
-    | '/data'
-    | '/projects/$id'
-    | '/sessions/$id'
-    | '/projects'
-    | '/sessions'
-  id:
-    | '__root__'
-    | '/'
-    | '/costs'
-    | '/data'
-    | '/projects/$id'
-    | '/sessions/$id'
-    | '/projects/'
-    | '/sessions/'
+  to: '/'
+  id: '__root__' | '/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CostsRoute: typeof CostsRoute
-  DataRoute: typeof DataRoute
-  ProjectsIdRoute: typeof ProjectsIdRoute
-  SessionsIdRoute: typeof SessionsIdRoute
-  ProjectsIndexRoute: typeof ProjectsIndexRoute
-  SessionsIndexRoute: typeof SessionsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/data': {
-      id: '/data'
-      path: '/data'
-      fullPath: '/data'
-      preLoaderRoute: typeof DataRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/costs': {
-      id: '/costs'
-      path: '/costs'
-      fullPath: '/costs'
-      preLoaderRoute: typeof CostsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -144,45 +48,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/sessions/': {
-      id: '/sessions/'
-      path: '/sessions'
-      fullPath: '/sessions/'
-      preLoaderRoute: typeof SessionsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/projects/': {
-      id: '/projects/'
-      path: '/projects'
-      fullPath: '/projects/'
-      preLoaderRoute: typeof ProjectsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sessions/$id': {
-      id: '/sessions/$id'
-      path: '/sessions/$id'
-      fullPath: '/sessions/$id'
-      preLoaderRoute: typeof SessionsIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/projects/$id': {
-      id: '/projects/$id'
-      path: '/projects/$id'
-      fullPath: '/projects/$id'
-      preLoaderRoute: typeof ProjectsIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CostsRoute: CostsRoute,
-  DataRoute: DataRoute,
-  ProjectsIdRoute: ProjectsIdRoute,
-  SessionsIdRoute: SessionsIdRoute,
-  ProjectsIndexRoute: ProjectsIndexRoute,
-  SessionsIndexRoute: SessionsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

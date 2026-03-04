@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TeamsRouteImport } from './routes/teams'
 import { Route as SkillsRouteImport } from './routes/skills'
 import { Route as DataRouteImport } from './routes/data'
 import { Route as CostsRouteImport } from './routes/costs'
@@ -18,6 +19,11 @@ import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
 import { Route as SessionsIdRouteImport } from './routes/sessions/$id'
 import { Route as ProjectsIdRouteImport } from './routes/projects/$id'
 
+const TeamsRoute = TeamsRouteImport.update({
+  id: '/teams',
+  path: '/teams',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SkillsRoute = SkillsRouteImport.update({
   id: '/skills',
   path: '/skills',
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/costs': typeof CostsRoute
   '/data': typeof DataRoute
   '/skills': typeof SkillsRoute
+  '/teams': typeof TeamsRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/sessions/$id': typeof SessionsIdRoute
   '/projects/': typeof ProjectsIndexRoute
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/costs': typeof CostsRoute
   '/data': typeof DataRoute
   '/skills': typeof SkillsRoute
+  '/teams': typeof TeamsRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/sessions/$id': typeof SessionsIdRoute
   '/projects': typeof ProjectsIndexRoute
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/costs': typeof CostsRoute
   '/data': typeof DataRoute
   '/skills': typeof SkillsRoute
+  '/teams': typeof TeamsRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/sessions/$id': typeof SessionsIdRoute
   '/projects/': typeof ProjectsIndexRoute
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/costs'
     | '/data'
     | '/skills'
+    | '/teams'
     | '/projects/$id'
     | '/sessions/$id'
     | '/projects/'
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/costs'
     | '/data'
     | '/skills'
+    | '/teams'
     | '/projects/$id'
     | '/sessions/$id'
     | '/projects'
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/costs'
     | '/data'
     | '/skills'
+    | '/teams'
     | '/projects/$id'
     | '/sessions/$id'
     | '/projects/'
@@ -128,6 +140,7 @@ export interface RootRouteChildren {
   CostsRoute: typeof CostsRoute
   DataRoute: typeof DataRoute
   SkillsRoute: typeof SkillsRoute
+  TeamsRoute: typeof TeamsRoute
   ProjectsIdRoute: typeof ProjectsIdRoute
   SessionsIdRoute: typeof SessionsIdRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
@@ -136,6 +149,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/teams': {
+      id: '/teams'
+      path: '/teams'
+      fullPath: '/teams'
+      preLoaderRoute: typeof TeamsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/skills': {
       id: '/skills'
       path: '/skills'
@@ -200,6 +220,7 @@ const rootRouteChildren: RootRouteChildren = {
   CostsRoute: CostsRoute,
   DataRoute: DataRoute,
   SkillsRoute: SkillsRoute,
+  TeamsRoute: TeamsRoute,
   ProjectsIdRoute: ProjectsIdRoute,
   SessionsIdRoute: SessionsIdRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,

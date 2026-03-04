@@ -9,7 +9,9 @@ import {
   Settings,
   Wand2,
   Zap,
+  Users,
 } from 'lucide-react';
+import { useTeams } from '../hooks/use-data';
 
 interface NavItem {
   href: string;
@@ -23,12 +25,15 @@ const navItems: NavItem[] = [
   { href: '/sessions', label: '세션', icon: <MessageSquare className="h-4 w-4" /> },
   { href: '/costs', label: '비용', icon: <DollarSign className="h-4 w-4" /> },
   { href: '/skills', label: '스킬', icon: <Wand2 className="h-4 w-4" /> },
+  { href: '/teams', label: '팀', icon: <Users className="h-4 w-4" /> },
   { href: '/data', label: '설정', icon: <Settings className="h-4 w-4" /> },
 ];
 
 export function Sidebar() {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
+  const { data: teams } = useTeams();
+  const hasActiveTeam = teams && teams.length > 0;
 
   return (
     <div className="fixed left-0 top-0 h-screen w-60 bg-card border-r border-border flex flex-col">
@@ -49,6 +54,7 @@ export function Sidebar() {
           const isActive = item.href === '/'
             ? currentPath === '/'
             : currentPath.startsWith(item.href);
+          const isTeams = item.href === '/teams';
 
           return (
             <Link
@@ -63,6 +69,12 @@ export function Sidebar() {
             >
               {item.icon}
               {item.label}
+              {isTeams && hasActiveTeam && (
+                <span className="ml-auto relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+                </span>
+              )}
             </Link>
           );
         })}

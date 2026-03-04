@@ -7,6 +7,7 @@ import type {
   DataSource,
   ClaudeSettings,
   SkillInfo,
+  TeamDetail,
 } from '@repo/shared';
 
 declare global {
@@ -27,6 +28,7 @@ declare global {
       onDataChanged: (callback: () => void) => () => void;
       getClaudeSettings: () => Promise<ClaudeSettings>;
       getSkills: () => Promise<SkillInfo[]>;
+      getTeams: () => Promise<TeamDetail[]>;
     };
   }
 }
