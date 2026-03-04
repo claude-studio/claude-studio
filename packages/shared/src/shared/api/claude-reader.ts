@@ -75,9 +75,25 @@ export function decodeProjectPath(dirName: string): string {
   return dirName;
 }
 
-export function getProjectName(projectPath: string): string {
-  const parts = projectPath.split('/').filter(Boolean);
-  return parts[parts.length - 1] ?? projectPath;
+export function getProjectName(dirName: string): string {
+  // worktree 감지: --worktree- 또는 --claude-worktrees- 패턴
+  const worktreeMatch = dirName.match(/^(.+?)--(?:claude-worktrees|worktree)-(.+)$/);
+  if (worktreeMatch) {
+    const base = worktreeMatch[1]!.split('-').filter(Boolean).pop() ?? worktreeMatch[1]!;
+    const label = worktreeMatch[2]!.split('-').slice(-2).join('-');
+    return `${base} (${label})`;
+  }
+
+  // 서브디렉토리 감지: -apps-xxx, -packages-xxx, -src-xxx 패턴
+  const subMatch = dirName.match(/-(apps|packages|src|libs|modules)-([^-]+)$/);
+  if (subMatch) {
+    const beforeSub = dirName.replace(/-(apps|packages|src|libs|modules)-[^-]+$/, '');
+    const baseName = beforeSub.split('-').filter(Boolean).pop() ?? beforeSub;
+    return `${baseName} (${subMatch[1]}-${subMatch[2]})`;
+  }
+
+  // 기본: 마지막 세그먼트
+  return dirName.split('-').filter(Boolean).pop() ?? dirName;
 }
 
 // --- JSONL parsing ---
@@ -103,6 +119,7 @@ function parseJsonlFile(filePath: string): unknown[] {
 interface ParsedSession {
   id: string;
   projectPath: string;
+  projectDirName: string; // 원본 디렉토리명 (인코딩된 상태)
   filePath: string;
   messages: unknown[];
 }
@@ -139,6 +156,7 @@ function getSessionsFromDir(projectsDir: string): ParsedSession[] {
           sessions.push({
             id: sessionId,
             projectPath,
+            projectDirName: projectDir,
             filePath,
             messages,
           });
@@ -243,7 +261,7 @@ function extractSessionStats(session: ParsedSession): SessionInfo | null {
   return {
     id: session.id,
     projectPath: session.projectPath,
-    projectName: getProjectName(session.projectPath),
+    projectName: getProjectName(session.projectDirName),
     startTime,
     lastTime,
     duration,
