@@ -1,12 +1,12 @@
-import * as React from "react"
-import * as ReactDOM from "react-dom"
-import { X } from "lucide-react"
-import { cn } from "../../lib/utils"
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import { X } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 interface DialogProps {
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-  children: React.ReactNode
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children: React.ReactNode;
 }
 
 const DialogContext = React.createContext<{ onClose: () => void }>({ onClose: () => {} });
@@ -30,7 +30,7 @@ function Dialog({ open, onOpenChange, children }: DialogProps) {
 }
 
 function DialogTrigger({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
-  return <button {...props}>{children}</button>
+  return <button {...props}>{children}</button>;
 }
 
 const DialogOverlay = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
@@ -40,13 +40,13 @@ const DialogOverlay = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
       <div
         ref={ref}
         onClick={onClose}
-        className={cn("fixed inset-0 animate-in fade-in-0 bg-black/80", className)}
+        className={cn('fixed inset-0 animate-in fade-in-0 bg-black/80', className)}
         {...props}
       />
     );
-  }
-)
-DialogOverlay.displayName = "DialogOverlay"
+  },
+);
+DialogOverlay.displayName = 'DialogOverlay';
 
 const DialogContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, children, ...props }, ref) => {
@@ -58,9 +58,9 @@ const DialogContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
         <div
           ref={ref}
           className={cn(
-            "fixed left-[50%] top-[50%] z-[201] grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg sm:rounded-lg",
-            "animate-in fade-in-0 zoom-in-95 slide-in-from-left-1/2 slide-in-from-bottom-4 duration-300",
-            className
+            'fixed left-[50%] top-[50%] z-[201] grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg sm:rounded-lg',
+            'animate-in fade-in-0 zoom-in-95 slide-in-from-left-1/2 slide-in-from-bottom-4 duration-300',
+            className,
           )}
           {...props}
         >
@@ -74,34 +74,50 @@ const DialogContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
           {children}
         </div>
       </div>,
-      document.body
+      document.body,
     );
-  }
-)
-DialogContent.displayName = "DialogContent"
+  },
+);
+DialogContent.displayName = 'DialogContent';
 
 const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("flex flex-col space-y-1.5 text-center sm:text-left", className)} {...props} />
-)
-DialogHeader.displayName = "DialogHeader"
+  <div className={cn('flex flex-col space-y-1.5 text-center sm:text-left', className)} {...props} />
+);
+DialogHeader.displayName = 'DialogHeader';
 
 const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)} {...props} />
-)
-DialogFooter.displayName = "DialogFooter"
+  <div
+    className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)}
+    {...props}
+  />
+);
+DialogFooter.displayName = 'DialogFooter';
 
 const DialogTitle = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("text-lg font-semibold leading-none tracking-tight", className)} {...props} />
-  )
-)
-DialogTitle.displayName = "DialogTitle"
+    <div
+      ref={ref}
+      className={cn('text-lg font-semibold leading-none tracking-tight', className)}
+      {...props}
+    />
+  ),
+);
+DialogTitle.displayName = 'DialogTitle';
 
 const DialogDescription = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("text-sm text-muted-foreground", className)} {...props} />
-  )
-)
-DialogDescription.displayName = "DialogDescription"
+    <div ref={ref} className={cn('text-sm text-muted-foreground', className)} {...props} />
+  ),
+);
+DialogDescription.displayName = 'DialogDescription';
 
-export { Dialog, DialogTrigger, DialogOverlay, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription }
+export {
+  Dialog,
+  DialogTrigger,
+  DialogOverlay,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+};

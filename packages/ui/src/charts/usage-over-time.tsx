@@ -28,8 +28,8 @@ const METRICS: { key: MetricKey; label: string; color: string }[] = [
 export function UsageOverTime({ data }: UsageOverTimeProps) {
   const [activeMetric, setActiveMetric] = React.useState<MetricKey>('messages');
 
-  const metric = METRICS.find(m => m.key === activeMetric)!;
-  const chartData = data.map(d => ({
+  const metric = METRICS.find((m) => m.key === activeMetric)!;
+  const chartData = data.map((d) => ({
     ...d,
     date: formatDateShort(new Date(d.date)),
   }));
@@ -37,7 +37,7 @@ export function UsageOverTime({ data }: UsageOverTimeProps) {
   return (
     <div className="space-y-4">
       <div className="flex gap-2 flex-wrap justify-end">
-        {METRICS.map(m => (
+        {METRICS.map((m) => (
           <button
             key={m.key}
             onClick={() => setActiveMetric(m.key)}
@@ -72,7 +72,7 @@ export function UsageOverTime({ data }: UsageOverTimeProps) {
             axisLine={false}
             tickLine={false}
             width={activeMetric === 'cost' ? 60 : 40}
-            tickFormatter={(v: number) => activeMetric === 'cost' ? formatCostKrw(v) : String(v)}
+            tickFormatter={(v: number) => (activeMetric === 'cost' ? formatCostKrw(v) : String(v))}
           />
           <Tooltip
             contentStyle={{

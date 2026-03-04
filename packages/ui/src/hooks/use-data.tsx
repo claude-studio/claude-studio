@@ -21,18 +21,14 @@ export function TeamsProviderWrapper({
   provider: TeamsProvider;
   children: React.ReactNode;
 }) {
-  return (
-    <TeamsProviderContext.Provider value={provider}>
-      {children}
-    </TeamsProviderContext.Provider>
-  );
+  return <TeamsProviderContext.Provider value={provider}>{children}</TeamsProviderContext.Provider>;
 }
 
 export function useTeams(): UseQueryResult<TeamDetail[]> {
   const provider = React.useContext(TeamsProviderContext);
   return useQuery({
     queryKey: ['teams'],
-    queryFn: () => provider ? provider() : Promise.resolve([]),
+    queryFn: () => (provider ? provider() : Promise.resolve([])),
     staleTime: 10_000,
     refetchInterval: 10_000,
     placeholderData: keepPreviousData,
@@ -47,11 +43,7 @@ export function DataProviderWrapper({
   provider: DataProvider;
   children: React.ReactNode;
 }) {
-  return (
-    <DataProviderContext.Provider value={provider}>
-      {children}
-    </DataProviderContext.Provider>
-  );
+  return <DataProviderContext.Provider value={provider}>{children}</DataProviderContext.Provider>;
 }
 
 function useDataProvider(): DataProvider {

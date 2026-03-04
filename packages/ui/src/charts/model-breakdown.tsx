@@ -16,7 +16,7 @@ export function ModelBreakdown({ data, view: externalView, onViewChange }: Model
   const setView = onViewChange ?? setInternalView;
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
 
-  const chartData = data.map(m => ({
+  const chartData = data.map((m) => ({
     name: m.displayName,
     value: view === 'cost' ? m.cost : m.totalTokens,
     color: m.color,

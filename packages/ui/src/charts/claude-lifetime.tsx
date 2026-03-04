@@ -9,7 +9,11 @@ interface ClaudeLifetimeCardProps {
   totalToolCalls: number;
 }
 
-export function ClaudeLifetimeCard({ data, totalMessages, totalToolCalls }: ClaudeLifetimeCardProps) {
+export function ClaudeLifetimeCard({
+  data,
+  totalMessages,
+  totalToolCalls,
+}: ClaudeLifetimeCardProps) {
   const items = [
     {
       label: '사용 시작일',
@@ -18,12 +22,9 @@ export function ClaudeLifetimeCard({ data, totalMessages, totalToolCalls }: Clau
     },
     {
       label: '역대 최장 세션',
-      value: data.longestSessionDurationMs > 0
-        ? formatDuration(data.longestSessionDurationMs)
-        : '-',
-      sub: data.longestSessionMessageCount > 0
-        ? `${data.longestSessionMessageCount}개 메시지`
-        : '',
+      value:
+        data.longestSessionDurationMs > 0 ? formatDuration(data.longestSessionDurationMs) : '-',
+      sub: data.longestSessionMessageCount > 0 ? `${data.longestSessionMessageCount}개 메시지` : '',
     },
     {
       label: '총 메시지 수',
@@ -43,9 +44,7 @@ export function ClaudeLifetimeCard({ data, totalMessages, totalToolCalls }: Clau
         <div key={item.label} className="rounded-lg bg-muted/50 p-3">
           <p className="text-xs text-muted-foreground">{item.label}</p>
           <p className="text-lg font-semibold mt-1">{item.value}</p>
-          {item.sub && (
-            <p className="text-xs text-primary mt-0.5">{item.sub}</p>
-          )}
+          {item.sub && <p className="text-xs text-primary mt-0.5">{item.sub}</p>}
         </div>
       ))}
     </div>

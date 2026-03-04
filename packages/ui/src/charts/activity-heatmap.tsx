@@ -13,12 +13,13 @@ interface ActivityHeatmapProps {
 function getIntensityStyle(count: number, max: number): React.CSSProperties {
   if (count === 0) return { backgroundColor: 'rgba(58, 58, 60, 0.8)' }; // --muted dark
   const ratio = count / max;
-  const opacity = ratio < 0.2 ? 0.25 : ratio < 0.4 ? 0.45 : ratio < 0.6 ? 0.65 : ratio < 0.8 ? 0.82 : 1;
+  const opacity =
+    ratio < 0.2 ? 0.25 : ratio < 0.4 ? 0.45 : ratio < 0.6 ? 0.65 : ratio < 0.8 ? 0.82 : 1;
   return { backgroundColor: `rgba(232, 149, 110, ${opacity})` }; // --primary dark #E8956E
 }
 
 export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
-  const max = Math.max(...data.map(d => d.count), 1);
+  const max = Math.max(...data.map((d) => d.count), 1);
 
   // Build last 24 weeks grid
   const today = new Date();
@@ -30,7 +31,7 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
       const date = new Date(today);
       date.setDate(today.getDate() - (w * 7 + (6 - d)));
       const dateStr = date.toISOString().split('T')[0]!;
-      const entry = data.find(item => item.date === dateStr);
+      const entry = data.find((item) => item.date === dateStr);
       week.push({ date: dateStr, count: entry?.count ?? 0 });
     }
     weeks.push(week);
@@ -67,9 +68,10 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
           <div
             key={opacity}
             className="h-[10px] w-[10px] rounded-sm"
-            style={opacity === 0
-              ? { backgroundColor: 'rgba(58, 58, 60, 0.8)' }
-              : { backgroundColor: `rgba(232, 149, 110, ${opacity})` }
+            style={
+              opacity === 0
+                ? { backgroundColor: 'rgba(58, 58, 60, 0.8)' }
+                : { backgroundColor: `rgba(232, 149, 110, ${opacity})` }
             }
           />
         ))}

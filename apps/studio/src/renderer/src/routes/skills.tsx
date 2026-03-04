@@ -4,7 +4,11 @@ import { SkillsPage } from '@repo/ui';
 
 export const Route = createFileRoute('/skills')({
   component: function SkillsRoute() {
-    const { data: skills = [], isLoading, isError } = useQuery({
+    const {
+      data: skills = [],
+      isLoading,
+      isError,
+    } = useQuery({
       queryKey: ['skills'],
       queryFn: () => window.electronAPI.getSkills(),
       staleTime: 60_000,

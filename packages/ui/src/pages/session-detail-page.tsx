@@ -18,7 +18,7 @@ export function SessionDetailPage({ id }: SessionDetailPageProps) {
   const [hideSidechain, setHideSidechain] = React.useState(false);
 
   const reversedMessages = React.useMemo(
-    () => session ? [...session.messages].reverse() : [],
+    () => (session ? [...session.messages].reverse() : []),
     [session],
   );
 
@@ -40,16 +40,13 @@ export function SessionDetailPage({ id }: SessionDetailPageProps) {
   return (
     <div className="space-y-6">
       <div>
-        <Link
-          to="/sessions"
-          className="text-sm text-muted-foreground hover:text-foreground"
-        >
+        <Link to="/sessions" className="text-sm text-muted-foreground hover:text-foreground">
           &larr; 세션 목록
         </Link>
         <h1 className="text-2xl font-semibold mt-2">{session.projectName}</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          {timeAgo(new Date(session.lastTime))} &middot;{' '}
-          {formatDuration(session.duration)} &middot; {formatCost(session.cost)}
+          {timeAgo(new Date(session.lastTime))} &middot; {formatDuration(session.duration)} &middot;{' '}
+          {formatCost(session.cost)}
         </p>
       </div>
 
@@ -72,17 +69,13 @@ export function SessionDetailPage({ id }: SessionDetailPageProps) {
           <Card className="border-border/50">
             <CardContent className="p-4">
               <p className="text-xs text-muted-foreground">메시지</p>
-              <p className="text-lg font-semibold">
-                {formatNumber(session.messageCount)}
-              </p>
+              <p className="text-lg font-semibold">{formatNumber(session.messageCount)}</p>
             </CardContent>
           </Card>
           <Card className="border-border/50">
             <CardContent className="p-4">
               <p className="text-xs text-muted-foreground">툴 호출</p>
-              <p className="text-lg font-semibold">
-                {formatNumber(session.toolCallCount)}
-              </p>
+              <p className="text-lg font-semibold">{formatNumber(session.toolCallCount)}</p>
             </CardContent>
           </Card>
         </div>
@@ -107,7 +100,9 @@ export function SessionDetailPage({ id }: SessionDetailPageProps) {
               <button
                 onClick={() => setHideErrors((v) => !v)}
                 className={`text-xs px-2 py-1 rounded-md transition-colors ${
-                  hideErrors ? 'bg-red-500/20 text-red-400' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                  hideErrors
+                    ? 'bg-red-500/20 text-red-400'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 }`}
               >
                 오류 {hideErrors ? '표시' : '숨기기'}
@@ -115,7 +110,9 @@ export function SessionDetailPage({ id }: SessionDetailPageProps) {
               <button
                 onClick={() => setHideSidechain((v) => !v)}
                 className={`text-xs px-2 py-1 rounded-md transition-colors ${
-                  hideSidechain ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                  hideSidechain
+                    ? 'bg-primary/20 text-primary'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 }`}
               >
                 서브에이전트 {hideSidechain ? '표시' : '숨기기'}
@@ -132,13 +129,17 @@ export function SessionDetailPage({ id }: SessionDetailPageProps) {
               const content = inner.content ?? raw.content;
               const model = inner.model as string | undefined;
               const timestamp = raw.timestamp as string | undefined;
-              const isApiError = !!(raw.isApiErrorMessage);
-              const isSidechain = !!(raw.isSidechain);
+              const isApiError = !!raw.isApiErrorMessage;
+              const isSidechain = !!raw.isSidechain;
 
               if (hideErrors && isApiError) return null;
               if (hideSidechain && isSidechain) return null;
               if (!content || (Array.isArray(content) && content.length === 0)) return null;
-              if (Array.isArray(content) && (content as Array<{ type?: string }>)[0]?.type === 'tool_result') return null;
+              if (
+                Array.isArray(content) &&
+                (content as Array<{ type?: string }>)[0]?.type === 'tool_result'
+              )
+                return null;
 
               let text: string;
               if (typeof content === 'string') {
@@ -146,10 +147,11 @@ export function SessionDetailPage({ id }: SessionDetailPageProps) {
                 if (!stripped) return null;
                 text = stripped;
               } else if (Array.isArray(content)) {
-                text = (content as Array<{ type?: string; text?: string }>)
-                  .filter((c) => c?.type === 'text' && c?.text)
-                  .map((c) => c.text)
-                  .join('\n') || '';
+                text =
+                  (content as Array<{ type?: string; text?: string }>)
+                    .filter((c) => c?.type === 'text' && c?.text)
+                    .map((c) => c.text)
+                    .join('\n') || '';
               } else {
                 text = JSON.stringify(content);
               }
@@ -159,31 +161,45 @@ export function SessionDetailPage({ id }: SessionDetailPageProps) {
               const isUser = role === 'user';
               return (
                 <div key={i} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] ${isUser ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
-                    <div className={`flex items-center gap-2 flex-wrap ${isUser ? 'flex-row-reverse' : ''}`}>
+                  <div
+                    className={`max-w-[80%] ${isUser ? 'items-end' : 'items-start'} flex flex-col gap-1`}
+                  >
+                    <div
+                      className={`flex items-center gap-2 flex-wrap ${isUser ? 'flex-row-reverse' : ''}`}
+                    >
                       <Badge variant={isUser ? 'secondary' : 'default'} className="text-xs">
                         {isUser ? '사용자' : '어시스턴트'}
                       </Badge>
                       {isSidechain && (
-                        <Badge variant="secondary" className="text-xs bg-primary/15 text-primary border-0">
+                        <Badge
+                          variant="secondary"
+                          className="text-xs bg-primary/15 text-primary border-0"
+                        >
                           서브에이전트
                         </Badge>
                       )}
                       {isApiError && (
-                        <Badge variant="secondary" className="text-xs bg-red-500/15 text-red-400 border-0">
+                        <Badge
+                          variant="secondary"
+                          className="text-xs bg-red-500/15 text-red-400 border-0"
+                        >
                           API 오류
                         </Badge>
                       )}
                       {model && <span className="text-xs text-muted-foreground">{model}</span>}
-                      {timestamp && <span className="text-xs text-muted-foreground">{timeAgo(timestamp)}</span>}
+                      {timestamp && (
+                        <span className="text-xs text-muted-foreground">{timeAgo(timestamp)}</span>
+                      )}
                     </div>
-                    <div className={`rounded-lg px-3 py-2 text-sm whitespace-pre-wrap ${
-                      isApiError
-                        ? 'bg-red-500/10 text-red-400 border border-red-500/20'
-                        : isUser
-                          ? 'bg-primary/15 text-foreground'
-                          : 'bg-muted text-foreground'
-                    }`}>
+                    <div
+                      className={`rounded-lg px-3 py-2 text-sm whitespace-pre-wrap ${
+                        isApiError
+                          ? 'bg-red-500/10 text-red-400 border border-red-500/20'
+                          : isUser
+                            ? 'bg-primary/15 text-foreground'
+                            : 'bg-muted text-foreground'
+                      }`}
+                    >
                       {text.length > 500 ? text.slice(0, 500) + '...' : text}
                     </div>
                   </div>
@@ -191,9 +207,7 @@ export function SessionDetailPage({ id }: SessionDetailPageProps) {
               );
             })}
             {session.messages.length === 0 && (
-              <p className="text-muted-foreground text-sm text-center py-4">
-                메시지가 없습니다
-              </p>
+              <p className="text-muted-foreground text-sm text-center py-4">메시지가 없습니다</p>
             )}
           </div>
         </CardContent>

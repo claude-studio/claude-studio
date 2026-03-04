@@ -51,9 +51,8 @@ export function Sidebar() {
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-1">
         {navItems.map((item) => {
-          const isActive = item.href === '/'
-            ? currentPath === '/'
-            : currentPath.startsWith(item.href);
+          const isActive =
+            item.href === '/' ? currentPath === '/' : currentPath.startsWith(item.href);
           const isTeams = item.href === '/teams';
 
           return (
@@ -64,7 +63,7 @@ export function Sidebar() {
                 'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
                 isActive
                   ? 'bg-primary/10 text-primary font-medium'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
               )}
             >
               {item.icon}

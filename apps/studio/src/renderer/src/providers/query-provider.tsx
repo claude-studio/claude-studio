@@ -16,9 +16,21 @@ const queryClient = new QueryClient({
 // Prefetch core data immediately on app startup so first page navigation is instant
 function prefetchCoreData() {
   const opts = { staleTime: 30_000 };
-  queryClient.prefetchQuery({ queryKey: ['stats'],    queryFn: () => electronProvider.getStats(),    ...opts });
-  queryClient.prefetchQuery({ queryKey: ['projects'], queryFn: () => electronProvider.getProjects(), ...opts });
-  queryClient.prefetchQuery({ queryKey: ['sessions', undefined], queryFn: () => electronProvider.getSessions(), ...opts });
+  queryClient.prefetchQuery({
+    queryKey: ['stats'],
+    queryFn: () => electronProvider.getStats(),
+    ...opts,
+  });
+  queryClient.prefetchQuery({
+    queryKey: ['projects'],
+    queryFn: () => electronProvider.getProjects(),
+    ...opts,
+  });
+  queryClient.prefetchQuery({
+    queryKey: ['sessions', undefined],
+    queryFn: () => electronProvider.getSessions(),
+    ...opts,
+  });
 }
 
 prefetchCoreData();
@@ -36,7 +48,9 @@ function DataChangedListener() {
   React.useEffect(() => {
     if (!window.electronAPI?.onDataChanged) return;
     // Debounce: avoid thundering herd when multiple files change at once
-    const invalidate = debounce(() => { qc.invalidateQueries(); }, 2_000);
+    const invalidate = debounce(() => {
+      qc.invalidateQueries();
+    }, 2_000);
     const unsub = window.electronAPI.onDataChanged(invalidate);
     return unsub;
   }, [qc]);

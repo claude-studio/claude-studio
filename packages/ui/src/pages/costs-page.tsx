@@ -79,7 +79,7 @@ export function CostsPage() {
   const lastMonth = React.useMemo(() => getMonthStr(-1), []);
 
   const filteredDaily = React.useMemo(
-    () => stats ? filterByPeriod(stats.dailyUsage, period) : [],
+    () => (stats ? filterByPeriod(stats.dailyUsage, period) : []),
     [stats, period],
   );
   const totals = React.useMemo(() => sumDailyUsage(filteredDaily), [filteredDaily]);
@@ -88,24 +88,28 @@ export function CostsPage() {
     [filteredDaily, period],
   );
   const thisMonthCost = React.useMemo(
-    () => stats ? sumDailyUsage(stats.dailyUsage.filter(d => d.date.startsWith(thisMonth))).cost : 0,
+    () =>
+      stats ? sumDailyUsage(stats.dailyUsage.filter((d) => d.date.startsWith(thisMonth))).cost : 0,
     [stats, thisMonth],
   );
   const lastMonthCost = React.useMemo(
-    () => stats ? sumDailyUsage(stats.dailyUsage.filter(d => d.date.startsWith(lastMonth))).cost : 0,
+    () =>
+      stats ? sumDailyUsage(stats.dailyUsage.filter((d) => d.date.startsWith(lastMonth))).cost : 0,
     [stats, lastMonth],
   );
-  const monthDiff = lastMonthCost > 0 ? ((thisMonthCost - lastMonthCost) / lastMonthCost) * 100 : null;
+  const monthDiff =
+    lastMonthCost > 0 ? ((thisMonthCost - lastMonthCost) / lastMonthCost) * 100 : null;
 
   const topProjects = React.useMemo(
-    () => [...projects]
-      .sort((a, b) => b.totalCost - a.totalCost)
-      .slice(0, 10)
-      .map(p => ({
-        name: p.name.length > 16 ? p.name.slice(0, 16) + '…' : p.name,
-        fullName: p.name,
-        cost: p.totalCost,
-      })),
+    () =>
+      [...projects]
+        .sort((a, b) => b.totalCost - a.totalCost)
+        .slice(0, 10)
+        .map((p) => ({
+          name: p.name.length > 16 ? p.name.slice(0, 16) + '…' : p.name,
+          fullName: p.name,
+          cost: p.totalCost,
+        })),
     [projects],
   );
 
@@ -117,9 +121,7 @@ export function CostsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">비용</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            토큰 사용량 및 비용 분석
-          </p>
+          <p className="text-muted-foreground text-sm mt-1">토큰 사용량 및 비용 분석</p>
         </div>
         <div className="flex gap-1 rounded-lg border border-border/50 p-1">
           {PERIOD_OPTIONS.map((opt) => (
@@ -169,7 +171,9 @@ export function CostsPage() {
         <Card className="border-border/50">
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground">이번 달</p>
-            <p className="text-xl font-semibold mt-1"><CostValue cost={thisMonthCost} /></p>
+            <p className="text-xl font-semibold mt-1">
+              <CostValue cost={thisMonthCost} />
+            </p>
             <p className="text-xs text-muted-foreground mt-1">{thisMonth}</p>
           </CardContent>
         </Card>
@@ -178,15 +182,29 @@ export function CostsPage() {
             <div className="flex items-center justify-between">
               <p className="text-xs text-muted-foreground">지난 달</p>
               {monthDiff !== null && (
-                <div className={`flex items-center gap-0.5 text-xs font-medium ${
-                  monthDiff > 0 ? 'text-red-400' : monthDiff < 0 ? 'text-green-400' : 'text-muted-foreground'
-                }`}>
-                  {monthDiff > 0 ? <TrendingUp className="h-3 w-3" /> : monthDiff < 0 ? <TrendingDown className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
+                <div
+                  className={`flex items-center gap-0.5 text-xs font-medium ${
+                    monthDiff > 0
+                      ? 'text-red-400'
+                      : monthDiff < 0
+                        ? 'text-green-400'
+                        : 'text-muted-foreground'
+                  }`}
+                >
+                  {monthDiff > 0 ? (
+                    <TrendingUp className="h-3 w-3" />
+                  ) : monthDiff < 0 ? (
+                    <TrendingDown className="h-3 w-3" />
+                  ) : (
+                    <Minus className="h-3 w-3" />
+                  )}
                   {Math.abs(monthDiff).toFixed(1)}%
                 </div>
               )}
             </div>
-            <p className="text-xl font-semibold mt-1"><CostValue cost={lastMonthCost} /></p>
+            <p className="text-xl font-semibold mt-1">
+              <CostValue cost={lastMonthCost} />
+            </p>
             <p className="text-xs text-muted-foreground mt-1">{lastMonth}</p>
           </CardContent>
         </Card>

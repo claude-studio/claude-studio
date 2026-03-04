@@ -1,5 +1,5 @@
 import * as React from 'react';
-import type { InboxMessage, TaskInfo } from '@repo/shared';
+import type { InboxMessage } from '@repo/shared';
 import { useTeams } from '../hooks/use-data';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -45,13 +45,18 @@ function parseMessageText(text: string): ParsedMessage {
     if (parsed && typeof parsed.type === 'string') {
       const typeLabel = MESSAGE_TYPE_LABEL[parsed.type] ?? parsed.type;
       const body =
-        typeof parsed.content === 'string' ? parsed.content :
-        typeof parsed.message === 'string' ? parsed.message :
-        typeof parsed.error === 'string' ? parsed.error :
-        JSON.stringify(parsed, null, 2);
+        typeof parsed.content === 'string'
+          ? parsed.content
+          : typeof parsed.message === 'string'
+            ? parsed.message
+            : typeof parsed.error === 'string'
+              ? parsed.error
+              : JSON.stringify(parsed, null, 2);
       return { typeLabel, body };
     }
-  } catch { /* not JSON */ }
+  } catch {
+    /* not JSON */
+  }
   return { typeLabel: null, body: text };
 }
 
@@ -195,7 +200,9 @@ export function TeamsPage() {
                   return (
                     <button
                       key={m.agentId}
-                      onClick={() => setSelectedInbox({ agentName: m.name, messages: memberMessages })}
+                      onClick={() =>
+                        setSelectedInbox({ agentName: m.name, messages: memberMessages })
+                      }
                       className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted text-xs hover:bg-muted/70 transition-colors cursor-pointer"
                     >
                       <span className="font-medium">{m.name}</span>
@@ -221,13 +228,18 @@ export function TeamsPage() {
                       className="rounded-md border border-border/30 bg-muted/40 px-3 [&:not(:last-child)]:mb-1.5"
                     >
                       <AccordionTrigger className="py-2 hover:no-underline gap-2">
-                        <span className="text-xs text-muted-foreground w-4 shrink-0">#{task.id}</span>
+                        <span className="text-xs text-muted-foreground w-4 shrink-0">
+                          #{task.id}
+                        </span>
                         <span className="text-sm flex-1 truncate text-left">{task.subject}</span>
                         <div className="flex items-center gap-2 shrink-0 ml-auto">
                           {task.owner && (
                             <span className="text-xs text-muted-foreground">{task.owner}</span>
                           )}
-                          <Badge variant={STATUS_VARIANT[task.status] ?? 'outline'} className="text-xs">
+                          <Badge
+                            variant={STATUS_VARIANT[task.status] ?? 'outline'}
+                            className="text-xs"
+                          >
                             {STATUS_LABEL[task.status] ?? task.status}
                           </Badge>
                         </div>
@@ -255,7 +267,9 @@ export function TeamsPage() {
           agentName={selectedInbox.agentName}
           messages={selectedInbox.messages}
           open={!!selectedInbox}
-          onOpenChange={(open) => { if (!open) setSelectedInbox(null); }}
+          onOpenChange={(open) => {
+            if (!open) setSelectedInbox(null);
+          }}
         />
       )}
     </div>

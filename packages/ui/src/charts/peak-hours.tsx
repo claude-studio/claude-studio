@@ -8,9 +8,16 @@ interface PeakHoursProps {
 }
 
 export function PeakHours({ data }: PeakHoursProps) {
-  const chartData = data.map(d => ({
+  const chartData = data.map((d) => ({
     ...d,
-    label: d.hour === 0 ? '12am' : d.hour === 12 ? '12pm' : d.hour < 12 ? `${d.hour}am` : `${d.hour - 12}pm`,
+    label:
+      d.hour === 0
+        ? '12am'
+        : d.hour === 12
+          ? '12pm'
+          : d.hour < 12
+            ? `${d.hour}am`
+            : `${d.hour - 12}pm`,
   }));
 
   return (
@@ -30,7 +37,7 @@ export function PeakHours({ data }: PeakHoursProps) {
           tickLine={false}
           width={35}
           tickCount={5}
-          tickFormatter={(v: number) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v)}
+          tickFormatter={(v: number) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v))}
         />
         <Tooltip
           contentStyle={{

@@ -34,9 +34,7 @@ export function OverviewPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-semibold">개요</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Claude Code 사용량 요약
-          </p>
+          <p className="text-muted-foreground text-sm mt-1">Claude Code 사용량 요약</p>
         </div>
         {stats.lifetime?.firstSessionDate && (
           <div className="flex items-center gap-2 text-sm">
@@ -104,12 +102,14 @@ export function OverviewPage() {
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium">모델별 분석</CardTitle>
               <div className="flex gap-1">
-                {(['cost', 'tokens'] as const).map(v => (
+                {(['cost', 'tokens'] as const).map((v) => (
                   <button
                     key={v}
                     onClick={() => setModelView(v)}
                     className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                      modelView === v ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'
+                      modelView === v
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
                     {v === 'cost' ? '비용' : '토큰'}
@@ -119,7 +119,11 @@ export function OverviewPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <ModelBreakdown data={stats.modelBreakdown} view={modelView} onViewChange={setModelView} />
+            <ModelBreakdown
+              data={stats.modelBreakdown}
+              view={modelView}
+              onViewChange={setModelView}
+            />
           </CardContent>
         </Card>
       </div>
@@ -167,31 +171,29 @@ export function OverviewPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {stats.recentSessions.filter((s) => s.cost > 0).map((session) => (
-              <div
-                key={session.id}
-                className="flex items-center justify-between py-2 border-b border-border/50 last:border-0"
-              >
-                <div>
-                  <p className="text-sm font-medium">{session.projectName}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {timeAgo(new Date(session.lastTime))}
-                  </p>
+            {stats.recentSessions
+              .filter((s) => s.cost > 0)
+              .map((session) => (
+                <div
+                  key={session.id}
+                  className="flex items-center justify-between py-2 border-b border-border/50 last:border-0"
+                >
+                  <div>
+                    <p className="text-sm font-medium">{session.projectName}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {timeAgo(new Date(session.lastTime))}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium">
+                      <CostValue cost={session.cost} />
+                    </p>
+                    <p className="text-xs text-muted-foreground">{session.messageCount}개 메시지</p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium">
-                    <CostValue cost={session.cost} />
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {session.messageCount}개 메시지
-                  </p>
-                </div>
-              </div>
-            ))}
+              ))}
             {stats.recentSessions.length === 0 && (
-              <p className="text-muted-foreground text-sm text-center py-4">
-                세션이 없습니다
-              </p>
+              <p className="text-muted-foreground text-sm text-center py-4">세션이 없습니다</p>
             )}
           </div>
         </CardContent>

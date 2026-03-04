@@ -139,9 +139,9 @@ export const ConversationStatsSchema = z.object({
   avgMessagesPerSession: z.number(),
   avgInputTokensPerMessage: z.number(),
   avgOutputTokensPerMessage: z.number(),
-  shortSessions: z.number(),   // < 10분
-  mediumSessions: z.number(),  // 10분 ~ 1시간
-  longSessions: z.number(),    // > 1시간
+  shortSessions: z.number(), // < 10분
+  mediumSessions: z.number(), // 10분 ~ 1시간
+  longSessions: z.number(), // > 1시간
 });
 
 export type ConversationStats = z.infer<typeof ConversationStatsSchema>;
@@ -158,17 +158,19 @@ export type SkillInfo = z.infer<typeof SkillInfoSchema>;
 export const ClaudeSettingsSchema = z.object({
   model: z.string().optional(),
   enabledPlugins: z.record(z.string(), z.boolean()).optional(),
-  permissions: z.object({
-    defaultMode: z.string().optional(),
-    allow: z.array(z.string()).optional(),
-  }).optional(),
+  permissions: z
+    .object({
+      defaultMode: z.string().optional(),
+      allow: z.array(z.string()).optional(),
+    })
+    .optional(),
 });
 
 export type ClaudeSettings = z.infer<typeof ClaudeSettingsSchema>;
 
 export const ClaudeLifetimeSchema = z.object({
   firstSessionDate: z.coerce.date().nullable(),
-  daysActive: z.number(),           // D+N (days since first session)
+  daysActive: z.number(), // D+N (days since first session)
   longestSessionDurationMs: z.number(),
   longestSessionMessageCount: z.number(),
 });
@@ -242,7 +244,7 @@ export const DashboardStatsSchema = z.object({
     z.object({
       date: z.string(),
       count: z.number(),
-    })
+    }),
   ),
   cacheStats: CacheStatsSchema,
   toolUsage: z.array(ToolUsageItemSchema),

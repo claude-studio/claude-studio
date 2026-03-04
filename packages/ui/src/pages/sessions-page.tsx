@@ -4,7 +4,14 @@ import { useSessions } from '../hooks/use-data';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Input } from '../components/ui/input';
-import { formatCost, formatTokens, formatNumber, timeAgo, formatDuration, getModelShortName } from '@repo/shared';
+import {
+  formatCost,
+  formatTokens,
+  formatNumber,
+  timeAgo,
+  formatDuration,
+  getModelShortName,
+} from '@repo/shared';
 import { Search } from 'lucide-react';
 import { PageSpinner } from './page-spinner';
 
@@ -32,9 +39,7 @@ export function SessionsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">세션</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            {filtered.length}개 세션
-          </p>
+          <p className="text-muted-foreground text-sm mt-1">{filtered.length}개 세션</p>
         </div>
         <div className="relative w-64">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -49,11 +54,7 @@ export function SessionsPage() {
 
       <div className="grid gap-3">
         {filtered.map((session) => (
-          <Link
-            key={session.id}
-            to="/sessions/$id"
-            params={{ id: session.id }}
-          >
+          <Link key={session.id} to="/sessions/$id" params={{ id: session.id }}>
             <Card className="border-border/50 hover:border-border transition-colors cursor-pointer">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
@@ -86,9 +87,7 @@ export function SessionsPage() {
           </Link>
         ))}
         {filtered.length === 0 && (
-          <p className="text-muted-foreground text-sm text-center py-8">
-            세션이 없습니다
-          </p>
+          <p className="text-muted-foreground text-sm text-center py-8">세션이 없습니다</p>
         )}
       </div>
     </div>

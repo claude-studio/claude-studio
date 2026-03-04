@@ -43,11 +43,7 @@ export function getPricing(model: string): ModelPricing {
   return DEFAULT_PRICING;
 }
 
-export function calculateCost(
-  model: string,
-  inputTokens: number,
-  outputTokens: number
-): number {
+export function calculateCost(model: string, inputTokens: number, outputTokens: number): number {
   const pricing = getPricing(model);
   return (inputTokens * pricing.input + outputTokens * pricing.output) / 1_000_000;
 }

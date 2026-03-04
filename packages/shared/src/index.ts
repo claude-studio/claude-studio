@@ -39,11 +39,7 @@ export {
 } from './shared/types/index';
 
 export { IpcChannel } from './shared/types/ipc';
-export type {
-  DataSource,
-  DataProvider,
-  DataSourceType,
-} from './shared/types/data-source';
+export type { DataSource, DataProvider, DataSourceType } from './shared/types/data-source';
 
 // Config
 export {
@@ -89,8 +85,4 @@ export {
   getProjectName,
 } from './shared/api/claude-reader';
 
-export {
-  getActiveDataSource,
-  setDataSource,
-  clearImportedData,
-} from './shared/api/data-source';
+export { getActiveDataSource, setDataSource, clearImportedData } from './shared/api/data-source';

@@ -8,12 +8,19 @@ import { PageSpinner } from './page-spinner';
 
 function formatDateLabel(dateStr: string): string {
   const d = new Date(dateStr);
-  return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
+  return d.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'short',
+  });
 }
 
 function groupByDate(sessions: SessionInfo[]): { date: string; sessions: SessionInfo[] }[] {
   const map = new Map<string, SessionInfo[]>();
-  for (const s of [...sessions].sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())) {
+  for (const s of [...sessions].sort(
+    (a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime(),
+  )) {
     const d = new Date(s.startTime);
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     if (!map.has(key)) map.set(key, []);
@@ -46,9 +53,7 @@ export function ProjectDetailPage({ id }: ProjectDetailPageProps) {
           &larr; 프로젝트 목록
         </Link>
         <h1 className="text-2xl font-semibold mt-2">{projectName}</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          {sessions?.length ?? 0}개 세션
-        </p>
+        <p className="text-muted-foreground text-sm mt-1">{sessions?.length ?? 0}개 세션</p>
       </div>
 
       {grouped.length === 0 && (
@@ -62,7 +67,9 @@ export function ProjectDetailPage({ id }: ProjectDetailPageProps) {
           <div key={date}>
             <div className="flex items-center gap-3 mb-3">
               <div className="h-px flex-1 bg-border/50" />
-              <span className="text-xs text-muted-foreground font-medium px-2">{formatDateLabel(date)}</span>
+              <span className="text-xs text-muted-foreground font-medium px-2">
+                {formatDateLabel(date)}
+              </span>
               <div className="h-px flex-1 bg-border/50" />
             </div>
 
@@ -95,8 +102,18 @@ export function ProjectDetailPage({ id }: ProjectDetailPageProps) {
                             </div>
                             <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                               {session.models.slice(0, 2).map((m) => (
-                                <Badge key={m} variant="secondary" className="text-[10px] px-1.5 py-0">
-                                  {m.includes('opus') ? 'Opus' : m.includes('sonnet') ? 'Sonnet' : m.includes('haiku') ? 'Haiku' : m}
+                                <Badge
+                                  key={m}
+                                  variant="secondary"
+                                  className="text-[10px] px-1.5 py-0"
+                                >
+                                  {m.includes('opus')
+                                    ? 'Opus'
+                                    : m.includes('sonnet')
+                                      ? 'Sonnet'
+                                      : m.includes('haiku')
+                                        ? 'Haiku'
+                                        : m}
                                 </Badge>
                               ))}
                             </div>

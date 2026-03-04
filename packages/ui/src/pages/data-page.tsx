@@ -15,7 +15,9 @@ const modeLabel: Record<string, string> = {
 
 export function DataPage({ settings }: DataPageProps) {
   const plugins = settings?.enabledPlugins
-    ? Object.entries(settings.enabledPlugins).filter(([, v]) => v).map(([k]) => k.split('@')[0])
+    ? Object.entries(settings.enabledPlugins)
+        .filter(([, v]) => v)
+        .map(([k]) => k.split('@')[0])
     : [];
 
   return (

@@ -4,16 +4,49 @@ export { cn } from './lib/utils';
 // Components
 export { Badge, badgeVariants } from './components/ui/badge';
 export { Button, buttonVariants } from './components/ui/button';
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './components/ui/card';
-export { Dialog, DialogTrigger, DialogOverlay, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription } from './components/ui/dialog';
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from './components/ui/card';
+export {
+  Dialog,
+  DialogTrigger,
+  DialogOverlay,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from './components/ui/dialog';
 export { Input } from './components/ui/input';
 export { ScrollArea, ScrollBar } from './components/ui/scroll-area';
 export { Separator } from './components/ui/separator';
-export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCaption } from './components/ui/table';
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+  TableCaption,
+} from './components/ui/table';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './components/ui/tooltip';
 export { Progress } from './components/ui/progress';
-export { Select, SelectGroup, SelectValue, SelectTrigger, SelectContent, SelectItem, SelectLabel, SelectSeparator } from './components/ui/select';
+export {
+  Select,
+  SelectGroup,
+  SelectValue,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+} from './components/ui/select';
 
 // Layout
 export { Sidebar } from './layout/sidebar';
@@ -32,10 +65,29 @@ export { ClaudeLifetimeCard } from './charts/claude-lifetime';
 export { ProjectCostChart } from './charts/project-cost-chart';
 
 // Hooks / Provider
-export { DataProviderWrapper, useStats, useProjects, useSessions, useSessionDetail, useProjectSessions, TeamsProviderWrapper, useTeams } from './hooks/use-data';
+export {
+  DataProviderWrapper,
+  useStats,
+  useProjects,
+  useSessions,
+  useSessionDetail,
+  useProjectSessions,
+  TeamsProviderWrapper,
+  useTeams,
+} from './hooks/use-data';
 
 // Pages
-export { OverviewPage, CostsPage, SessionsPage, SessionDetailPage, ProjectsPage, ProjectDetailPage, TeamsPage, SkillsPage, DataPage } from './pages/index';
+export {
+  OverviewPage,
+  CostsPage,
+  SessionsPage,
+  SessionDetailPage,
+  ProjectsPage,
+  ProjectDetailPage,
+  TeamsPage,
+  SkillsPage,
+  DataPage,
+} from './pages/index';
 
 // CSS (consumers must import separately)
 // import '@repo/ui/globals.css'

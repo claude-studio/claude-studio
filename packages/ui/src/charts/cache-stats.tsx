@@ -3,20 +3,17 @@ import * as React from 'react';
 import type { CacheStats } from '@repo/shared';
 import { formatTokens, formatCost } from '@repo/shared';
 import { Info } from 'lucide-react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '../components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 
 interface CacheStatsCardProps {
   data: CacheStats;
 }
 
 const TOOLTIPS = {
-  cacheHitRate: '캐시 생성+읽기 토큰 중 재사용(읽기) 비율입니다. 높을수록 같은 컨텍스트를 반복 활용한 것입니다.',
-  estimatedSavings: '캐시 읽기 토큰에 실제 사용 모델의 가중평균 입력 단가를 적용한 예상 절약액입니다. (캐시 읽기는 일반 입력의 약 10% 과금)',
+  cacheHitRate:
+    '캐시 생성+읽기 토큰 중 재사용(읽기) 비율입니다. 높을수록 같은 컨텍스트를 반복 활용한 것입니다.',
+  estimatedSavings:
+    '캐시 읽기 토큰에 실제 사용 모델의 가중평균 입력 단가를 적용한 예상 절약액입니다. (캐시 읽기는 일반 입력의 약 10% 과금)',
   cacheCreation: '처음 캐시를 생성할 때 사용된 토큰 수입니다. 일반 입력보다 약 25% 비쌉니다.',
   cacheRead: '이미 저장된 캐시를 재사용한 토큰 수입니다. 일반 입력 대비 약 90% 저렴합니다.',
 };
@@ -48,11 +45,15 @@ export function CacheStatsCard({ data }: CacheStatsCardProps) {
           </div>
           <div className="rounded-lg bg-muted/50 p-3">
             <FieldLabel label="절약 비용" tooltip={TOOLTIPS.estimatedSavings} />
-            <p className="text-xl font-semibold mt-1 text-primary">{formatCost(data.estimatedSavingsUsd)}</p>
+            <p className="text-xl font-semibold mt-1 text-primary">
+              {formatCost(data.estimatedSavingsUsd)}
+            </p>
           </div>
           <div className="rounded-lg bg-muted/50 p-3">
             <FieldLabel label="캐시 생성 토큰" tooltip={TOOLTIPS.cacheCreation} />
-            <p className="text-lg font-semibold mt-1">{formatTokens(data.totalCacheCreationTokens)}</p>
+            <p className="text-lg font-semibold mt-1">
+              {formatTokens(data.totalCacheCreationTokens)}
+            </p>
           </div>
           <div className="rounded-lg bg-muted/50 p-3">
             <FieldLabel label="캐시 읽기 토큰" tooltip={TOOLTIPS.cacheRead} />

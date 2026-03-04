@@ -14,9 +14,7 @@ export function ProjectsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold">프로젝트</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          {projects?.length ?? 0}개 프로젝트
-        </p>
+        <p className="text-muted-foreground text-sm mt-1">{projects?.length ?? 0}개 프로젝트</p>
       </div>
 
       <div className="grid gap-4">
@@ -34,16 +32,15 @@ export function ProjectsPage() {
                 </div>
                 <p className="text-xs text-muted-foreground truncate">{project.path}</p>
                 <p className="text-xs text-muted-foreground">
-                  {formatCost(project.totalCost)} · {formatTokens(project.totalTokens)} 토큰 · {formatNumber(project.sessionCount)}개 세션 · {timeAgo(project.lastActivity)}
+                  {formatCost(project.totalCost)} · {formatTokens(project.totalTokens)} 토큰 ·{' '}
+                  {formatNumber(project.sessionCount)}개 세션 · {timeAgo(project.lastActivity)}
                 </p>
               </CardContent>
             </Card>
           </Link>
         ))}
         {(!projects || projects.length === 0) && (
-          <p className="text-muted-foreground text-sm text-center py-8">
-            프로젝트가 없습니다
-          </p>
+          <p className="text-muted-foreground text-sm text-center py-8">프로젝트가 없습니다</p>
         )}
       </div>
     </div>

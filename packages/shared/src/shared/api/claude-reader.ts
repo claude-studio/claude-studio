@@ -302,10 +302,7 @@ export function getSessions(claudeDir?: string): SessionInfo[] {
   return sessions;
 }
 
-export function getSessionDetail(
-  sessionId: string,
-  claudeDir?: string
-): SessionDetail | null {
+export function getSessionDetail(sessionId: string, claudeDir?: string): SessionDetail | null {
   const cacheKey = `session:${sessionId}`;
   const cached = getCached<SessionDetail>(cacheKey);
   if (cached) return cached;
@@ -446,17 +443,14 @@ export function getProjects(claudeDir?: string): ProjectInfo[] {
   }
 
   const projects = Array.from(projectMap.values()).sort(
-    (a, b) => b.lastActivity.getTime() - a.lastActivity.getTime()
+    (a, b) => b.lastActivity.getTime() - a.lastActivity.getTime(),
   );
 
   setCached('projects', projects);
   return projects;
 }
 
-export function getProjectSessions(
-  projectId: string,
-  claudeDir?: string
-): SessionInfo[] {
+export function getProjectSessions(projectId: string, claudeDir?: string): SessionInfo[] {
   const sessions = getSessions(claudeDir);
   return sessions.filter((s) => s.projectPath === projectId);
 }
@@ -599,8 +593,7 @@ export function getDashboardStats(claudeDir?: string): DashboardStats {
         const dateKey = toLocalDateStr(new Date(m.timestamp as string));
         const dailyEntry = dailyMap.get(dateKey);
         if (dailyEntry) {
-          dailyEntry.modelCosts[model] =
-            (dailyEntry.modelCosts[model] ?? 0) + msgCost;
+          dailyEntry.modelCosts[model] = (dailyEntry.modelCosts[model] ?? 0) + msgCost;
         }
       }
     }
@@ -609,18 +602,18 @@ export function getDashboardStats(claudeDir?: string): DashboardStats {
   // Cache stats
   // 적중률 = 캐시 읽기 / 전체 캐시 관련 토큰 (생성+읽기)
   const totalCacheTokens = totalCacheCreation + totalCacheRead;
-  const cacheHitRate = totalCacheTokens > 0
-    ? Math.round((totalCacheRead / totalCacheTokens) * 100)
-    : 0;
+  const cacheHitRate =
+    totalCacheTokens > 0 ? Math.round((totalCacheRead / totalCacheTokens) * 100) : 0;
   // 실제 모델별 가중평균 입력 단가로 절약 비용 계산
   // 캐시 읽기는 일반 입력의 ~10% 과금 → 절약 = 캐시 읽기 토큰 × 입력 단가 × 90%
   const totalModelTokens = Array.from(modelMap.values()).reduce((s, m) => s + m.inputTokens, 0);
-  const weightedInputPrice = totalModelTokens > 0
-    ? Array.from(modelMap.values()).reduce((s, m) => {
-        const pricing = getPricing(m.model);
-        return s + (m.inputTokens / totalModelTokens) * pricing.input;
-      }, 0)
-    : 3; // fallback: Sonnet 기본값
+  const weightedInputPrice =
+    totalModelTokens > 0
+      ? Array.from(modelMap.values()).reduce((s, m) => {
+          const pricing = getPricing(m.model);
+          return s + (m.inputTokens / totalModelTokens) * pricing.input;
+        }, 0)
+      : 3; // fallback: Sonnet 기본값
   const estimatedSavingsUsd = (totalCacheRead * weightedInputPrice * 0.9) / 1_000_000;
   const cacheStats: CacheStats = {
     totalCacheCreationTokens: totalCacheCreation,
@@ -637,12 +630,11 @@ export function getDashboardStats(claudeDir?: string): DashboardStats {
 
   // Conversation stats
   const sessionsWithDuration = sessions.filter((s) => s.duration > 0);
-  const avgSessionDurationMs = sessionsWithDuration.length > 0
-    ? sessionsWithDuration.reduce((sum, s) => sum + s.duration, 0) / sessionsWithDuration.length
-    : 0;
-  const avgMessagesPerSession = sessions.length > 0
-    ? totalMessages / sessions.length
-    : 0;
+  const avgSessionDurationMs =
+    sessionsWithDuration.length > 0
+      ? sessionsWithDuration.reduce((sum, s) => sum + s.duration, 0) / sessionsWithDuration.length
+      : 0;
+  const avgMessagesPerSession = sessions.length > 0 ? totalMessages / sessions.length : 0;
   const TEN_MIN = 10 * 60 * 1000;
   const ONE_HOUR = 60 * 60 * 1000;
   const conversationStats: ConversationStats = {
@@ -680,9 +672,7 @@ export function getDashboardStats(claudeDir?: string): DashboardStats {
     modelBreakdown: Array.from(modelMap.values())
       .filter((m) => m.messageCount > 0 && m.model !== '<synthetic>')
       .sort((a, b) => b.cost - a.cost),
-    dailyUsage: Array.from(dailyMap.values()).sort((a, b) =>
-      a.date.localeCompare(b.date)
-    ),
+    dailyUsage: Array.from(dailyMap.values()).sort((a, b) => a.date.localeCompare(b.date)),
     peakHours: Array.from(hourMap.values()),
     recentSessions: sessions.slice(0, 10),
     activityData: Array.from(activityMap.entries()).map(([date, count]) => ({
@@ -708,12 +698,14 @@ export function getClaudeSettings(claudeDir?: string): ClaudeSettings {
     const parsed = JSON.parse(raw) as Record<string, unknown>;
     return {
       model: typeof parsed.model === 'string' ? parsed.model : undefined,
-      enabledPlugins: typeof parsed.enabledPlugins === 'object' && parsed.enabledPlugins !== null
-        ? parsed.enabledPlugins as Record<string, boolean>
-        : undefined,
-      permissions: typeof parsed.permissions === 'object' && parsed.permissions !== null
-        ? parsed.permissions as { defaultMode?: string; allow?: string[] }
-        : undefined,
+      enabledPlugins:
+        typeof parsed.enabledPlugins === 'object' && parsed.enabledPlugins !== null
+          ? (parsed.enabledPlugins as Record<string, boolean>)
+          : undefined,
+      permissions:
+        typeof parsed.permissions === 'object' && parsed.permissions !== null
+          ? (parsed.permissions as { defaultMode?: string; allow?: string[] })
+          : undefined,
     };
   } catch {
     return {};
@@ -734,7 +726,9 @@ export function getSkills(claudeDir?: string): SkillInfo[] {
       const entryPath = path.join(skillsDir, entry);
       try {
         if (!fs.statSync(entryPath).isDirectory()) continue;
-      } catch { continue; }
+      } catch {
+        continue;
+      }
 
       // Find SKILL.md or skill.md
       let skillFile = path.join(entryPath, 'SKILL.md');
@@ -770,9 +764,13 @@ export function getSkills(claudeDir?: string): SkillInfo[] {
         const body = bodyMatch?.[1]?.trim() ?? '';
 
         skills.push({ name, description, userInvocable, body });
-      } catch { continue; }
+      } catch {
+        continue;
+      }
     }
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 
   return skills.sort((a, b) => a.name.localeCompare(b.name));
 }
@@ -793,16 +791,15 @@ function readStatsCache(claudeDir?: string): Record<string, any> | null {
 export function getClaudeLifetime(claudeDir?: string): ClaudeLifetime {
   const sc = readStatsCache(claudeDir);
 
-  const firstSessionDate = sc?.firstSessionDate
-    ? new Date(sc.firstSessionDate as string)
-    : null;
+  const firstSessionDate = sc?.firstSessionDate ? new Date(sc.firstSessionDate as string) : null;
   const daysActive = firstSessionDate
     ? Math.floor((Date.now() - firstSessionDate.getTime()) / (1000 * 60 * 60 * 24))
     : 0;
 
   const longest = sc?.longestSession as Record<string, unknown> | undefined;
   const longestSessionDurationMs = typeof longest?.duration === 'number' ? longest.duration : 0;
-  const longestSessionMessageCount = typeof longest?.messageCount === 'number' ? longest.messageCount : 0;
+  const longestSessionMessageCount =
+    typeof longest?.messageCount === 'number' ? longest.messageCount : 0;
 
   return {
     firstSessionDate,
@@ -854,23 +851,33 @@ export function getTeams(claudeDir?: string): import('../types/index').TeamDetai
             for (const taskFile of taskFiles) {
               try {
                 const taskRaw = JSON.parse(
-                  fs.readFileSync(path.join(teamTasksDir, taskFile), 'utf-8')
+                  fs.readFileSync(path.join(teamTasksDir, taskFile), 'utf-8'),
                 ) as Record<string, unknown>;
                 if (taskRaw.status === 'deleted') continue;
                 tasks.push({
-                  id: typeof taskRaw.id === 'string' ? taskRaw.id : path.basename(taskFile, '.json'),
+                  id:
+                    typeof taskRaw.id === 'string' ? taskRaw.id : path.basename(taskFile, '.json'),
                   subject: typeof taskRaw.subject === 'string' ? taskRaw.subject : '',
-                  description: typeof taskRaw.description === 'string' ? taskRaw.description : undefined,
-                  status: (['pending', 'in_progress', 'completed', 'deleted'].includes(taskRaw.status as string)
+                  description:
+                    typeof taskRaw.description === 'string' ? taskRaw.description : undefined,
+                  status: (['pending', 'in_progress', 'completed', 'deleted'].includes(
+                    taskRaw.status as string,
+                  )
                     ? taskRaw.status
                     : 'pending') as 'pending' | 'in_progress' | 'completed' | 'deleted',
                   owner: typeof taskRaw.owner === 'string' ? taskRaw.owner : undefined,
-                  blocks: Array.isArray(taskRaw.blocks) ? taskRaw.blocks as string[] : [],
-                  blockedBy: Array.isArray(taskRaw.blockedBy) ? taskRaw.blockedBy as string[] : [],
+                  blocks: Array.isArray(taskRaw.blocks) ? (taskRaw.blocks as string[]) : [],
+                  blockedBy: Array.isArray(taskRaw.blockedBy)
+                    ? (taskRaw.blockedBy as string[])
+                    : [],
                 });
-              } catch { continue; }
+              } catch {
+                continue;
+              }
             }
-          } catch { /* skip */ }
+          } catch {
+            /* skip */
+          }
         }
 
         // Read inboxes
@@ -883,7 +890,7 @@ export function getTeams(claudeDir?: string): import('../types/index').TeamDetai
               const agentName = path.basename(inboxFile, '.json');
               try {
                 const raw = JSON.parse(
-                  fs.readFileSync(path.join(inboxesDir, inboxFile), 'utf-8')
+                  fs.readFileSync(path.join(inboxesDir, inboxFile), 'utf-8'),
                 ) as unknown;
                 if (Array.isArray(raw)) {
                   inboxes[agentName] = (raw as AnyMessage[])
@@ -896,23 +903,28 @@ export function getTeams(claudeDir?: string): import('../types/index').TeamDetai
                       read: typeof item.read === 'boolean' ? item.read : undefined,
                     }));
                 }
-              } catch { /* skip */ }
+              } catch {
+                /* skip */
+              }
             }
-          } catch { /* skip */ }
+          } catch {
+            /* skip */
+          }
         }
 
         results.push({ team, tasks: tasks.sort((a, b) => Number(a.id) - Number(b.id)), inboxes });
-      } catch { continue; }
+      } catch {
+        continue;
+      }
     }
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 
   return results;
 }
 
-export function searchSessions(
-  query: string,
-  claudeDir?: string
-): SessionInfo[] {
+export function searchSessions(query: string, claudeDir?: string): SessionInfo[] {
   const sessions = getSessions(claudeDir);
   if (!query.trim()) return sessions;
 
@@ -921,6 +933,6 @@ export function searchSessions(
     (s) =>
       s.projectName.toLowerCase().includes(q) ||
       s.projectPath.toLowerCase().includes(q) ||
-      s.id.toLowerCase().includes(q)
+      s.id.toLowerCase().includes(q),
   );
 }
