@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import {
   useSessionDetail,
@@ -8,7 +9,8 @@ import {
   Badge,
   ScrollArea,
 } from '@repo/ui';
-import { formatCost, formatCostUsd, formatTokens, formatDuration } from '@repo/shared';
+import { formatCost, formatCostUsd, formatTokens, formatDuration, timeAgo } from '@repo/shared';
+import { ArrowLeft, AlertCircle } from 'lucide-react';
 
 function CostValue({ cost }: { cost: number }) {
   return (
@@ -18,7 +20,6 @@ function CostValue({ cost }: { cost: number }) {
     </span>
   );
 }
-import { ArrowLeft } from 'lucide-react';
 
 export const Route = createFileRoute('/sessions/$id')({
   component: SessionDetailPage,
@@ -26,7 +27,9 @@ export const Route = createFileRoute('/sessions/$id')({
 
 function SessionDetailPage() {
   const { id } = Route.useParams();
-  const { data: session, isLoading } = useSessionDetail(id);
+  const { data: session, isLoading, isError } = useSessionDetail(id);
+  const [hideErrors, setHideErrors] = React.useState(false);
+  const [hideSidechain, setHideSidechain] = React.useState(false);
 
   if (isLoading)
     return (
@@ -35,7 +38,15 @@ function SessionDetailPage() {
       </div>
     );
 
-  if (!session) return <div className="text-muted-foreground">세션을 찾을 수 없습니다</div>;
+  if (isError)
+    return (
+      <div className="flex items-center gap-2 text-destructive">
+        <AlertCircle className="h-4 w-4" />
+        <span className="text-sm">세션을 불러오는 중 오류가 발생했습니다.</span>
+      </div>
+    );
+
+  if (!session) return <div className="text-muted-foreground text-sm">세션을 찾을 수 없습니다.</div>;
 
   return (
     <div className="space-y-6">
@@ -106,78 +117,101 @@ function SessionDetailPage() {
 
       <Card className="border-border/50">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">
-            대화 내용 ({session.messages?.length ?? 0}개 메시지)
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm font-medium">
+              대화 내용 ({session.messages?.length ?? 0}개 메시지)
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setHideErrors((v) => !v)}
+                className={`text-xs px-2 py-1 rounded-md transition-colors ${
+                  hideErrors ? 'bg-red-500/20 text-red-400' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+              >
+                오류 {hideErrors ? '표시' : '숨기기'}
+              </button>
+              <button
+                onClick={() => setHideSidechain((v) => !v)}
+                className={`text-xs px-2 py-1 rounded-md transition-colors ${
+                  hideSidechain ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
+              >
+                서브에이전트 {hideSidechain ? '표시' : '숨기기'}
+              </button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[500px] pr-4">
             <div className="space-y-3">
               {(session.messages ?? []).map(
                 (msg: Record<string, unknown>, i: number) => {
-                  const message = msg.message as
-                    | Record<string, unknown>
-                    | undefined;
-                  const role =
-                    (message?.role as string) || (msg.type as string);
-                  const content = message?.content || msg.content;
-                  if (
-                    !content ||
-                    (Array.isArray(content) && content.length === 0)
-                  )
-                    return null;
+                  const raw = msg as Record<string, unknown>;
+                  const inner = (raw.message as Record<string, unknown>) ?? raw;
+                  const role = (inner.role as string) ?? (raw.type as string);
+                  const content = inner.content ?? raw.content;
+                  const model = inner.model as string | undefined;
+                  const timestamp = raw.timestamp as string | undefined;
+                  const isApiError = !!(raw.isApiErrorMessage);
+                  const isSidechain = !!(raw.isSidechain);
 
-                  const text =
-                    typeof content === 'string'
-                      ? content
-                      : Array.isArray(content)
-                        ? (content as Record<string, unknown>[])
-                            .filter(
-                              (c: Record<string, unknown>) =>
-                                c?.type === 'text',
-                            )
-                            .map((c: Record<string, unknown>) => c.text)
-                            .join('\n')
-                        : JSON.stringify(content).slice(0, 200);
+                  if (hideErrors && isApiError) return null;
+                  if (hideSidechain && isSidechain) return null;
+
+                  if (!content || (Array.isArray(content) && content.length === 0)) return null;
+
+                  if (Array.isArray(content) && (content as Array<{ type?: string }>)[0]?.type === 'tool_result') return null;
+
+                  let text: string;
+                  if (typeof content === 'string') {
+                    const stripped = content.replace(/<[^>]+>[\s\S]*?<\/[^>]+>/g, '').trim();
+                    if (!stripped) return null;
+                    text = stripped;
+                  } else if (Array.isArray(content)) {
+                    text = (content as Array<{ type?: string; text?: string }>)
+                      .filter((c) => c?.type === 'text' && c?.text)
+                      .map((c) => c.text)
+                      .join('\n') || '';
+                  } else {
+                    text = JSON.stringify(content);
+                  }
 
                   if (!text) return null;
 
+                  const isUser = role === 'user';
                   return (
-                    <div
-                      key={i}
-                      className={`flex gap-3 ${role === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
-                          role === 'user'
-                            ? 'bg-primary/10 text-foreground'
-                            : 'bg-muted text-foreground'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2 mb-1">
-                          <Badge
-                            variant="secondary"
-                            className="text-[10px] px-1.5 py-0"
-                          >
-                            {role === 'user'
-                              ? '사용자'
-                              : (message?.model as string)
-                                ? (message!.model as string)
-                                    .split('-')
-                                    .slice(-2)
-                                    .join('-')
-                                : '어시스턴트'}
+                    <div key={i} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`max-w-[80%] ${isUser ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
+                        <div className={`flex items-center gap-2 flex-wrap ${isUser ? 'flex-row-reverse' : ''}`}>
+                          <Badge variant={isUser ? 'secondary' : 'default'} className="text-[10px] px-1.5 py-0">
+                            {isUser ? '사용자' : '어시스턴트'}
                           </Badge>
-                          {(msg.costUSD as number) != null && (
-                            <span className="text-[10px] text-muted-foreground">
-                              {formatCost(msg.costUSD as number)}
-                            </span>
+                          {isSidechain && (
+                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-primary/15 text-primary border-0">
+                              서브에이전트
+                            </Badge>
+                          )}
+                          {isApiError && (
+                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-red-500/15 text-red-400 border-0">
+                              API 오류
+                            </Badge>
+                          )}
+                          {model && (
+                            <span className="text-xs text-muted-foreground">{model.split('-').slice(-2).join('-')}</span>
+                          )}
+                          {timestamp && (
+                            <span className="text-xs text-muted-foreground">{timeAgo(timestamp)}</span>
                           )}
                         </div>
-                        <p className="whitespace-pre-wrap break-words">
-                          {(text as string).slice(0, 1000)}
-                          {(text as string).length > 1000 ? '...' : ''}
-                        </p>
+                        <div className={`rounded-lg px-3 py-2 text-sm whitespace-pre-wrap break-words ${
+                          isApiError
+                            ? 'bg-red-500/10 text-red-400 border border-red-500/20'
+                            : isUser
+                              ? 'bg-primary/10 text-foreground'
+                              : 'bg-muted text-foreground'
+                        }`}>
+                          {text.length > 1000 ? text.slice(0, 1000) + '...' : text}
+                        </div>
                       </div>
                     </div>
                   );

@@ -19,7 +19,7 @@ export const Route = createFileRoute('/skills')({
 function SkillsPage() {
   const [selected, setSelected] = React.useState<SkillInfo | null>(null);
 
-  const { data: skills = [], isLoading } = useQuery({
+  const { data: skills = [], isLoading, isError } = useQuery({
     queryKey: ['skills'],
     queryFn: () => window.electronAPI.getSkills(),
     staleTime: 60_000,
@@ -43,7 +43,11 @@ function SkillsPage() {
         </div>
       )}
 
-      {!isLoading && skills.length === 0 && (
+      {isError && (
+        <p className="text-sm text-destructive">스킬 목록을 불러오는 중 오류가 발생했습니다.</p>
+      )}
+
+      {!isLoading && !isError && skills.length === 0 && (
         <p className="text-sm text-muted-foreground">등록된 스킬이 없습니다.</p>
       )}
 

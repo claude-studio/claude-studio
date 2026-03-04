@@ -10,6 +10,7 @@ import {
 } from '@repo/ui';
 import { formatCost, formatTokens, formatNumber, timeAgo, formatDuration } from '@repo/shared';
 import * as React from 'react';
+import { AlertCircle } from 'lucide-react';
 
 export const Route = createFileRoute('/sessions/$id')({
   component: SessionDetailPage,
@@ -17,7 +18,7 @@ export const Route = createFileRoute('/sessions/$id')({
 
 function SessionDetailPage() {
   const { id } = Route.useParams();
-  const { data: session, isLoading } = useSessionDetail(id);
+  const { data: session, isLoading, isError } = useSessionDetail(id);
   const [hideErrors, setHideErrors] = React.useState(false);
   const [hideSidechain, setHideSidechain] = React.useState(false);
 
@@ -29,8 +30,17 @@ function SessionDetailPage() {
     );
   }
 
+  if (isError) {
+    return (
+      <div className="flex items-center gap-2 text-destructive">
+        <AlertCircle className="h-4 w-4" />
+        <span className="text-sm">세션을 불러오는 중 오류가 발생했습니다.</span>
+      </div>
+    );
+  }
+
   if (!session) {
-    return <div className="text-muted-foreground">Session not found</div>;
+    return <div className="text-muted-foreground text-sm">세션을 찾을 수 없습니다.</div>;
   }
 
   return (

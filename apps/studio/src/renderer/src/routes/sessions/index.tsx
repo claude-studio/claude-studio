@@ -1,6 +1,8 @@
+import * as React from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { useSessions, Card, CardContent, Badge } from '@repo/ui';
-import { formatCost, formatTokens, formatNumber, timeAgo, formatDuration } from '@repo/shared';
+import { useSessions, Card, CardContent, Badge, Input } from '@repo/ui';
+import { formatCost, formatTokens, formatNumber, timeAgo, formatDuration, getModelShortName } from '@repo/shared';
+import { Search } from 'lucide-react';
 
 export const Route = createFileRoute('/sessions/')({
   component: SessionsPage,
@@ -8,6 +10,19 @@ export const Route = createFileRoute('/sessions/')({
 
 function SessionsPage() {
   const { data: sessions, isLoading } = useSessions();
+  const [query, setQuery] = React.useState('');
+
+  const filtered = React.useMemo(() => {
+    if (!sessions) return [];
+    if (!query.trim()) return sessions;
+    const q = query.toLowerCase();
+    return sessions.filter(
+      (s) =>
+        s.projectName.toLowerCase().includes(q) ||
+        s.projectPath.toLowerCase().includes(q) ||
+        s.id.toLowerCase().includes(q),
+    );
+  }, [sessions, query]);
 
   if (isLoading) {
     return (
@@ -19,15 +34,26 @@ function SessionsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">세션</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          {sessions?.length ?? 0}개 세션
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">세션</h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            {filtered.length}개 세션
+          </p>
+        </div>
+        <div className="relative w-64">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="세션 검색..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="pl-9"
+          />
+        </div>
       </div>
 
       <div className="grid gap-3">
-        {sessions?.map((session) => (
+        {filtered.map((session) => (
           <Link
             key={session.id}
             to="/sessions/$id"
@@ -54,7 +80,7 @@ function SessionsPage() {
                     <div className="flex gap-1">
                       {session.models.slice(0, 2).map((m) => (
                         <Badge key={m} variant="secondary" className="text-xs">
-                          {m}
+                          {getModelShortName(m)}
                         </Badge>
                       ))}
                     </div>
@@ -64,7 +90,7 @@ function SessionsPage() {
             </Card>
           </Link>
         ))}
-        {(!sessions || sessions.length === 0) && (
+        {filtered.length === 0 && (
           <p className="text-muted-foreground text-sm text-center py-8">
             세션이 없습니다
           </p>
