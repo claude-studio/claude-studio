@@ -8,6 +8,8 @@ files:
   - "!node_modules/**/*"
 publish:
   provider: github
+  owner: claude-studio
+  repo: claude-studio
   releaseType: release
 mac:
   target:
