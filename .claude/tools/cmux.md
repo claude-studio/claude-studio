@@ -193,11 +193,13 @@ fi
 cmux clear-progress
 ```
 
-### 현재 열린 모든 surface 파악
+### 현재 열린 모든 surface 파악 (탭 무관)
 ```bash
-cmux list-workspaces
-cmux list-pane-surfaces --workspace workspace:1
-cmux list-pane-surfaces --workspace workspace:2
+# ⚠️ cmux list-pane-surfaces는 현재 선택된 tab의 surface만 반환 — 다른 탭의 surface 누락됨
+# surface.list RPC를 사용하면 워크스페이스 전체 surface를 탭 구분 없이 조회 가능
+SOCK="${CMUX_SOCKET_PATH:-/tmp/cmux.sock}"
+printf '%s\n' '{"id":"sl","method":"surface.list","params":{}}' | nc -U "$SOCK"
+# → 모든 surface의 ref, title, type, pane_ref 반환 (title에 실행 중인 명령 포함)
 ```
 
 ### 특정 워크스페이스 surface에 명령 전송
