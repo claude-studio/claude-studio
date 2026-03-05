@@ -6,5 +6,5 @@
 
 | 도구 | 설명 | 상세 레퍼런스 |
 |------|------|--------------|
-| cmux browser | 터미널 내 브라우저 자동화 (열기, 클릭, 폼, 스냅샷 등) | `~/.claude/tools/cmux-browser.md` |
-| cmux | 워크스페이스/surface 제어, 입력 전송, 사이드바 메타데이터 | `~/.claude/tools/cmux.md` |
+| cmux browser | 터미널 내 브라우저 자동화 (열기, 클릭, 폼, 스냅샷 등) | `.claude/tools/cmux-browser.md` |
+| cmux | 워크스페이스/surface 제어, 입력 전송, 사이드바 메타데이터 | `.claude/tools/cmux.md` |
