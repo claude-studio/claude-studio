@@ -8,7 +8,7 @@ files:
   - "!node_modules/**/*"
 publish:
   provider: github
-  releaseType: draft
+  releaseType: release
 mac:
   target:
     - target: dmg
