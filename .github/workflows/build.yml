@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build (e.g. v1.0.0)'
+        required: true
+        default: 'v1.0.0'
 
 permissions:
   contents: write
@@ -23,8 +29,10 @@ jobs:
 
       - name: Set version from tag
         run: |
-          VERSION=${GITHUB_REF_NAME#v}
+          TAG=${{ github.event.inputs.tag || github.ref_name }}
+          VERSION=${TAG#v}
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "TAG=$TAG" >> $GITHUB_ENV
           node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('apps/studio/package.json')); p.version='$VERSION'; fs.writeFileSync('apps/studio/package.json', JSON.stringify(p, null, 2)+'\n');"
 
       - name: Install dependencies
@@ -42,9 +50,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          TAG=${GITHUB_REF_NAME}
           NOTES=$(gh release view "$TAG" --json body -q '.body')
-          APPEND=$(cat <<'EOF'
+          APPEND=$(cat <<'NOTES_EOF'
 
           ---
 
@@ -58,7 +65,7 @@ jobs:
           ```bash
           xattr -cr /Applications/Claude\ Studio.app
           ```
-          EOF
+          NOTES_EOF
           )
           gh release edit "$TAG" --notes "${NOTES}${APPEND}"
 
@@ -77,8 +84,10 @@ jobs:
       - name: Set version from tag
         shell: bash
         run: |
-          VERSION=${GITHUB_REF_NAME#v}
+          TAG=${{ github.event.inputs.tag || github.ref_name }}
+          VERSION=${TAG#v}
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "TAG=$TAG" >> $GITHUB_ENV
           node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('apps/studio/package.json')); p.version='$VERSION'; fs.writeFileSync('apps/studio/package.json', JSON.stringify(p, null, 2)+'\n');"
 
       - name: Install dependencies
