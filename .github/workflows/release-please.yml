@@ -12,7 +12,79 @@ permissions:
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
       - uses: googleapis/release-please-action@v4
+        id: release
         with:
           token: ${{ secrets.GH_TOKEN }}
+
+  build:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            platform: mac
+          - os: windows-latest
+            platform: win
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Set version from tag
+        shell: bash
+        env:
+          TAG: ${{ needs.release-please.outputs.tag_name }}
+        run: |
+          VERSION=${TAG#v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "TAG=$TAG" >> $GITHUB_ENV
+          node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('apps/studio/package.json')); p.version='$VERSION'; fs.writeFileSync('apps/studio/package.json', JSON.stringify(p, null, 2)+'\n');"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        shell: bash
+        run: pnpm --filter @repo/shared build || true && pnpm --filter @repo/ui build || true
+
+      - name: Build & publish Electron app
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        shell: bash
+        run: pnpm --filter @repo/studio build && cd apps/studio && pnpm exec electron-builder --${{ matrix.platform }} --publish always
+
+      - name: Append install notes to release (macOS)
+        if: matrix.platform == 'mac'
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          NOTES=$(gh release view "$TAG" --json body -q '.body')
+          APPEND=$(cat <<'NOTES_EOF'
+
+          ---
+
+          ## 설치 안내
+
+          ### macOS — "손상됨" 오류 해결
+
+          Apple 공증(Notarization)을 받지 않은 앱은 Gatekeeper가 차단합니다.
+          앱을 Applications 폴더로 이동한 뒤 터미널에서 아래 명령어를 실행하세요.
+
+          ```bash
+          xattr -cr /Applications/Claude\ Studio.app
+          ```
+          NOTES_EOF
+          )
+          gh release edit "$TAG" --notes "${NOTES}${APPEND}"
