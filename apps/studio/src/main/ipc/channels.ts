@@ -1,0 +1,17 @@
+export enum IpcChannel {
+  GetStats = 'stats:get',
+  GetProjects = 'projects:get',
+  GetProjectSessions = 'projects:sessions',
+  GetSessions = 'sessions:get',
+  GetSessionDetail = 'sessions:detail',
+  SearchSessions = 'sessions:search',
+  GetDataSource = 'data-source:get',
+  SetDataSource = 'data-source:set',
+  ExportData = 'data:export',
+  ImportData = 'data:import',
+  ClearImport = 'data:clear-import',
+  GetCostAnalysis = 'costs:get',
+  GetClaudeSettings = 'settings:get',
+  GetSkills = 'skills:get',
+  GetTeams = 'teams:get',
+}

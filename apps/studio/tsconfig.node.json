@@ -1,0 +1,14 @@
+{
+  "extends": "@repo/typescript-config/electron-main.json",
+  "compilerOptions": {
+    "composite": true,
+    "incremental": true,
+    "outDir": "out",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src/main/**/*", "src/preload/**/*"],
+  "exclude": ["node_modules"]
+}

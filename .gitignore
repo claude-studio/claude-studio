@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.turbo/
+*.local
+.env
+out/
+release/
+.DS_Store
+coverage/
+.playwright-mcp/

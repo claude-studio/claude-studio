@@ -1,0 +1,16 @@
+{
+  "extends": "@repo/typescript-config/vite-app.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src", ".turbo/generators/config.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "../../packages/shared/src/shared/api"
+  ]
+}

@@ -1,0 +1,73 @@
+// Utilities
+export { cn } from './lib/utils';
+
+// Components
+export { Badge, badgeVariants } from './components/ui/badge';
+export { Button, buttonVariants } from './components/ui/button';
+export {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from './components/ui/card';
+export {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogTitle,
+  DialogTrigger,
+} from './components/ui/dialog';
+export { Input } from './components/ui/input';
+export { ScrollArea, ScrollBar } from './components/ui/scroll-area';
+export { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
+export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './components/ui/tooltip';
+
+// Layout
+export { Sidebar } from './layout/sidebar';
+export { StatCard } from './layout/stat-card';
+export { CostDisplay } from './layout/cost-display';
+
+// Charts
+export { ActivityHeatmap } from './charts/activity-heatmap';
+export { CacheStatsCard } from './charts/cache-stats';
+export { ClaudeLifetimeCard } from './charts/claude-lifetime';
+export { ConversationStatsCard } from './charts/conversation-stats';
+export { CostChart } from './charts/cost-chart';
+export { ModelBreakdown } from './charts/model-breakdown';
+export { PeakHours } from './charts/peak-hours';
+export { ProjectCostChart } from './charts/project-cost-chart';
+export { ToolUsageChart } from './charts/tool-usage';
+export { UsageOverTime } from './charts/usage-over-time';
+
+// Hooks / Provider
+export {
+  DataProviderWrapper,
+  TeamsProviderWrapper,
+  useProjects,
+  useProjectSessions,
+  useSessionDetail,
+  useSessions,
+  useStats,
+  useTeams,
+} from './hooks/use-data';
+
+// Pages
+export {
+  CostsPage,
+  DataPage,
+  OverviewPage,
+  ProjectDetailPage,
+  ProjectsPage,
+  SessionDetailPage,
+  SessionsPage,
+  SkillsPage,
+  TeamsPage,
+} from './pages/index';
+
+// CSS (consumers must import separately)
+// import '@repo/ui/globals.css'
