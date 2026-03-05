@@ -3,7 +3,7 @@ name: Build & Release
 on:
   push:
     tags:
-      - 'claude-studio-v*'
+      - 'v*'
 
 permissions:
   contents: write
@@ -23,7 +23,7 @@ jobs:
 
       - name: Set version from tag
         run: |
-          VERSION=${GITHUB_REF_NAME#claude-studio-v}
+          VERSION=${GITHUB_REF_NAME#v}
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('apps/studio/package.json')); p.version='$VERSION'; fs.writeFileSync('apps/studio/package.json', JSON.stringify(p, null, 2)+'\n');"
 
@@ -77,7 +77,7 @@ jobs:
       - name: Set version from tag
         shell: bash
         run: |
-          VERSION=${GITHUB_REF_NAME#claude-studio-v}
+          VERSION=${GITHUB_REF_NAME#v}
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('apps/studio/package.json')); p.version='$VERSION'; fs.writeFileSync('apps/studio/package.json', JSON.stringify(p, null, 2)+'\n');"
 
