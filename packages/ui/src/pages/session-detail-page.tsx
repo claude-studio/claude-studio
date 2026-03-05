@@ -53,7 +53,11 @@ export function SessionDetailPage({ id }: SessionDetailPageProps) {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div
+        className="grid gap-4"
+        style={{ gridTemplateColumns: session.modelBreakdown.length > 0 ? '1fr 1fr' : '1fr 1fr', gridTemplateRows: 'auto auto' }}
+      >
+        {/* Row 1 Left: 비용, 토큰 */}
         <div className="grid grid-cols-2 gap-4">
           <Card className="border-border/50">
             <CardContent className="p-4">
@@ -69,6 +73,24 @@ export function SessionDetailPage({ id }: SessionDetailPageProps) {
               </p>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Row 1-2 Right: 모델별 분석 */}
+        {session.modelBreakdown.length > 0 ? (
+          <Card className="border-border/50" style={{ gridRow: 'span 2' }}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">모델별 분석</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ModelBreakdown data={session.modelBreakdown} />
+            </CardContent>
+          </Card>
+        ) : (
+          <div />
+        )}
+
+        {/* Row 2 Left: 메시지, 툴 호출 */}
+        <div className="grid grid-cols-2 gap-4">
           <Card className="border-border/50">
             <CardContent className="p-4">
               <p className="text-xs text-muted-foreground">메시지</p>
@@ -82,17 +104,6 @@ export function SessionDetailPage({ id }: SessionDetailPageProps) {
             </CardContent>
           </Card>
         </div>
-
-        {session.modelBreakdown.length > 0 && (
-          <Card className="border-border/50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">모델별 분석</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ModelBreakdown data={session.modelBreakdown} />
-            </CardContent>
-          </Card>
-        )}
       </div>
 
       <Card className="border-border/50">

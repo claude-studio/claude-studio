@@ -30,6 +30,7 @@ export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './comp
 // Layout
 export { Sidebar } from './layout/sidebar';
 export { StatCard } from './layout/stat-card';
+export { CostDisplay } from './layout/cost-display';
 
 // Charts
 export { ActivityHeatmap } from './charts/activity-heatmap';

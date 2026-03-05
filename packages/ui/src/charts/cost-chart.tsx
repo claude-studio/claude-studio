@@ -39,7 +39,7 @@ export function CostChart({ data }: CostChartProps) {
   if (models.length === 0) {
     return (
       <ResponsiveContainer width="100%" height={200}>
-        <AreaChart data={chartData}>
+        <AreaChart data={chartData} margin={{ left: 4 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
           <XAxis
             dataKey="date"
@@ -79,7 +79,7 @@ export function CostChart({ data }: CostChartProps) {
 
   return (
     <ResponsiveContainer width="100%" height={200}>
-      <AreaChart data={chartData}>
+      <AreaChart data={chartData} margin={{ left: 4 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
         <XAxis
           dataKey="date"

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import type { DailyUsage } from '@repo/shared';
 import { formatDate, formatDateShort, formatNumber, formatTokens, timeAgo } from '@repo/shared';
 
 import { DollarSign, FolderOpen, MessageSquare, Zap } from 'lucide-react';
@@ -18,6 +19,13 @@ import { StatCard } from '../layout/stat-card';
 import { CostValue } from './cost-value';
 import { PageSpinner } from './page-spinner';
 
+function getDateRangeDesc(dailyUsage: DailyUsage[]): string {
+  const dates = dailyUsage.map((d) => d.date).sort();
+  if (dates.length === 0) return '데이터 없음';
+  if (dates.length === 1) return formatDateShort(dates[0]!);
+  return `${formatDateShort(dates[0]!)} ~ ${formatDateShort(dates[dates.length - 1]!)}`;
+}
+
 export function OverviewPage() {
   const { data: stats, isLoading } = useStats();
   const [modelView, setModelView] = useState<'cost' | 'tokens'>('cost');
@@ -25,12 +33,7 @@ export function OverviewPage() {
   if (isLoading) return <PageSpinner />;
   if (!stats) return <div className="text-muted-foreground">데이터가 없습니다</div>;
 
-  const dateRangeDesc = (() => {
-    const dates = stats.dailyUsage.map((d) => d.date).sort();
-    if (dates.length === 0) return '데이터 없음';
-    if (dates.length === 1) return formatDateShort(dates[0]!);
-    return `${formatDateShort(dates[0]!)} ~ ${formatDateShort(dates[dates.length - 1]!)}`;
-  })();
+  const dateRangeDesc = getDateRangeDesc(stats.dailyUsage);
 
   return (
     <div className="space-y-6">
@@ -86,22 +89,6 @@ export function OverviewPage() {
         </Card>
         <Card className="border-border/50">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">피크 시간대</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <PeakHours data={stats.peakHours} />
-          </CardContent>
-        </Card>
-        <Card className="border-border/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">활동 히트맵</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ActivityHeatmap data={stats.activityData} />
-          </CardContent>
-        </Card>
-        <Card className="border-border/50">
-          <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium">모델별 분석</CardTitle>
               <div className="flex gap-1">
@@ -127,6 +114,22 @@ export function OverviewPage() {
               view={modelView}
               onViewChange={setModelView}
             />
+          </CardContent>
+        </Card>
+        <Card className="border-border/50">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">활동 히트맵</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ActivityHeatmap data={stats.activityData} />
+          </CardContent>
+        </Card>
+        <Card className="border-border/50">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">피크 시간대</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PeakHours data={stats.peakHours} />
           </CardContent>
         </Card>
       </div>
