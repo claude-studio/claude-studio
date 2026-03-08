@@ -3,9 +3,6 @@
   "outputDirectory": "apps/web/dist",
   "installCommand": "pnpm install --frozen-lockfile",
   "framework": "vite",
-  "engines": {
-    "node": "22.x"
-  },
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
