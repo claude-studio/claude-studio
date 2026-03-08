@@ -1,0 +1,4 @@
+apps/studio
+packages/pixel-agents
+**/node_modules
+**/.turbo
