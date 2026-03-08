@@ -69,7 +69,7 @@ export function DashboardPreviewSection() {
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
             대시보드 한눈에 보기
           </h2>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-lg break-keep">
             설치 후 바로 사용할 수 있는 직관적인 인터페이스
           </p>
         </ScrollReveal>
@@ -87,9 +87,9 @@ export function DashboardPreviewSection() {
               <span className="ml-4 text-xs text-muted-foreground">Claude Studio — 대시보드</span>
             </div>
 
-            <div className="flex min-h-[420px]">
-              {/* 사이드바 모킹 */}
-              <div className="w-48 border-r border-border/30 bg-card/50 p-4 flex-shrink-0">
+            <div className="flex min-h-[320px] sm:min-h-[420px]">
+              {/* 사이드바 모킹 — 모바일에서 숨김 */}
+              <div className="hidden sm:block w-48 border-r border-border/30 bg-card/50 p-4 flex-shrink-0">
                 <div className="space-y-1">
                   {['개요', '비용', '프로젝트', '세션', '활동'].map((item, i) => (
                     <div
@@ -103,17 +103,17 @@ export function DashboardPreviewSection() {
               </div>
 
               {/* 메인 콘텐츠 */}
-              <div className="flex-1 p-6">
+              <div className="flex-1 p-3 sm:p-6 min-w-0">
                 {/* 스탯 카드 행 */}
-                <div className="grid grid-cols-4 gap-4 mb-6">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
                   {stats.map((stat) => (
                     <div
                       key={stat.label}
-                      className="rounded-xl border border-border/40 bg-card/60 p-4"
+                      className="rounded-xl border border-border/40 bg-card/60 p-2.5 sm:p-4 min-w-0"
                     >
-                      <p className="text-xs text-muted-foreground mb-1">{stat.label}</p>
-                      <p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{stat.sub}</p>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground mb-1 truncate">{stat.label}</p>
+                      <p className={`text-base sm:text-xl font-bold truncate ${stat.color}`}>{stat.value}</p>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 truncate">{stat.sub}</p>
                     </div>
                   ))}
                 </div>

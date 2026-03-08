@@ -39,10 +39,11 @@ export function HeroSection() {
 
         {/* 헤드라인 */}
         <h1
-          className="text-5xl sm:text-6xl font-bold text-foreground leading-tight mb-6"
+          className="text-3xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6 break-keep"
           style={fadeUp('0.1s')}
         >
-          Claude Code 사용량을, <span className="text-claude-orange-light">한눈에</span>
+          Claude Code 사용량을,{' '}
+          <span className="text-claude-orange-light">한눈에</span>
         </h1>
 
         {/* 서브라인 */}
