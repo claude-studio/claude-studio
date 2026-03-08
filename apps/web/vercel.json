@@ -1,6 +1,0 @@
-{
-  "buildCommand": "cd ../.. && pnpm --filter @repo/web build",
-  "installCommand": "cd ../.. && pnpm install",
-  "outputDirectory": "apps/web/dist",
-  "framework": "vite"
-}
