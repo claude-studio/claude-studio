@@ -9,24 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TeamsRouteImport } from './routes/teams'
 import { Route as SkillsRouteImport } from './routes/skills'
+import { Route as LiveRouteImport } from './routes/live'
 import { Route as DataRouteImport } from './routes/data'
 import { Route as CostsRouteImport } from './routes/costs'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SessionsIndexRouteImport } from './routes/sessions/index'
 import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
-import { Route as SessionsIdRouteImport } from './routes/sessions/$id'
 import { Route as ProjectsIdRouteImport } from './routes/projects/$id'
 
-const TeamsRoute = TeamsRouteImport.update({
-  id: '/teams',
-  path: '/teams',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SkillsRoute = SkillsRouteImport.update({
   id: '/skills',
   path: '/skills',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveRoute = LiveRouteImport.update({
+  id: '/live',
+  path: '/live',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DataRoute = DataRouteImport.update({
@@ -44,19 +42,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SessionsIndexRoute = SessionsIndexRouteImport.update({
-  id: '/sessions/',
-  path: '/sessions/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
   id: '/projects/',
   path: '/projects/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SessionsIdRoute = SessionsIdRouteImport.update({
-  id: '/sessions/$id',
-  path: '/sessions/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectsIdRoute = ProjectsIdRouteImport.update({
@@ -69,35 +57,29 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/costs': typeof CostsRoute
   '/data': typeof DataRoute
+  '/live': typeof LiveRoute
   '/skills': typeof SkillsRoute
-  '/teams': typeof TeamsRoute
   '/projects/$id': typeof ProjectsIdRoute
-  '/sessions/$id': typeof SessionsIdRoute
   '/projects/': typeof ProjectsIndexRoute
-  '/sessions/': typeof SessionsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/costs': typeof CostsRoute
   '/data': typeof DataRoute
+  '/live': typeof LiveRoute
   '/skills': typeof SkillsRoute
-  '/teams': typeof TeamsRoute
   '/projects/$id': typeof ProjectsIdRoute
-  '/sessions/$id': typeof SessionsIdRoute
   '/projects': typeof ProjectsIndexRoute
-  '/sessions': typeof SessionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/costs': typeof CostsRoute
   '/data': typeof DataRoute
+  '/live': typeof LiveRoute
   '/skills': typeof SkillsRoute
-  '/teams': typeof TeamsRoute
   '/projects/$id': typeof ProjectsIdRoute
-  '/sessions/$id': typeof SessionsIdRoute
   '/projects/': typeof ProjectsIndexRoute
-  '/sessions/': typeof SessionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -105,62 +87,54 @@ export interface FileRouteTypes {
     | '/'
     | '/costs'
     | '/data'
+    | '/live'
     | '/skills'
-    | '/teams'
     | '/projects/$id'
-    | '/sessions/$id'
     | '/projects/'
-    | '/sessions/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/costs'
     | '/data'
+    | '/live'
     | '/skills'
-    | '/teams'
     | '/projects/$id'
-    | '/sessions/$id'
     | '/projects'
-    | '/sessions'
   id:
     | '__root__'
     | '/'
     | '/costs'
     | '/data'
+    | '/live'
     | '/skills'
-    | '/teams'
     | '/projects/$id'
-    | '/sessions/$id'
     | '/projects/'
-    | '/sessions/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CostsRoute: typeof CostsRoute
   DataRoute: typeof DataRoute
+  LiveRoute: typeof LiveRoute
   SkillsRoute: typeof SkillsRoute
-  TeamsRoute: typeof TeamsRoute
   ProjectsIdRoute: typeof ProjectsIdRoute
-  SessionsIdRoute: typeof SessionsIdRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
-  SessionsIndexRoute: typeof SessionsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/teams': {
-      id: '/teams'
-      path: '/teams'
-      fullPath: '/teams'
-      preLoaderRoute: typeof TeamsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/skills': {
       id: '/skills'
       path: '/skills'
       fullPath: '/skills'
       preLoaderRoute: typeof SkillsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live': {
+      id: '/live'
+      path: '/live'
+      fullPath: '/live'
+      preLoaderRoute: typeof LiveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/data': {
@@ -184,25 +158,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/sessions/': {
-      id: '/sessions/'
-      path: '/sessions'
-      fullPath: '/sessions/'
-      preLoaderRoute: typeof SessionsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/projects/': {
       id: '/projects/'
       path: '/projects'
       fullPath: '/projects/'
       preLoaderRoute: typeof ProjectsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sessions/$id': {
-      id: '/sessions/$id'
-      path: '/sessions/$id'
-      fullPath: '/sessions/$id'
-      preLoaderRoute: typeof SessionsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/projects/$id': {
@@ -219,12 +179,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CostsRoute: CostsRoute,
   DataRoute: DataRoute,
+  LiveRoute: LiveRoute,
   SkillsRoute: SkillsRoute,
-  TeamsRoute: TeamsRoute,
   ProjectsIdRoute: ProjectsIdRoute,
-  SessionsIdRoute: SessionsIdRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
-  SessionsIndexRoute: SessionsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

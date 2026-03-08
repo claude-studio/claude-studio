@@ -1,7 +1,6 @@
 import * as React from 'react';
 
-import type { DataChangeSource } from '@repo/shared';
-import { DataProviderWrapper, TeamsProviderWrapper } from '@repo/ui';
+import { DataProviderWrapper } from '@repo/ui';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 
 import { electronProvider } from './electron-provider';
@@ -29,11 +28,6 @@ function prefetchCoreData() {
     queryFn: () => electronProvider.getProjects(),
     ...opts,
   });
-  queryClient.prefetchQuery({
-    queryKey: ['sessions', undefined],
-    queryFn: () => electronProvider.getSessions(),
-    ...opts,
-  });
 }
 
 prefetchCoreData();
@@ -49,29 +43,21 @@ function debounce<T extends (...args: Parameters<T>) => void>(
   };
 }
 
-const SOURCE_QUERY_KEYS: Record<DataChangeSource, string[]> = {
-  projects: ['stats', 'projects', 'sessions'],
-  teams: ['teams'],
-};
+const INVALIDATE_KEYS = ['stats', 'projects'];
 
 function DataChangedListener() {
   const qc = useQueryClient();
   React.useEffect(() => {
     if (!window.electronAPI?.onDataChanged) return;
 
-    const invalidateProjects = debounce(() => {
-      for (const key of SOURCE_QUERY_KEYS.projects) {
+    const invalidate = debounce(() => {
+      for (const key of INVALIDATE_KEYS) {
         qc.invalidateQueries({ queryKey: [key] });
       }
     }, 2_000);
 
-    const invalidateTeams = debounce(() => {
-      qc.invalidateQueries({ queryKey: ['teams'] });
-    }, 500);
-
-    const unsub = window.electronAPI.onDataChanged((source) => {
-      if (source === 'teams') invalidateTeams();
-      else invalidateProjects();
+    const unsub = window.electronAPI.onDataChanged(() => {
+      invalidate();
     });
     return unsub;
   }, [qc]);
@@ -82,10 +68,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <DataProviderWrapper provider={electronProvider}>
-        <TeamsProviderWrapper provider={() => window.electronAPI.getTeams()}>
-          <DataChangedListener />
-          {children}
-        </TeamsProviderWrapper>
+        <DataChangedListener />
+        {children}
       </DataProviderWrapper>
     </QueryClientProvider>
   );

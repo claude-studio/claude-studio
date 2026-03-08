@@ -8,7 +8,6 @@ export type {
   DailyUsage,
   DashboardStats,
   DataChangeSource,
-  InboxMessage,
   Message,
   ModelUsage,
   PeakHour,
@@ -16,10 +15,6 @@ export type {
   SessionDetail,
   SessionInfo,
   SkillInfo,
-  TaskInfo,
-  TeamDetail,
-  TeamInfo,
-  TeamMember,
   TokenUsage,
   ToolUsageItem,
 } from './shared/types/index';
@@ -60,11 +55,6 @@ export {
   getProjectName,
   getProjects,
   getProjectsDir,
-  getProjectSessions,
-  getSessionDetail,
-  getSessions,
   getSkills,
-  getTeams,
-  searchSessions,
 } from './shared/api/claude-reader';
 export { clearImportedData, getActiveDataSource, setDataSource } from './shared/api/data-source';

@@ -11,7 +11,9 @@ function broadcast(source: DataChangeSource): void {
   clearCache(source);
   const windows = BrowserWindow.getAllWindows();
   for (const win of windows) {
-    win.webContents.send('data-changed', source);
+    if (!win.isDestroyed()) {
+      try { win.webContents.send('data-changed', source); } catch { /* renderer not ready */ }
+    }
   }
 }
 
@@ -29,8 +31,6 @@ export function startFileWatcher(): void {
 
   const base = join(homedir(), '.claude');
   watchDir(join(base, 'projects'), 'projects');
-  watchDir(join(base, 'teams'), 'teams');
-  watchDir(join(base, 'tasks'), 'teams');
 }
 
 export function stopFileWatcher(): void {

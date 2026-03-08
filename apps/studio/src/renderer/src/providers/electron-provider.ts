@@ -5,11 +5,10 @@ import type {
   DataProvider,
   DataSource,
   ProjectInfo,
-  SessionDetail,
-  SessionInfo,
   SkillInfo,
-  TeamDetail,
 } from '@repo/shared';
+
+import type { PixelAgentEvent } from '@repo/pixel-agents';
 
 declare global {
   interface Window {
@@ -17,10 +16,6 @@ declare global {
       getStats: () => Promise<DashboardStats>;
       getCostAnalysis: () => Promise<DashboardStats>;
       getProjects: () => Promise<ProjectInfo[]>;
-      getProjectSessions: (id: string) => Promise<SessionInfo[]>;
-      getSessions: (limit?: number) => Promise<SessionInfo[]>;
-      getSessionDetail: (id: string) => Promise<SessionDetail>;
-      searchSessions: (query: string) => Promise<SessionInfo[]>;
       getDataSource: () => Promise<DataSource>;
       setDataSource: (source: DataSource) => Promise<void>;
       exportData: () => Promise<string>;
@@ -29,10 +24,16 @@ declare global {
       onDataChanged: (callback: (source: DataChangeSource) => void) => () => void;
       getClaudeSettings: () => Promise<ClaudeSettings>;
       getSkills: () => Promise<SkillInfo[]>;
-      getTeams: () => Promise<TeamDetail[]>;
+      getCharacterSprites: () => Promise<unknown>;
+      getWallSprites: () => Promise<unknown>;
+      getActiveAgents: () => Promise<Array<{ id: number; projectName: string; shortId: string; status: string; activeToolId: string | null; activeToolName: string | null; activeToolStatus: string | null }>>;
+      startLiveWatching: () => Promise<void>;
+      stopLiveWatching: () => Promise<void>;
+      onLiveAgentEvent: (callback: (event: PixelAgentEvent) => void) => () => void;
     };
   }
 }
+
 
 function reviveDates(obj: unknown): unknown {
   if (obj instanceof Date) return obj;
@@ -56,10 +57,6 @@ async function invoke<T>(fn: () => Promise<T>): Promise<T> {
 export const electronProvider: DataProvider = {
   getStats: () => invoke(() => window.electronAPI.getStats()),
   getProjects: () => invoke(() => window.electronAPI.getProjects()),
-  getProjectSessions: (id) => invoke(() => window.electronAPI.getProjectSessions(id)),
-  getSessions: (limit) => invoke(() => window.electronAPI.getSessions(limit)),
-  getSessionDetail: (id) => invoke(() => window.electronAPI.getSessionDetail(id)),
-  searchSessions: (q) => invoke(() => window.electronAPI.searchSessions(q)),
   getDataSource: () => invoke(() => window.electronAPI.getDataSource()),
   setDataSource: (s) => window.electronAPI.setDataSource(s),
   exportData: async () => {

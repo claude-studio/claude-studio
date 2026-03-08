@@ -4,7 +4,6 @@ import {
   getActiveDataSource,
   getDashboardStats,
   getProjects,
-  getSessions,
   setDataSource,
 } from '@repo/shared';
 
@@ -33,7 +32,6 @@ export function registerDataSourceHandlers(): void {
     return JSON.stringify(
       {
         stats: getDashboardStats(),
-        sessions: getSessions(),
         projects: getProjects(),
         exportedAt: new Date().toISOString(),
       },

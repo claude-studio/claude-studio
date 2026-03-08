@@ -6,37 +6,34 @@ import {
   DollarSign,
   FolderOpen,
   LayoutDashboard,
-  MessageSquare,
+  Radio,
   Settings,
-  Users,
   Wand2,
   Zap,
 } from 'lucide-react';
 
-import { useTeams } from '../hooks/use-data';
 import { cn } from '../lib/utils';
 
 interface NavItem {
   href: string;
   label: string;
   icon: ReactNode;
+  badge?: string;
+  pulse?: boolean;
 }
 
 const navItems: NavItem[] = [
   { href: '/', label: '개요', icon: <LayoutDashboard className="h-4 w-4" /> },
   { href: '/projects', label: '프로젝트', icon: <FolderOpen className="h-4 w-4" /> },
-  { href: '/sessions', label: '세션', icon: <MessageSquare className="h-4 w-4" /> },
+  { href: '/live', label: '라이브', icon: <Radio className="h-4 w-4" />, badge: 'Beta', pulse: true },
   { href: '/costs', label: '비용', icon: <DollarSign className="h-4 w-4" /> },
   { href: '/skills', label: '스킬', icon: <Wand2 className="h-4 w-4" /> },
-  { href: '/teams', label: '팀', icon: <Users className="h-4 w-4" /> },
   { href: '/data', label: '설정', icon: <Settings className="h-4 w-4" /> },
 ];
 
 export function Sidebar() {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
-  const { data: teams } = useTeams();
-  const hasActiveTeam = teams && teams.length > 0;
 
   return (
     <div className="fixed left-0 top-0 h-screen w-60 bg-card border-r border-border flex flex-col">
@@ -56,7 +53,6 @@ export function Sidebar() {
         {navItems.map((item) => {
           const isActive =
             item.href === '/' ? currentPath === '/' : currentPath.startsWith(item.href);
-          const isTeams = item.href === '/teams';
 
           return (
             <Link
@@ -71,10 +67,17 @@ export function Sidebar() {
             >
               {item.icon}
               {item.label}
-              {isTeams && hasActiveTeam && (
-                <span className="ml-auto relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+              {item.badge && (
+                <span className="ml-auto flex items-center gap-1.5">
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-primary/15 text-primary leading-none">
+                    {item.badge}
+                  </span>
+                  {item.pulse && (
+                    <span className="flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-primary opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+                    </span>
+                  )}
                 </span>
               )}
             </Link>

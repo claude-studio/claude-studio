@@ -5,7 +5,11 @@
     "skipLibCheck": true,
     "paths": {
       "@/*": ["./*"],
-      "@renderer/*": ["./src/*"]
+      "@renderer/*": ["./src/*"],
+      "@repo/pixel-agents": ["../../../packages/pixel-agents/src/index.ts"],
+      "@repo/pixel-agents/*": ["../../../packages/pixel-agents/src/*"],
+      "@repo/ui": ["../../../packages/ui/src/index.ts"],
+      "@repo/shared": ["../../../packages/shared/src/index.ts"]
     }
   },
   "include": ["src/**/*"],

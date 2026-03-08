@@ -1,10 +1,6 @@
 export enum IpcChannel {
   GetStats = 'stats:get',
   GetProjects = 'projects:get',
-  GetProjectSessions = 'projects:sessions',
-  GetSessions = 'sessions:get',
-  GetSessionDetail = 'sessions:detail',
-  SearchSessions = 'sessions:search',
   GetDataSource = 'data-source:get',
   SetDataSource = 'data-source:set',
   ExportData = 'data:export',
@@ -13,5 +9,9 @@ export enum IpcChannel {
   GetCostAnalysis = 'costs:get',
   GetClaudeSettings = 'settings:get',
   GetSkills = 'skills:get',
-  GetTeams = 'teams:get',
+  LiveGetActiveAgents = 'live:get-active-agents',
+  LiveStartWatching = 'live:start-watching',
+  LiveStopWatching = 'live:stop-watching',
+  GetCharacterSprites = 'assets:get-character-sprites',
+  GetWallSprites = 'assets:get-wall-sprites',
 }

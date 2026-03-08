@@ -177,56 +177,6 @@ export const ClaudeLifetimeSchema = z.object({
 
 export type ClaudeLifetime = z.infer<typeof ClaudeLifetimeSchema>;
 
-export const TeamMemberSchema = z.object({
-  agentId: z.string(),
-  name: z.string(),
-  agentType: z.string(),
-  model: z.string().optional(),
-  joinedAt: z.number(),
-  isActive: z.boolean().optional(),
-});
-
-export type TeamMember = z.infer<typeof TeamMemberSchema>;
-
-export const TeamInfoSchema = z.object({
-  name: z.string(),
-  description: z.string().optional(),
-  createdAt: z.number(),
-  members: z.array(TeamMemberSchema),
-});
-
-export type TeamInfo = z.infer<typeof TeamInfoSchema>;
-
-export const TaskInfoSchema = z.object({
-  id: z.string(),
-  subject: z.string(),
-  description: z.string().optional(),
-  status: z.enum(['pending', 'in_progress', 'completed', 'deleted']),
-  owner: z.string().optional(),
-  blocks: z.array(z.string()).optional(),
-  blockedBy: z.array(z.string()).optional(),
-});
-
-export type TaskInfo = z.infer<typeof TaskInfoSchema>;
-
-export const InboxMessageSchema = z.object({
-  from: z.string(),
-  text: z.string(),
-  timestamp: z.string(),
-  color: z.string().optional(),
-  read: z.boolean().optional(),
-});
-
-export type InboxMessage = z.infer<typeof InboxMessageSchema>;
-
-export const TeamDetailSchema = z.object({
-  team: TeamInfoSchema,
-  tasks: z.array(TaskInfoSchema),
-  inboxes: z.record(z.string(), z.array(InboxMessageSchema)).default({}),
-});
-
-export type TeamDetail = z.infer<typeof TeamDetailSchema>;
-
 export const DashboardStatsSchema = z.object({
   totalCost: z.number(),
   totalTokens: z.number(),
@@ -254,4 +204,4 @@ export const DashboardStatsSchema = z.object({
 
 export type DashboardStats = z.infer<typeof DashboardStatsSchema>;
 
-export type DataChangeSource = 'projects' | 'teams';
+export type DataChangeSource = 'projects';

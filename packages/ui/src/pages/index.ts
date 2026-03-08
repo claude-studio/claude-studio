@@ -5,7 +5,4 @@ export { OverviewPage } from './overview-page';
 export { PageSpinner } from './page-spinner';
 export { ProjectDetailPage } from './project-detail-page';
 export { ProjectsPage } from './projects-page';
-export { SessionDetailPage } from './session-detail-page';
-export { SessionsPage } from './sessions-page';
 export { SkillsPage } from './skills-page';
-export { TeamsPage } from './teams-page';

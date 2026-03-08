@@ -1,4 +1,4 @@
-import type { DashboardStats, ProjectInfo, SessionDetail, SessionInfo } from './index';
+import type { DashboardStats, ProjectInfo } from './index';
 
 export type DataSourceType = 'local' | 'imported';
 
@@ -10,10 +10,6 @@ export interface DataSource {
 export interface DataProvider {
   getStats(): Promise<DashboardStats>;
   getProjects(): Promise<ProjectInfo[]>;
-  getProjectSessions(projectId: string): Promise<SessionInfo[]>;
-  getSessions(limit?: number): Promise<SessionInfo[]>;
-  getSessionDetail(sessionId: string): Promise<SessionDetail>;
-  searchSessions(query: string): Promise<SessionInfo[]>;
   getDataSource(): Promise<DataSource>;
   setDataSource(source: DataSource): Promise<void>;
   exportData(): Promise<Uint8Array>;

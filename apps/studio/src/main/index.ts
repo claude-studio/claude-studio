@@ -2,7 +2,24 @@ import { app, BrowserWindow, shell } from 'electron';
 import { join } from 'path';
 
 import { registerAllIpcHandlers } from './ipc/index';
+import { loadCharacterSprites, loadWallSprites } from './services/character-loader';
 import { startFileWatcher, stopFileWatcher } from './services/file-watcher';
+import { startLiveWatcher, stopLiveWatcher } from './services/live-watcher';
+
+// dev: <project>/apps/studio, prod: <app>/resources/app
+function getAssetsRoot(): string {
+  const appPath = app.getAppPath();
+  // electron-vite dev: appPath = apps/studio
+  // prod: appPath = resources/app
+  const candidates = [
+    join(appPath, 'public', 'assets'),
+    join(appPath, '..', 'public', 'assets'),
+  ];
+  for (const p of candidates) {
+    if (require('fs').existsSync(p)) return p;
+  }
+  return join(appPath, 'public', 'assets');
+}
 
 function createWindow(): void {
   const win = new BrowserWindow({
@@ -39,7 +56,10 @@ function createWindow(): void {
 
 app.whenReady().then(() => {
   registerAllIpcHandlers();
+  loadCharacterSprites(getAssetsRoot());
+  loadWallSprites(getAssetsRoot());
   startFileWatcher();
+  startLiveWatcher();
   createWindow();
 
   app.on('activate', () => {
@@ -49,6 +69,7 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   stopFileWatcher();
+  stopLiveWatcher();
   if (process.platform !== 'darwin') {
     app.quit();
   }

@@ -17,31 +17,34 @@
     "lint": "eslint src"
   },
   "dependencies": {
+    "@fontsource/geist-mono": "catalog:",
+    "@fontsource/geist-sans": "catalog:",
+    "@repo/pixel-agents": "workspace:*",
     "@repo/shared": "workspace:*",
     "@repo/ui": "workspace:*",
-    "@tanstack/react-router": "catalog:",
     "@tanstack/react-query": "catalog:",
+    "@tanstack/react-router": "catalog:",
+    "@types/pngjs": "^6.0.5",
+    "lucide-react": "catalog:",
+    "pngjs": "^7.0.0",
     "react": "catalog:",
-    "react-dom": "catalog:",
-    "@fontsource/geist-sans": "catalog:",
-    "@fontsource/geist-mono": "catalog:",
-    "lucide-react": "catalog:"
+    "react-dom": "catalog:"
   },
   "devDependencies": {
-    "electron": "catalog:",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@tanstack/router-plugin": "catalog:",
     "@tailwindcss/vite": "catalog:",
+    "@tanstack/router-plugin": "catalog:",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "catalog:",
+    "electron": "catalog:",
+    "electron-builder": "catalog:",
+    "electron-vite": "catalog:",
     "eslint": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
-    "vite": "catalog:",
-    "electron-vite": "catalog:",
-    "electron-builder": "catalog:"
+    "vite": "catalog:"
   }
 }

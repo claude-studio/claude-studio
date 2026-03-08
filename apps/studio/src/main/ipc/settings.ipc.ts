@@ -1,4 +1,4 @@
-import { getClaudeSettings, getSkills, getTeams } from '@repo/shared';
+import { getClaudeSettings, getSkills } from '@repo/shared';
 
 import { ipcMain } from 'electron';
 
@@ -10,8 +10,5 @@ export function registerSettingsHandlers(): void {
   });
   ipcMain.handle(IpcChannel.GetSkills, async () => {
     return getSkills();
-  });
-  ipcMain.handle(IpcChannel.GetTeams, async () => {
-    return getTeams();
   });
 }

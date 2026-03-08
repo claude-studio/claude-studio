@@ -48,6 +48,7 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src'),
         '@repo/ui': resolve('../../packages/ui/src'),
         '@repo/shared': resolve('../../packages/shared/src'),
+        '@repo/pixel-agents': resolve('../../packages/pixel-agents/src'),
       },
     },
   },
