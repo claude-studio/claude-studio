@@ -2,6 +2,10 @@ import { Button } from '@repo/ui';
 
 import { Github } from 'lucide-react';
 
+function fadeUp(delay: string): React.CSSProperties {
+  return { animation: `fadeUp 0.6s ease ${delay} forwards`, opacity: 0 };
+}
+
 export function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -27,7 +31,7 @@ export function HeroSection() {
         {/* 배지 */}
         <div
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-border/60 bg-card/50 text-muted-foreground text-sm mb-8"
-          style={{ animationDelay: '0ms', animation: 'fadeUp 0.6s ease forwards', opacity: 0 }}
+          style={fadeUp('0ms')}
         >
           <span className="w-1.5 h-1.5 rounded-full bg-claude-orange-light animate-pulse" />
           로컬 데이터 기반 · 무료 오픈소스
@@ -36,7 +40,7 @@ export function HeroSection() {
         {/* 헤드라인 */}
         <h1
           className="text-5xl sm:text-6xl font-bold text-foreground leading-tight mb-6"
-          style={{ animation: 'fadeUp 0.6s ease 0.1s forwards', opacity: 0 }}
+          style={fadeUp('0.1s')}
         >
           Claude Code 사용량을, <span className="text-claude-orange-light">한눈에</span>
         </h1>
@@ -44,7 +48,7 @@ export function HeroSection() {
         {/* 서브라인 */}
         <p
           className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
-          style={{ animation: 'fadeUp 0.6s ease 0.2s forwards', opacity: 0 }}
+          style={fadeUp('0.2s')}
         >
           비용, 토큰, 세션, 프로젝트 — 로컬 데이터를 분석하여
           <br className="hidden sm:block" />
@@ -52,10 +56,7 @@ export function HeroSection() {
         </p>
 
         {/* CTA 버튼 */}
-        <div
-          className="flex items-center justify-center"
-          style={{ animation: 'fadeUp 0.6s ease 0.3s forwards', opacity: 0 }}
-        >
+        <div className="flex items-center justify-center" style={fadeUp('0.3s')}>
           <a href="https://github.com" target="_blank" rel="noopener noreferrer">
             <Button
               size="lg"
@@ -70,13 +71,6 @@ export function HeroSection() {
 
       {/* 하단 fade */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
-
-      <style>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </section>
   );
 }

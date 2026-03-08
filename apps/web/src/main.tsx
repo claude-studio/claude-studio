@@ -1,14 +1,18 @@
 import React from 'react';
+
+import { createRouter, RouterProvider } from '@tanstack/react-router';
+
 import ReactDOM from 'react-dom/client';
-import { RouterProvider, createRouter } from '@tanstack/react-router';
+
+import { Providers } from './providers/query-provider';
+import { routeTree } from './routeTree.gen';
+
 import '@fontsource/geist-sans/400.css';
 import '@fontsource/geist-sans/500.css';
 import '@fontsource/geist-sans/600.css';
 import '@fontsource/geist-mono/400.css';
 import '@repo/ui/globals.css';
 import './globals.css';
-import { routeTree } from './routeTree.gen';
-import { Providers } from './providers/query-provider';
 
 const router = createRouter({ routeTree });
 

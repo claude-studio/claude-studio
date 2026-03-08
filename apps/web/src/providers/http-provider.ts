@@ -14,8 +14,7 @@ async function apiFetch<T>(path: string): Promise<T> {
   return reviveDates(data) as T;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function reviveDates(obj: any): any {
+function reviveDates(obj: unknown): unknown {
   if (typeof obj === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(obj)) {
     return new Date(obj);
   }
@@ -26,13 +25,20 @@ function reviveDates(obj: any): any {
   return obj;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const httpProvider: DataProvider & Record<string, any> = {
+interface ExtendedDataProvider extends DataProvider {
+  getProjectSessions(id: string): Promise<SessionInfo[]>;
+  getSessions(limit?: number): Promise<SessionInfo[]>;
+  getSessionDetail(id: string): Promise<SessionDetail>;
+  searchSessions(q: string): Promise<SessionInfo[]>;
+}
+
+export const httpProvider: ExtendedDataProvider = {
   getStats: () => apiFetch<DashboardStats>('/'),
   getProjects: () => apiFetch<ProjectInfo[]>('/projects'),
   getProjectSessions: (id: string) =>
     apiFetch<SessionInfo[]>(`/projects/${encodeURIComponent(id)}/sessions`),
-  getSessions: (limit?: number) => apiFetch<SessionInfo[]>(`/sessions${limit ? `?limit=${limit}` : ''}`),
+  getSessions: (limit?: number) =>
+    apiFetch<SessionInfo[]>(`/sessions${limit ? `?limit=${limit}` : ''}`),
   getSessionDetail: (id: string) => apiFetch<SessionDetail>(`/sessions/${id}`),
   searchSessions: (q: string) => apiFetch<SessionInfo[]>(`/search?q=${encodeURIComponent(q)}`),
   getDataSource: () => apiFetch<DataSource>('/data-source'),
