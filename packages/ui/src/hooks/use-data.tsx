@@ -1,40 +1,12 @@
 import { createContext, type ReactNode, useContext } from 'react';
 
-import type {
-  DashboardStats,
-  DataProvider,
-  ProjectInfo,
-  SessionDetail,
-  SessionInfo,
-  TeamDetail,
-} from '@repo/shared';
+import type { DashboardStats, DataProvider, ProjectInfo, SessionDetail, SessionInfo } from '@repo/shared';
 import { keepPreviousData, useQuery, type UseQueryResult } from '@tanstack/react-query';
 
-const DataProviderContext = createContext<DataProvider | null>(null);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyProvider = DataProvider & Record<string, any>;
 
-type TeamsProvider = () => Promise<TeamDetail[]>;
-const TeamsProviderContext = createContext<TeamsProvider | null>(null);
-
-export function TeamsProviderWrapper({
-  provider,
-  children,
-}: {
-  provider: TeamsProvider;
-  children: ReactNode;
-}) {
-  return <TeamsProviderContext.Provider value={provider}>{children}</TeamsProviderContext.Provider>;
-}
-
-export function useTeams(): UseQueryResult<TeamDetail[]> {
-  const provider = useContext(TeamsProviderContext);
-  return useQuery({
-    queryKey: ['teams'],
-    queryFn: () => (provider ? provider() : Promise.resolve([])),
-    staleTime: 30_000,
-    placeholderData: keepPreviousData,
-    enabled: !!provider,
-  });
-}
+const DataProviderContext = createContext<AnyProvider | null>(null);
 
 export function DataProviderWrapper({
   provider,
@@ -43,10 +15,12 @@ export function DataProviderWrapper({
   provider: DataProvider;
   children: ReactNode;
 }) {
-  return <DataProviderContext.Provider value={provider}>{children}</DataProviderContext.Provider>;
+  return <DataProviderContext.Provider value={provider as AnyProvider}>{children}</DataProviderContext.Provider>;
 }
 
-function useDataProvider(): DataProvider {
+export const TeamsProviderWrapper = DataProviderWrapper;
+
+function useDataProvider(): AnyProvider {
   const ctx = useContext(DataProviderContext);
   if (!ctx) throw new Error('useDataProvider must be used within DataProviderWrapper');
   return ctx;
@@ -56,7 +30,7 @@ export function useStats(): UseQueryResult<DashboardStats> {
   const provider = useDataProvider();
   return useQuery({
     queryKey: ['stats'],
-    queryFn: () => provider.getStats(),
+    queryFn: () => provider.getStats() as Promise<DashboardStats>,
     staleTime: 30_000,
     placeholderData: keepPreviousData,
   });
@@ -66,7 +40,17 @@ export function useProjects(): UseQueryResult<ProjectInfo[]> {
   const provider = useDataProvider();
   return useQuery({
     queryKey: ['projects'],
-    queryFn: () => provider.getProjects(),
+    queryFn: () => provider.getProjects() as Promise<ProjectInfo[]>,
+    staleTime: 30_000,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useProjectSessions(id: string): UseQueryResult<SessionInfo[]> {
+  const provider = useDataProvider();
+  return useQuery({
+    queryKey: ['project-sessions', id],
+    queryFn: () => provider.getProjectSessions(id) as Promise<SessionInfo[]>,
     staleTime: 30_000,
     placeholderData: keepPreviousData,
   });
@@ -76,30 +60,26 @@ export function useSessions(limit?: number): UseQueryResult<SessionInfo[]> {
   const provider = useDataProvider();
   return useQuery({
     queryKey: ['sessions', limit],
-    queryFn: () => provider.getSessions(limit),
+    queryFn: () => provider.getSessions(limit) as Promise<SessionInfo[]>,
     staleTime: 30_000,
     placeholderData: keepPreviousData,
   });
 }
 
-export function useSessionDetail(sessionId: string): UseQueryResult<SessionDetail> {
+export function useSessionDetail(id: string): UseQueryResult<SessionDetail> {
   const provider = useDataProvider();
   return useQuery({
-    queryKey: ['session', sessionId],
-    queryFn: () => provider.getSessionDetail(sessionId),
-    enabled: !!sessionId,
-    staleTime: 60_000,
+    queryKey: ['session', id],
+    queryFn: () => provider.getSessionDetail(id) as Promise<SessionDetail>,
+    staleTime: 30_000,
     placeholderData: keepPreviousData,
   });
 }
 
-export function useProjectSessions(projectId: string): UseQueryResult<SessionInfo[]> {
-  const provider = useDataProvider();
+export function useTeams(): UseQueryResult<unknown[]> {
   return useQuery({
-    queryKey: ['project-sessions', projectId],
-    queryFn: () => provider.getProjectSessions(projectId),
-    enabled: !!projectId,
+    queryKey: ['teams'],
+    queryFn: () => Promise.resolve([]),
     staleTime: 30_000,
-    placeholderData: keepPreviousData,
   });
 }

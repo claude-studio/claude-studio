@@ -1,6 +1,7 @@
-import { OverviewPage } from '@repo/ui';
 import { createFileRoute } from '@tanstack/react-router';
 
+import { LandingPage } from '../pages/landing';
+
 export const Route = createFileRoute('/')({
-  component: OverviewPage,
+  component: LandingPage,
 });

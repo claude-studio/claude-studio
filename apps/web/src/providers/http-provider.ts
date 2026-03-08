@@ -1,10 +1,10 @@
 import type {
-  DataProvider,
   DashboardStats,
-  ProjectInfo,
-  SessionInfo,
-  SessionDetail,
+  DataProvider,
   DataSource,
+  ProjectInfo,
+  SessionDetail,
+  SessionInfo,
 } from '@repo/shared';
 
 async function apiFetch<T>(path: string): Promise<T> {
@@ -26,14 +26,15 @@ function reviveDates(obj: any): any {
   return obj;
 }
 
-export const httpProvider: DataProvider = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const httpProvider: DataProvider & Record<string, any> = {
   getStats: () => apiFetch<DashboardStats>('/'),
   getProjects: () => apiFetch<ProjectInfo[]>('/projects'),
-  getProjectSessions: (id) =>
+  getProjectSessions: (id: string) =>
     apiFetch<SessionInfo[]>(`/projects/${encodeURIComponent(id)}/sessions`),
-  getSessions: (limit) => apiFetch<SessionInfo[]>(`/sessions${limit ? `?limit=${limit}` : ''}`),
-  getSessionDetail: (id) => apiFetch<SessionDetail>(`/sessions/${id}`),
-  searchSessions: (q) => apiFetch<SessionInfo[]>(`/search?q=${encodeURIComponent(q)}`),
+  getSessions: (limit?: number) => apiFetch<SessionInfo[]>(`/sessions${limit ? `?limit=${limit}` : ''}`),
+  getSessionDetail: (id: string) => apiFetch<SessionDetail>(`/sessions/${id}`),
+  searchSessions: (q: string) => apiFetch<SessionInfo[]>(`/search?q=${encodeURIComponent(q)}`),
   getDataSource: () => apiFetch<DataSource>('/data-source'),
   setDataSource: async () => {},
   exportData: async () => new Uint8Array(0),

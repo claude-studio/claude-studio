@@ -45,16 +45,7 @@ export { ToolUsageChart } from './charts/tool-usage';
 export { UsageOverTime } from './charts/usage-over-time';
 
 // Hooks / Provider
-export {
-  DataProviderWrapper,
-  TeamsProviderWrapper,
-  useProjects,
-  useProjectSessions,
-  useSessionDetail,
-  useSessions,
-  useStats,
-  useTeams,
-} from './hooks/use-data';
+export { DataProviderWrapper, useProjects, useStats } from './hooks/use-data';
 
 // Pages
 export {
@@ -63,10 +54,7 @@ export {
   OverviewPage,
   ProjectDetailPage,
   ProjectsPage,
-  SessionDetailPage,
-  SessionsPage,
   SkillsPage,
-  TeamsPage,
 } from './pages/index';
 
 // CSS (consumers must import separately)
