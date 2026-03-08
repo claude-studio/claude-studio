@@ -25,7 +25,7 @@ function AnimatedChart() {
           observer.disconnect();
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.3 },
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -91,12 +91,26 @@ export function DashboardPreviewSection() {
               {/* 사이드바 모킹 — 모바일에서 숨김 */}
               <div className="hidden sm:block w-48 border-r border-border/30 bg-card/50 p-4 flex-shrink-0">
                 <div className="space-y-1">
-                  {['개요', '비용', '프로젝트', '세션', '활동'].map((item, i) => (
+                  {[
+                    { label: '개요', active: true },
+                    { label: '라이브', badge: true },
+                    { label: '비용', active: false },
+                    { label: '프로젝트', active: false },
+                    { label: '스킬', active: false },
+                  ].map((item) => (
                     <div
-                      key={item}
-                      className={`px-3 py-2 rounded-lg text-xs ${i === 0 ? 'bg-claude-orange-light/15 text-claude-orange-light font-medium' : 'text-muted-foreground'}`}
+                      key={item.label}
+                      className={`px-3 py-2 rounded-lg text-xs flex items-center justify-between ${item.active ? 'bg-claude-orange-light/15 text-claude-orange-light font-medium' : 'text-muted-foreground'}`}
                     >
-                      {item}
+                      <span>{item.label}</span>
+                      {item.badge && (
+                        <span className="flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-claude-orange-light animate-pulse" />
+                          <span className="text-[9px] text-claude-orange-light font-medium">
+                            Beta
+                          </span>
+                        </span>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -111,9 +125,15 @@ export function DashboardPreviewSection() {
                       key={stat.label}
                       className="rounded-xl border border-border/40 bg-card/60 p-2.5 sm:p-4 min-w-0"
                     >
-                      <p className="text-[10px] sm:text-xs text-muted-foreground mb-1 truncate">{stat.label}</p>
-                      <p className={`text-base sm:text-xl font-bold truncate ${stat.color}`}>{stat.value}</p>
-                      <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 truncate">{stat.sub}</p>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground mb-1 truncate">
+                        {stat.label}
+                      </p>
+                      <p className={`text-base sm:text-xl font-bold truncate ${stat.color}`}>
+                        {stat.value}
+                      </p>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 truncate">
+                        {stat.sub}
+                      </p>
                     </div>
                   ))}
                 </div>

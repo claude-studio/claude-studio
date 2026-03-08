@@ -42,8 +42,7 @@ export function HeroSection() {
           className="text-3xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6 break-keep"
           style={fadeUp('0.1s')}
         >
-          Claude Code 사용량을,{' '}
-          <span className="text-claude-orange-light">한눈에</span>
+          Claude Code 사용량을, <span className="text-claude-orange-light">한눈에</span>
         </h1>
 
         {/* 서브라인 */}
@@ -51,12 +50,18 @@ export function HeroSection() {
           className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
           style={fadeUp('0.2s')}
         >
-          비용, 토큰, 세션, 프로젝트 — 로컬 데이터를 분석하여 실시간 인사이트를 제공합니다
+          비용, 토큰, 프로젝트 — 로컬 데이터를 분석하고, 지금 이 순간 Claude Code가 무엇을 하는지{' '}
+          <span className="text-claude-orange-light font-medium">픽셀 오피스</span>로 실시간
+          확인하세요
         </p>
 
         {/* CTA 버튼 */}
         <div className="flex items-center justify-center" style={fadeUp('0.3s')}>
-          <a href="https://github.com" target="_blank" rel="noopener noreferrer">
+          <a
+            href="https://github.com/claude-studio/claude-studio"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <Button
               size="lg"
               className="bg-claude-orange-light hover:bg-claude-orange text-white border-0 gap-2 px-8 shadow-lg shadow-claude-orange-light/20 hover:shadow-claude-orange-light/30 transition-all"

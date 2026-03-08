@@ -39,7 +39,7 @@ export function LandingHeader() {
 
         {/* GitHub 링크 */}
         <a
-          href="https://github.com"
+          href="https://github.com/claude-studio/claude-studio"
           target="_blank"
           rel="noopener noreferrer"
           className="text-muted-foreground hover:text-foreground transition-colors"

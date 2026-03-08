@@ -4,6 +4,7 @@ import { FeaturesSection } from '../../../widgets/features-section';
 import { HeroSection } from '../../../widgets/hero-section';
 import { HighlightsSection } from '../../../widgets/highlights-section';
 import { LandingHeader } from '../../../widgets/landing-header';
+import { LivePreviewSection } from '../../../widgets/live-preview-section';
 
 export function LandingPage() {
   return (
@@ -11,6 +12,7 @@ export function LandingPage() {
       <LandingHeader />
       <HeroSection />
       <FeaturesSection />
+      <LivePreviewSection />
       <DashboardPreviewSection />
       <HighlightsSection />
       <CtaSection />

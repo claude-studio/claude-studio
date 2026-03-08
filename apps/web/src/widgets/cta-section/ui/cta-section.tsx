@@ -34,7 +34,7 @@ export function CtaSection() {
               </div>
 
               <div className="flex items-center justify-center">
-                <a href="https://github.com" target="_blank" rel="noopener noreferrer">
+                <a href="https://github.com/claude-studio/claude-studio" target="_blank" rel="noopener noreferrer">
                   <Button
                     size="lg"
                     className="bg-claude-orange-light hover:bg-claude-orange text-white border-0 gap-2 px-8 shadow-lg shadow-claude-orange-light/20"
