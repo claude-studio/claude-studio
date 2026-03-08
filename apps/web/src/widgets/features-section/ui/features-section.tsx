@@ -40,7 +40,7 @@ export function FeaturesSection() {
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
             분석에 필요한 모든 것
           </h2>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-xl mx-auto break-keep">
             Claude Code의 모든 사용 데이터를 시각화하여 더 스마트한 개발 결정을 내리세요.
           </p>
         </ScrollReveal>

@@ -23,9 +23,8 @@ export function CtaSection() {
               <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
                 지금 바로 시작하세요
               </h2>
-              <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
-                설치 없이 바로 실행. Claude Code를 사용하고 있다면 분석할 데이터가 이미 준비되어
-                있습니다.
+              <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto break-keep">
+                설치 없이 바로 실행. Claude Code를 사용하고 있다면 분석할 데이터가 이미 준비되어 있습니다.
               </p>
 
               {/* 설치 커맨드 */}

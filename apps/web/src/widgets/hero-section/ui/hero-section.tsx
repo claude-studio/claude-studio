@@ -51,9 +51,7 @@ export function HeroSection() {
           className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
           style={fadeUp('0.2s')}
         >
-          비용, 토큰, 세션, 프로젝트 — 로컬 데이터를 분석하여
-          <br className="hidden sm:block" />
-          실시간 인사이트를 제공합니다
+          비용, 토큰, 세션, 프로젝트 — 로컬 데이터를 분석하여 실시간 인사이트를 제공합니다
         </p>
 
         {/* CTA 버튼 */}

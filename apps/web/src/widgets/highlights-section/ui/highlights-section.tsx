@@ -44,7 +44,7 @@ export function HighlightsSection() {
                   <Icon className="w-6 h-6 text-claude-orange-light" />
                 </div>
                 <h3 className="text-lg font-semibold text-foreground mb-3">{item.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">{item.description}</p>
+                <p className="text-muted-foreground text-sm leading-relaxed break-keep">{item.description}</p>
               </ScrollReveal>
             );
           })}
