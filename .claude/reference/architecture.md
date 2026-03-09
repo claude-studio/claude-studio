@@ -68,6 +68,7 @@ barrel export: `index.ts` → 소비자는 `import { X } from '@repo/ui'`
 ### packages/shared — 공유 데이터 레이어
 
 FSD(Feature-Sliced Design) 유사 구조:
+
 ```
 src/
 ├── entities/     # project/, session/, stats/
@@ -76,7 +77,7 @@ src/
     ├── api/      # claude-reader.ts (JSONL 파싱), data-source.ts
     ├── config/   # pricing.ts (모델별 토큰 단가)
     ├── lib/      # format.ts (포맷 유틸), index.ts
-    └── types/    # index.ts (Zod 스키마 + 타입)
+    └── types/    # index.ts (Zod 스키마 + 타입), data-source.ts, ipc.ts
 ```
 
 ### packages/pixel-agents — 픽셀 오피스 엔진
@@ -97,14 +98,14 @@ shared/claude-reader.ts
   │
   ▼
 apps/studio/src/main/ipc/*.ipc.ts
-  (IPC 핸들러: stats, projects, costs, settings, skills...)
+  (IPC 핸들러: stats, projects, settings, data-source, live, plugin)
   │
   ▼
 apps/studio/src/preload/api.ts
   (contextBridge → window.electronAPI)
   │
   ▼
-packages/ui/src/shared/api/ (electronProvider / httpProvider)
+apps/studio/src/renderer/src/providers/ (electron-provider.ts)
   │
   ▼
 DataProviderWrapper (React Context)

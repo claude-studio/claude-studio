@@ -15,8 +15,8 @@ JS config(`tailwind.config.js`) 없음. CSS-first 방식.
 
 ```css
 /* packages/ui/src/globals.css */
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @source ".";
 
@@ -28,38 +28,42 @@ JS config(`tailwind.config.js`) 없음. CSS-first 방식.
   --color-background: var(--background);
   --color-primary: var(--primary);
   /* ... */
-  --color-claude-orange: #D4764E;
-  --color-claude-orange-light: #E8956E;
-  --color-claude-cream: #FAF9F6;
-  --color-claude-warm: #F5F0EB;
+  --color-claude-orange: #d4764e;
+  --color-claude-orange-light: #e8956e;
+  --color-claude-cream: #faf9f6;
+  --color-claude-warm: #f5f0eb;
 }
 ```
 
 소비자 앱에서 반드시 import:
+
 ```ts
-import '@repo/ui/globals.css'
+import '@repo/ui/globals.css';
 ```
 
 ## 테마 색상
 
 ### Light 모드 (`:root`)
-| 변수 | 값 | 용도 |
-|------|-----|------|
-| `--background` | `#F7F6F2` | 배경 |
-| `--foreground` | `#0D0D0F` | 텍스트 |
-| `--primary` | `#C4643A` | Claude 오렌지 |
-| `--card` | `rgba(255,255,255,0.85)` | 카드 배경 |
-| `--muted-foreground` | `#6E6B65` | 보조 텍스트 |
+
+| 변수                 | 값                       | 용도          |
+| -------------------- | ------------------------ | ------------- |
+| `--background`       | `#F7F6F2`                | 배경          |
+| `--foreground`       | `#0D0D0F`                | 텍스트        |
+| `--primary`          | `#C4643A`                | Claude 오렌지 |
+| `--card`             | `rgba(255,255,255,0.85)` | 카드 배경     |
+| `--muted-foreground` | `#6E6B65`                | 보조 텍스트   |
 
 ### Dark 모드 (`.dark`)
-| 변수 | 값 | 용도 |
-|------|-----|------|
-| `--background` | `#07070A` | 배경 |
-| `--foreground` | `#F2F1EE` | 텍스트 |
-| `--primary` | `#E8834E` | Claude 오렌지 (밝게) |
-| `--card` | `rgba(255,255,255,0.03)` | 카드 배경 |
+
+| 변수           | 값                        | 용도                 |
+| -------------- | ------------------------- | -------------------- |
+| `--background` | `#07070A`                 | 배경                 |
+| `--foreground` | `#EDEBE7`                 | 텍스트               |
+| `--primary`    | `#E8834E`                 | Claude 오렌지 (밝게) |
+| `--card`       | `rgba(255,255,255,0.035)` | 카드 배경            |
 
 ### 커스텀 색상
+
 - `--color-claude-orange`: `#D4764E` → `bg-claude-orange`, `text-claude-orange`
 - `--color-claude-orange-light`: `#E8956E`
 - `--color-claude-cream`: `#FAF9F6`
@@ -70,32 +74,41 @@ import '@repo/ui/globals.css'
 `.card-glass` 유틸리티 클래스:
 
 ```css
+/* Light (기본) */
 .card-glass {
-  /* Dark */
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-
-  /* Light */
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.07);
+}
+
+/* Dark */
+.dark .card-glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  border-color: rgba(255, 255, 255, 0.07);
 }
 ```
 
 사용 패턴:
+
 ```tsx
 <div className="card-glass relative rounded-xl border overflow-hidden">
 ```
 
 ## 배경 앰비언트 글로우
 
-`body::before` — radial-gradient 2개 (오렌지 + 블루):
+`.dark body::before` — 다크 모드 전용, radial-gradient 2개 (오렌지 + 블루):
+
 ```css
-body::before {
+.dark body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
   background:
-    radial-gradient(ellipse at 20% 50%, rgba(196,100,58,0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(66,153,225,0.05) 0%, transparent 50%);
+    radial-gradient(ellipse 60% 45% at 12% 0%, rgba(232, 131, 78, 0.09) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 30% at 90% 100%, rgba(100, 160, 200, 0.05) 0%, transparent 60%);
 }
 ```
 
@@ -132,9 +145,20 @@ body::before {
 ## 스크롤바
 
 ```css
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
 ```
 
 ## 반응형

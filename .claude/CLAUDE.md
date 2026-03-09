@@ -18,7 +18,39 @@ pnpm test         # Vitest 유닛 테스트
 
 ---
 
+## 커밋 워크플로우
+
+커밋 전 반드시 아래 순서를 따른다.
+
+1. **변경 파일 파악** — `git diff --name-only` 로 변경 파일 목록 확인
+2. **문서 동기화 검토** — 변경사항 중 아래 기준에 해당하는 항목이 있으면 **커밋 전에 사용자에게 질문**한다
+
+   | 변경 유형                                   | 수정할 문서                             |
+   | ------------------------------------------- | --------------------------------------- |
+   | 새 TypeScript·ESLint·Git·의존성 규칙 추가   | `.claude/reference/coding-rules.md`     |
+   | 새 기술·라이브러리·버전 추가                | `.claude/reference/tech-stack.md`       |
+   | 아키텍처·패키지 구조 변경                   | `.claude/reference/architecture.md`     |
+   | UI 컴포넌트·훅·프리미티브 변경              | `.claude/reference/ui-components.md`    |
+   | 스타일·테마·CSS 변수 변경                   | `.claude/reference/styling.md`          |
+   | 라우트·데이터 패칭 패턴 변경                | `.claude/reference/routing.md`          |
+   | IPC 채널·서비스 레이어 변경                 | `.claude/reference/ipc-and-services.md` |
+   | shared 타입·DataProvider·claude-reader 변경 | `.claude/reference/data-layer.md`       |
+   | 픽셀 에이전트 상태·이벤트·스프라이트 변경   | `.claude/reference/pixel-agents.md`     |
+
+3. **문서 반영 후 커밋** — 사용자가 반영을 승인하면 문서 수정 → 커밋에 포함
+
+> 문서에 추가할 내용은 유추하지 않는다. 기존 레퍼런스 문서를 먼저 읽고, 실제 코드 변경에서 확인된 사실만 반영한다.
+> 레퍼런스 문서가 300줄을 초과하면 관련 섹션을 별도 파일로 분리하고 원본 문서에서 링크로 참조한다.
+
+---
+
 ## 카테고리별 레퍼런스
+
+### 코딩 규칙 (TypeScript, ESLint, 의존성, Git 등 공통 규칙) 확인 시 참조하세요.
+
+| 레퍼런스                                     | 설명                                              |
+| -------------------------------------------- | ------------------------------------------------- |
+| [coding-rules.md](reference/coding-rules.md) | TypeScript, ESLint, 의존성, 패키지 격리, Git 규칙 |
 
 ### 패키지 구조, 데이터 흐름, 의존 관계가 궁금하거나 새 패키지/앱을 추가할 때 참조하세요.
 
@@ -44,9 +76,9 @@ pnpm test         # Vitest 유닛 테스트
 
 ### /live 라우트, 픽셀 오피스 시각화, 에이전트 상태 처리 작업 시 참조하세요.
 
-| 레퍼런스                                     | 설명                                      |
-| -------------------------------------------- | ----------------------------------------- |
-| [pixel-agents.md](reference/pixel-agents.md) | 픽셀 오피스 엔진 구조, 캐릭터/타일/이벤트 |
+| 레퍼런스                                     | 설명                                                        |
+| -------------------------------------------- | ----------------------------------------------------------- |
+| [pixel-agents.md](reference/pixel-agents.md) | 픽셀 에이전트 상태 머신, 이벤트 흐름, 스프라이트, 코딩 규칙 |
 
 ---
 
@@ -54,11 +86,12 @@ pnpm test         # Vitest 유닛 테스트
 
 ### 배포·환경변수 관리가 필요할 때 슬래시 커맨드를 사용하세요.
 
-| 커맨드                                        | 설명                                                 |
-| --------------------------------------------- | ---------------------------------------------------- |
-| [/deploy](commands/deploy.md)                 | Vercel 배포 — `prod` 또는 `preview` 인수로 환경 선택 |
-| [/deploy-preview](commands/deploy-preview.md) | Vercel preview 배포 (빌드 검증 포함)                 |
-| [/vercel-env](commands/vercel-env.md)         | Vercel 환경변수 조회(`ls`) 또는 로컬 pull            |
+| 스킬                                              | 설명                                                                            |
+| ------------------------------------------------- | ------------------------------------------------------------------------------- |
+| [/deploy](skills/deploy/SKILL.md)                 | Vercel 배포 — `prod` 또는 `preview` 인수로 환경 선택                            |
+| [/deploy-preview](skills/deploy-preview/SKILL.md) | Vercel preview 배포 (빌드 검증 포함)                                            |
+| [/vercel-env](skills/vercel-env/SKILL.md)         | Vercel 환경변수 조회(`ls`) 또는 로컬 pull                                       |
+| [/verify-refs](skills/verify-refs/SKILL.md)       | 레퍼런스 문서 9개와 코드 불일치 검증 후 수정 (기본), `--no-fix`로 보고서만 출력 |
 
 ### 브라우저 자동화 또는 터미널 제어가 필요한 경우 아래 레퍼런스를 읽고 cmux 명령어를 사용하세요.
 
