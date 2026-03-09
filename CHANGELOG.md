@@ -1,5 +1,41 @@
 # Changelog
 
+## [1.1.0](https://github.com/claude-studio/claude-studio/compare/claude-studio-v1.0.0...claude-studio-v1.1.0) (2026-03-08)
+
+
+### Other Changes
+
+* add vercel deployment config ([f692217](https://github.com/claude-studio/claude-studio/commit/f692217866681a5acc3838f69233ae5432ae2d98))
+* initial commit ([fec2659](https://github.com/claude-studio/claude-studio/commit/fec2659a79c7d23e14ae0a91ec941d1fd7c9e6f4))
+* remove invalid engines field from vercel.json ([7923b13](https://github.com/claude-studio/claude-studio/commit/7923b131efc0e43f3b149733856c270437611031))
+
+
+### Features
+
+* **studio:** 라이브 에이전트 베타기능 추가 ([e25eb86](https://github.com/claude-studio/claude-studio/commit/e25eb869e0183aad3f572598aa9e707db9e4e21f))
+* **web:** vercel 배포 설정 및 랜딩 페이지 에셋 추가 ([ccf5a62](https://github.com/claude-studio/claude-studio/commit/ccf5a62b51c799e3c0e8dc63a23d3e6eb308d709))
+* **web:** 랜딩 페이지 UI 개선 ([687f9df](https://github.com/claude-studio/claude-studio/commit/687f9dfcd95c72f262397f2149e029eaf7f0c133))
+* **web:** 랜딩페이지 구현 ([3eefb83](https://github.com/claude-studio/claude-studio/commit/3eefb83493a469876d3b85243d9230b9ef71655b))
+
+
+### Bug Fixes
+
+* **web:** improve cta section mobile layout ([d86589e](https://github.com/claude-studio/claude-studio/commit/d86589ef177e5afec824af13a98203c98f57b7b4))
+* **web:** vercel output directory 경로 수정 ([fd4b739](https://github.com/claude-studio/claude-studio/commit/fd4b7391ab3da7a59d2b609ed4a9d8935087fdab))
+* **web:** vercel.json 제거 (루트 설정으로 통합) ([e598069](https://github.com/claude-studio/claude-studio/commit/e598069866735f22b8ea2564923a1bbf265fe529))
+* **web:** 반응형 레이아웃 개선 ([44bcb2d](https://github.com/claude-studio/claude-studio/commit/44bcb2dff549c6f7a482d1db4273ada2394f72ea))
+* **web:** 텍스트 줄바꿈 개선 ([9ca8f33](https://github.com/claude-studio/claude-studio/commit/9ca8f33a95e66a030ef8ad45abe37339b789b8e8))
+
+
+### Documentation
+
+* 라이브 에이전트 베타기능 반영 README 업데이트 ([0363cc9](https://github.com/claude-studio/claude-studio/commit/0363cc9d819917ca2c392f2b7c9d7eb27667bbca))
+
+
+### Code Refactoring
+
+* **web:** 랜딩 페이지 코드 품질 개선 ([264ffe1](https://github.com/claude-studio/claude-studio/commit/264ffe19e3552cc5b67f04bbf746b434753df116))
+
 ## [1.0.0](https://github.com/claude-studio/claude-studio/releases/tag/v1.0.0) (2026-03-06)
 
 ### Features
