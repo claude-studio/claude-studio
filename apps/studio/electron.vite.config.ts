@@ -6,7 +6,7 @@ import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin({ exclude: ['@repo/shared'] })],
+    plugins: [externalizeDepsPlugin({ exclude: ['@repo/shared', 'pngjs'] })],
     resolve: {
       alias: {
         '@repo/shared': resolve('../../packages/shared/src'),
@@ -27,6 +27,9 @@ export default defineConfig({
     },
   },
   renderer: {
+    server: {
+      port: 9999,
+    },
     root: resolve('src/renderer'),
     build: {
       rollupOptions: {
