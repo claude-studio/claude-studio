@@ -1,5 +1,54 @@
 # Changelog
 
+## [1.2.0](https://github.com/claude-studio/claude-studio/compare/claude-studio-v1.1.0...claude-studio-v1.2.0) (2026-03-09)
+
+
+### Other Changes
+
+* cmux 없는 환경에서 hook 에러 방지 ([04df6f2](https://github.com/claude-studio/claude-studio/commit/04df6f24bdfc71ffe393c0a00bf28957b0b02198))
+* esm 전환 및 electron preload cjs 빌드 설정 ([14fc4d2](https://github.com/claude-studio/claude-studio/commit/14fc4d2b7775e397827dbe837e84f1e8156b869f))
+* husky + lint-staged pre-commit 파이프라인 구축 ([e9d9877](https://github.com/claude-studio/claude-studio/commit/e9d9877cd87f210801e2e7de2ce4023f568f94c5))
+* husky post-commit hook 추가 (동적 workspace) ([47c23e9](https://github.com/claude-studio/claude-studio/commit/47c23e9066bc6d339a75e8e428cffc54653ddb71))
+* pnpm-lock.yaml 동기화 (ui package.json 변경 반영) ([41d4dbe](https://github.com/claude-studio/claude-studio/commit/41d4dbe14953ec8b89400179e0ce1fb34ccfefa4))
+* post-commit hook 요일 한글 표기로 변경 ([9e26178](https://github.com/claude-studio/claude-studio/commit/9e261788a3364a3d20831a53c69df77dae117a16))
+
+
+### Features
+
+* /verify-refs 레퍼런스 검증 스킬 추가 ([8188917](https://github.com/claude-studio/claude-studio/commit/8188917f2c6def3a26f826e8946eb3e6bd512083))
+* glass bento 리디자인 + 사이드바 개편 ([#5](https://github.com/claude-studio/claude-studio/issues/5)) ([17349c3](https://github.com/claude-studio/claude-studio/commit/17349c3bf83c9aaff0fd10b6210eaf1af68491b5))
+* glass bento 리디자인 + 사이드바 개편 후속 UI 개선 ([b5bf486](https://github.com/claude-studio/claude-studio/commit/b5bf486920e15a3bca6a9b301a70f97df7a18d04))
+* vercel 배포 스킬 3종 추가 ([3e87298](https://github.com/claude-studio/claude-studio/commit/3e8729806d8a3c116b02d3367892b4dc99e0825b))
+* **verify-refs:** phase 3에 team-lead readme 갱신 플로우 추가 ([775db16](https://github.com/claude-studio/claude-studio/commit/775db164a5db7ca7f5e8f8b7c575ccccaa1f99f0))
+* **web:** studio UI와 일치하도록 레이아웃 및 사이드바 목업 업데이트 ([42ce5f4](https://github.com/claude-studio/claude-studio/commit/42ce5f415a4df0d7596f9adea6b48cf8979fd3f2))
+* 라이브 모니터링 플러그인 + hook server 연동 ([2a8f50b](https://github.com/claude-studio/claude-studio/commit/2a8f50bed4df48f7bb967823ef3c4d39745b219e))
+
+
+### Bug Fixes
+
+* **studio:** pngjs 번들 포함 및 renderer 포트 9999 설정 ([021d418](https://github.com/claude-studio/claude-studio/commit/021d418985dada3bc48360635220f114568ebe6b))
+
+
+### Documentation
+
+* .claude/reference/ 카테고리별 레퍼런스 추가 및 CLAUDE.md 개편 ([f08f1cf](https://github.com/claude-studio/claude-studio/commit/f08f1cf206b27bf62071150e21ec1f97c4e04463))
+* live monitoring hooks integration 계획 문서 추가 ([e4b4a8a](https://github.com/claude-studio/claude-studio/commit/e4b4a8af5aa15fdedffe1a8a536abeef2313eaef))
+* packages/ui 패키지 격리 규칙 문서 반영 ([163b030](https://github.com/claude-studio/claude-studio/commit/163b030b18eedc0627d67e2aecc219193213a7cc))
+* readme 프로젝트 구조 및 레퍼런스 문서 목록 수정 ([9d05399](https://github.com/claude-studio/claude-studio/commit/9d0539930a15fb820d8360d29dac9027d4ec92ac))
+* 레퍼런스 문서 코드 동기화 업데이트 ([837f0ed](https://github.com/claude-studio/claude-studio/commit/837f0edfabe530285cc8d648f6417d0fa51af5d2))
+* 아키텍처 중심으로 README 전면 재작성 ([3718b21](https://github.com/claude-studio/claude-studio/commit/3718b21c957bc343870c53e11ff59ec87cd7f1e4))
+
+
+### Code Refactoring
+
+* **studio:** 라우트 컴포넌트를 pages/widgets로 분리 ([ae97a00](https://github.com/claude-studio/claude-studio/commit/ae97a00b32a5d9a22858ae6b0464c45b51170f96))
+* **ui:** packages/ui 레거시 pages 제거 및 overview 개선 ([171bf0b](https://github.com/claude-studio/claude-studio/commit/171bf0b338bafe6403998f682d0917597fe40d5d))
+
+
+### Continuous Integration
+
+* release-please에서 build/publish job 제거 ([6f32f22](https://github.com/claude-studio/claude-studio/commit/6f32f2227fe4e31cf246b10a73f47b54456aadef))
+
 ## [1.1.0](https://github.com/claude-studio/claude-studio/compare/claude-studio-v1.0.0...claude-studio-v1.1.0) (2026-03-08)
 
 
