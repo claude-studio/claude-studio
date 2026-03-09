@@ -2,6 +2,26 @@
 
 버전 정보는 `pnpm-workspace.yaml`의 `catalog:` 섹션 기준.
 
+## 코딩 규칙
+
+2개 이상의 패키지/앱에서 사용하는 의존성은 반드시 `pnpm-workspace.yaml`의 `catalog:`에 버전을 등록하고, 각 `package.json`에서는 `"catalog:"` 로 참조한다.
+
+```yaml
+# pnpm-workspace.yaml
+catalog:
+  "framer-motion": ^12.35.2  # ← 버전 한 곳에서 관리
+```
+
+```json
+// packages/ui/package.json
+{ "framer-motion": "catalog:" }
+
+// apps/studio/package.json
+{ "framer-motion": "catalog:" }
+```
+
+단일 패키지에서만 쓰는 의존성(예: `pngjs`, `@types/pngjs`)은 해당 `package.json`에 직접 버전을 명시한다.
+
 ## 핵심 런타임/빌드
 
 | 카테고리 | 기술 | 버전 |
@@ -27,7 +47,7 @@
 | 아이콘 | Lucide React | ^0.468.0 |
 | 차트 | Recharts | ^2.15.0 |
 | 유효성 검사 | Zod | ^3.24.0 |
-| 애니메이션 | framer-motion | (packages/ui에 설치) |
+| 애니메이션 | framer-motion | ^12.35.2 |
 | 폰트 | Geist Sans / Geist Mono | latest |
 
 ## 개발 도구

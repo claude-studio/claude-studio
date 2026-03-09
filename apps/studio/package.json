@@ -25,6 +25,7 @@
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-router": "catalog:",
     "@types/pngjs": "^6.0.5",
+    "framer-motion": "catalog:",
     "lucide-react": "catalog:",
     "pngjs": "^7.0.0",
     "react": "catalog:",

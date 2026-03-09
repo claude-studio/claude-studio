@@ -4,7 +4,8 @@ import { join } from 'path';
 import { registerAllIpcHandlers } from './ipc/index';
 import { loadCharacterSprites, loadWallSprites } from './services/character-loader';
 import { startFileWatcher, stopFileWatcher } from './services/file-watcher';
-import { startLiveWatcher, stopLiveWatcher } from './services/live-watcher';
+import { startHookServer, stopHookServer } from './services/hook-server';
+import { processHookEvent, startLiveWatcher, stopLiveWatcher } from './services/live-watcher';
 
 // dev: <project>/apps/studio, prod: <app>/resources/app
 function getAssetsRoot(): string {
@@ -60,6 +61,7 @@ app.whenReady().then(() => {
   loadWallSprites(getAssetsRoot());
   startFileWatcher();
   startLiveWatcher();
+  startHookServer((e) => processHookEvent(e));
   createWindow();
 
   app.on('activate', () => {
@@ -70,7 +72,12 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   stopFileWatcher();
   stopLiveWatcher();
+  stopHookServer();
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+app.on('before-quit', () => {
+  stopHookServer();
 });

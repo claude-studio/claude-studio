@@ -30,6 +30,9 @@ declare global {
       startLiveWatching: () => Promise<void>;
       stopLiveWatching: () => Promise<void>;
       onLiveAgentEvent: (callback: (event: PixelAgentEvent) => void) => () => void;
+      checkPluginInstalled: () => Promise<boolean>;
+      installPlugin: () => Promise<void>;
+      uninstallPlugin: () => Promise<void>;
     };
   }
 }

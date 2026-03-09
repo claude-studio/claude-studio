@@ -11,7 +11,6 @@ interface ActivityHeatmapProps {
 
 const WEEKS = 24;
 const GAP = 4;
-const DAY_LABEL_WIDTH = 16;
 
 function getIntensityStyle(count: number, max: number): CSSProperties {
   if (count === 0) return { backgroundColor: 'color-mix(in srgb, var(--muted-foreground) 15%, transparent)' };
@@ -28,7 +27,7 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
     const el = containerRef.current;
     if (!el) return;
     const calc = () => {
-      const totalWidth = el.clientWidth - DAY_LABEL_WIDTH - 4;
+      const totalWidth = el.clientWidth;
       const c = Math.floor((totalWidth - GAP * (WEEKS - 1)) / WEEKS);
       setCell(Math.max(c, 8));
     };
@@ -38,8 +37,6 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
     return () => ro.disconnect();
   }, []);
 
-  const step = cell + GAP;
-  const gridHeight = 7 * step - GAP;
   const max = Math.max(...data.map((d) => d.count), 1);
 
   const today = new Date();
@@ -56,28 +53,9 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
     weeks.push(week);
   }
 
-  const DAY_LABELS = [
-    { idx: 1, label: '월' },
-    { idx: 3, label: '수' },
-    { idx: 5, label: '금' },
-  ];
-
   return (
     <div ref={containerRef} className="space-y-2 w-full">
       <div className="flex gap-1">
-        {/* 요일 라벨 */}
-        <div className="relative shrink-0" style={{ width: DAY_LABEL_WIDTH, height: gridHeight }}>
-          {DAY_LABELS.map(({ idx, label }) => (
-            <span
-              key={label}
-              className="absolute text-[9px] text-muted-foreground leading-none"
-              style={{ top: idx * step + cell / 2, transform: 'translateY(-50%)', right: 2 }}
-            >
-              {label}
-            </span>
-          ))}
-        </div>
-
         {/* 셀 그리드 */}
         <div className="flex flex-1" style={{ gap: GAP }}>
           {weeks.map((week, wi) => (

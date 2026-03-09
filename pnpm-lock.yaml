@@ -57,6 +57,9 @@ catalogs:
     eslint:
       specifier: ^9.39.0
       version: 9.39.3
+    framer-motion:
+      specifier: ^12.35.2
+      version: 12.35.2
     husky:
       specifier: ^9.1.7
       version: 9.1.7
@@ -143,6 +146,9 @@ importers:
       '@types/pngjs':
         specifier: ^6.0.5
         version: 6.0.5
+      framer-motion:
+        specifier: 'catalog:'
+        version: 12.35.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       lucide-react:
         specifier: 'catalog:'
         version: 0.468.0(react@19.2.4)
@@ -409,7 +415,7 @@ importers:
         specifier: 'catalog:'
         version: 2.1.1
       framer-motion:
-        specifier: ^12.35.2
+        specifier: 'catalog:'
         version: 12.35.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       lucide-react:
         specifier: 'catalog:'

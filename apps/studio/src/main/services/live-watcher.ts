@@ -4,7 +4,7 @@ import * as path from 'path';
 
 import { BrowserWindow } from 'electron';
 
-import type { LiveAgentEvent, LiveAgentState } from './live-types';
+import type { HookEvent, LiveAgentEvent, LiveAgentState } from './live-types';
 import { clearAgentActivity } from './timer-manager';
 import { processTranscriptLine } from './transcript-parser';
 
@@ -21,6 +21,7 @@ let dirWatcher: fs.FSWatcher | null = null;
 let nextAgentId = 1;
 const fileToAgentId = new Map<string, number>();
 const dirToAgentId = new Map<string, number>(); // 프로젝트 디렉토리 → 활성 에이전트 (1디렉토리 1에이전트)
+const sessionToAgentId = new Map<string, number>(); // 훅 session_id → 에이전트 ID
 
 function emit(event: object): void {
   const windows = BrowserWindow.getAllWindows();
@@ -175,6 +176,12 @@ function despawnAgent(agentId: number): void {
   fileLastActivity.delete(filePath);
   const dirPath = path.dirname(filePath);
   if (dirToAgentId.get(dirPath) === agentId) dirToAgentId.delete(dirPath);
+
+  // session → agentId 매핑 정리
+  for (const [sid, aid] of sessionToAgentId) {
+    if (aid === agentId) sessionToAgentId.delete(sid);
+  }
+
   agents.delete(agentId);
   emit({ type: 'agentClosed', id: agentId });
 }
@@ -197,7 +204,7 @@ function processFile(jsonlFile: string): void {
     const e = event as { type: string };
     if (e.type === 'agentWorking') {
       cancelIdleTimer(agentId);
-    } else if (e.type === 'agentSessionEnd') {
+    } else if (e.type === 'agentSessionEnd' || e.type === 'agentIdle') {
       startIdleTimer(agentId);
     }
   };
@@ -233,6 +240,7 @@ function unwatchFile(jsonlFile: string): void {
 
 function trySpawnFile(filePath: string): void {
   if (!JSONL_PATTERN.test(filePath)) return;
+  if (/[/\\]subagents[/\\]/.test(filePath)) return;
   if (fileToAgentId.has(filePath)) return;
 
   const mtime = getFileMtime(filePath);
@@ -310,6 +318,143 @@ export function stopLiveWatcher(): void {
 
   for (const [agentId] of [...agents]) {
     despawnAgent(agentId);
+  }
+}
+
+export function processHookEvent(event: HookEvent): void {
+  const { hook_event_name, session_id, transcript_path, cwd, tool_name, tool_use_id } = event;
+
+  // 에이전트 식별/생성 헬퍼
+  function getOrCreateAgent(): number {
+    if (session_id && sessionToAgentId.has(session_id)) {
+      return sessionToAgentId.get(session_id)!;
+    }
+
+    // transcript_path로 기존 에이전트 찾기
+    if (transcript_path && fileToAgentId.has(transcript_path)) {
+      const id = fileToAgentId.get(transcript_path)!;
+      if (session_id) sessionToAgentId.set(session_id, id);
+      return id;
+    }
+
+    // 새 에이전트 생성
+    const agentId = nextAgentId++;
+    const projectName = cwd
+      ? path.basename(cwd)
+      : transcript_path
+        ? projectNameFromDir(path.dirname(transcript_path))
+        : `session-${agentId}`;
+
+    const jsonlFile = transcript_path ?? path.join(getClaudeProjectsDir(), `hook-${agentId}.jsonl`);
+    const shortId = session_id ? session_id.slice(0, 8) : `hook-${agentId}`;
+
+    const agent: LiveAgentState = {
+      id: agentId,
+      projectName,
+      jsonlFile,
+      fileOffset: 0,
+      lineBuffer: '',
+      status: 'working',
+      activeToolIds: new Set(),
+      activeToolStatuses: new Map(),
+      activeToolNames: new Map(),
+      permissionSent: false,
+      hadToolsInTurn: false,
+    };
+
+    agents.set(agentId, agent);
+    fileToAgentId.set(jsonlFile, agentId);
+    dirToAgentId.set(path.dirname(jsonlFile), agentId);
+    if (session_id) sessionToAgentId.set(session_id, agentId);
+
+    emit({ type: 'agentCreated', id: agentId, projectName, shortId });
+    return agentId;
+  }
+
+  if (hook_event_name === 'SessionStart') {
+    const agentId = getOrCreateAgent();
+    const agent = agents.get(agentId);
+    if (agent) {
+      agent.status = 'working';
+      cancelIdleTimer(agentId);
+    }
+    emit({ type: 'agentWorking', id: agentId });
+    return;
+  }
+
+  if (hook_event_name === 'PreToolUse') {
+    const agentId = getOrCreateAgent();
+    const agent = agents.get(agentId);
+    if (!agent) return;
+    agent.status = 'working';
+    cancelIdleTimer(agentId);
+    emit({ type: 'agentWorking', id: agentId });
+
+    if (tool_name && tool_use_id) {
+      agent.activeToolIds.add(tool_use_id);
+      agent.activeToolNames.set(tool_use_id, tool_name);
+      agent.activeToolStatuses.set(tool_use_id, '');
+      emit({ type: 'agentToolStart', id: agentId, toolId: tool_use_id, toolName: tool_name, status: '' });
+    }
+
+    // 권한 요청 타이머 (8초 후 permission 이벤트)
+    if (tool_name && tool_use_id) {
+      const pTimer = setTimeout(() => {
+        permissionTimers.delete(agentId);
+        if (agents.get(agentId)?.activeToolIds.has(tool_use_id!)) {
+          emit({ type: 'agentToolPermission', id: agentId });
+        }
+      }, 8000);
+      permissionTimers.set(agentId, pTimer);
+    }
+    return;
+  }
+
+  if (hook_event_name === 'PostToolUse') {
+    const agentId = session_id ? sessionToAgentId.get(session_id) : undefined;
+    if (agentId === undefined) return;
+    const agent = agents.get(agentId);
+    if (!agent) return;
+
+    // 권한 타이머 취소
+    const pt = permissionTimers.get(agentId);
+    if (pt) {
+      clearTimeout(pt);
+      permissionTimers.delete(agentId);
+    }
+
+    if (tool_use_id) {
+      agent.activeToolIds.delete(tool_use_id);
+      agent.activeToolStatuses.delete(tool_use_id);
+      agent.activeToolNames.delete(tool_use_id);
+      emit({ type: 'agentToolDone', id: agentId, toolId: tool_use_id });
+    }
+
+    if (agent.activeToolIds.size === 0) {
+      emit({ type: 'agentToolsClear', id: agentId });
+    }
+    return;
+  }
+
+  if (hook_event_name === 'Stop' || hook_event_name === 'SubagentStop') {
+    const agentId = session_id ? sessionToAgentId.get(session_id) : undefined;
+    if (agentId === undefined) return;
+    const agent = agents.get(agentId);
+    if (!agent) return;
+
+    clearAgentActivity(agent, agentId, permissionTimers, emit);
+    agent.status = 'idle';
+    emit({ type: 'agentIdle', id: agentId });
+    startIdleTimer(agentId);
+    return;
+  }
+
+  if (hook_event_name === 'Notification') {
+    // permission_prompt matcher로 이미 필터링됨
+    const agentId = session_id ? sessionToAgentId.get(session_id) : undefined;
+    if (agentId === undefined) return;
+    emit({ type: 'agentToolPermission', id: agentId });
+    return;
   }
 }
 

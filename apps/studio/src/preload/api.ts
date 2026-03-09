@@ -61,6 +61,11 @@ export const electronAPI = {
       ipcRenderer.off('live:agent-event', handler);
     };
   },
+
+  // Plugin management
+  checkPluginInstalled: createInvoker<boolean>('plugin:check-installed'),
+  installPlugin: createInvoker<void>('plugin:install'),
+  uninstallPlugin: createInvoker<void>('plugin:uninstall'),
 };
 
 export type ElectronAPI = typeof electronAPI;

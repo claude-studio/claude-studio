@@ -32,3 +32,17 @@ export interface LiveAgentEvent {
   status?: string;
   toolId?: string;
 }
+
+export interface HookEvent {
+  hook_event_name: string;
+  session_id?: string;
+  transcript_path?: string;
+  cwd?: string;
+  tool_name?: string;
+  tool_input?: Record<string, unknown>;
+  tool_output?: string;
+  tool_use_id?: string;
+  source?: string;
+  model?: string;
+  agent_type?: string;
+}

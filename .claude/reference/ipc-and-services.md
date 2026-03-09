@@ -128,3 +128,98 @@ Renderer → use-pixel-messages.ts → OfficeState
 **1디렉토리 1에이전트**: `dirToAgentId: Map<string, number>` — 동일 프로젝트 디렉토리의 이벤트는 같은 에이전트에 라우팅.
 
 **이중 감시**: JSONL `fs.watch` + Hook server가 idempotent하게 공존. 둘 중 하나만 있어도 동작.
+
+---
+
+## 라이브 모니터링 플러그인
+
+설정 페이지(`/data`)에서 설치/제거할 수 있는 Claude Code 플러그인. 설치 후 Claude Code를 재시작하면 Hook 이벤트가 Studio로 전달되어 `/live` 라이브 모니터링이 활성화된다.
+
+### 플러그인 구성 (`apps/studio/resources/plugin/`)
+
+```
+resources/plugin/
+├── .claude-plugin/
+│   └── plugin.json          # { name, version, description }
+└── hooks/
+    ├── hooks.json            # Claude Code hook 이벤트 → notify.sh 연결
+    └── notify.sh             # stdin JSON을 ~/.claude/studio.sock 으로 전달
+```
+
+**hooks.json 등록 이벤트:**
+
+| 이벤트 | matcher | 설명 |
+|--------|---------|------|
+| `PreToolUse` | `.*` (전체) | 도구 실행 직전 |
+| `PostToolUse` | `.*` (전체) | 도구 실행 완료 후 |
+| `Stop` | — | 에이전트 세션 종료 |
+| `SubagentStop` | — | 서브에이전트 세션 종료 |
+| `SessionStart` | — | 세션 시작 |
+| `Notification` | `permission_prompt` | 권한 요청 알림 |
+
+**notify.sh 동작:**
+```bash
+SOCKET="$HOME/.claude/studio.sock"
+[ -S "$SOCKET" ] || exit 0          # 소켓 없으면 즉시 종료 (Studio 미실행 시 무해)
+cat | nc -U "$SOCKET" -w 1          # stdin(HookEvent JSON)을 소켓으로 전달
+```
+- `async: true` — Claude Code 실행을 블로킹하지 않음
+- Studio가 꺼져 있으면 소켓이 없으므로 즉시 종료, Claude Code 동작에 영향 없음
+
+### 설치 흐름 (`plugin-installer.ts`)
+
+```
+앱 번들 resources/plugin/
+    │
+    ▼  copyDirSync
+~/.claude/plugins/cache/local/claude-studio/1.0.0/
+    │
+    ├─ hooks/notify.sh  ← chmod 755 (실행 권한)
+    │
+    ▼
+~/.claude/installed_plugins.json
+  { "claude-studio@local": { version, installedAt, type: "local" } }
+    │
+    ▼
+~/.claude/settings.json
+  { "enabledPlugins": { "claude-studio@local": true } }
+```
+
+### 제거 흐름 (`plugin-installer.ts`)
+
+```
+~/.claude/settings.json
+  enabledPlugins에서 "claude-studio@local" 키 삭제
+    │
+    ▼
+~/.claude/installed_plugins.json
+  "claude-studio@local" 키 삭제
+    │
+    ▼
+~/.claude/plugins/cache/local/claude-studio/
+  디렉토리 전체 삭제 (fs.rmSync recursive)
+```
+
+### 설치 상태 확인
+
+`isPluginInstalled()` — `~/.claude/installed_plugins.json`에 `"claude-studio@local"` 키 존재 여부로 판단.
+
+설치/제거 후 UI 반영 흐름 (`routes/data.tsx`):
+
+```
+installPlugin() / uninstallPlugin() 호출 (useMutation)
+    │
+    ▼ onSuccess
+queryClient.invalidateQueries(['plugin-installed'])  → checkPluginInstalled() 재조회 → Badge 상태 갱신
+queryClient.invalidateQueries(['claude-settings'])   → getClaudeSettings() 재조회 → enabledPlugins 목록 갱신
+```
+
+- 버튼은 mutation `isPending` 동안 `disabled` 처리 (`pluginLoading` prop)
+- 설치 시 버튼이 "설치 → 제거"로, 제거 시 "제거 → 설치"로 즉시 전환됨
+
+### dev vs prod 경로
+
+| 환경 | 플러그인 소스 경로 |
+|------|------------------|
+| 개발 (`NODE_ENV=development`) | `apps/studio/resources/plugin/` |
+| 패키징 후 | `process.resourcesPath/plugin/` (electron-builder `extraResources` 설정) |

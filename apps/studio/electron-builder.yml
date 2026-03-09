@@ -6,6 +6,9 @@ directories:
 files:
   - out/**/*
   - "!node_modules/**/*"
+extraResources:
+  - from: resources/plugin
+    to: plugin
 publish:
   provider: github
   owner: claude-studio

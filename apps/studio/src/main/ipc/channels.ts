@@ -14,4 +14,7 @@ export enum IpcChannel {
   LiveStopWatching = 'live:stop-watching',
   GetCharacterSprites = 'assets:get-character-sprites',
   GetWallSprites = 'assets:get-wall-sprites',
+  PluginCheckInstalled = 'plugin:check-installed',
+  PluginInstall = 'plugin:install',
+  PluginUninstall = 'plugin:uninstall',
 }

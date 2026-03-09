@@ -21,6 +21,7 @@ catalog:
   clsx: ^2.1.1
   "tailwind-merge": ^3.0.0
   "lucide-react": ^0.468.0
+  "framer-motion": ^12.35.2
   recharts: ^2.15.0
   "@radix-ui/react-slot": ^1.2.0
   zod: ^3.24.0
