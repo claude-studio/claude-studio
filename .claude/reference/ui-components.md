@@ -2,28 +2,36 @@
 
 `packages/ui` 패키지. 소비자: `import { X } from '@repo/ui'`
 
-## Pages (`packages/ui/src/pages/`)
+## 코딩 규칙
 
-| 컴포넌트 | 파일 | Props | 데이터 소스 |
-|---------|------|-------|-----------|
-| `OverviewPage` | `overview-page.tsx` | 없음 | 내부 `useStats()` |
-| `CostsPage` | `costs-page.tsx` | 없음 | 내부 `useStats()` + `useProjects()` |
-| `ProjectsPage` | `projects-page.tsx` | 없음 | 내부 `useProjects()` |
-| `ProjectDetailPage` | `project-detail-page.tsx` | `{ id: string }` | 내부 `useProjectSessions(id)` |
-| `SkillsPage` | `skills-page.tsx` | `{ skills, isLoading, isError }` | 라우트에서 props 전달 |
-| `DataPage` | `data-page.tsx` | `{ settings, pluginInstalled?, pluginLoading?, onInstallPlugin?, onUninstallPlugin? }` | 라우트에서 props 전달 |
+- **라우터 의존 금지** — `packages/ui`에서 `@tanstack/react-router`의 `Link`, `useNavigate`, `useRouterState` 등을 직접 import하지 않는다. TanStack Router의 `Register` 타입은 앱별로 전역 주입되므로, 공유 패키지에서 사용하면 다른 앱의 typecheck에서 routeTree 충돌이 발생한다.
+- **라우터 의존 컴포넌트는 앱 내부에 작성** — `Link`를 사용하는 페이지·위젯은 `apps/studio/src/renderer/src/pages/` 또는 `widgets/`에 FSD 구조로 작성한다.
+- **packages/ui는 프리미티브 전용** — shadcn 컴포넌트, 차트, 훅(useStats, useProjects 등), 유틸(cn, CostDisplay)만 export한다.
 
-**헬퍼**:
-- `CostValue` — `{ cost: number, className? }` — KRW + USD 표시
+## Pages
+
+`packages/ui`에서 Page 컴포넌트는 export하지 않는다. 페이지는 앱 내부에 작성:
+
+| 위치 | 페이지 |
+|------|--------|
+| `apps/studio/src/renderer/src/pages/overview/` | OverviewPage |
+| `apps/studio/src/renderer/src/pages/costs/` | CostsPage |
+| `apps/studio/src/renderer/src/pages/projects/` | ProjectsPage, ProjectDetailPage |
+| `apps/studio/src/renderer/src/pages/skills/` | SkillsPage |
+| `apps/studio/src/renderer/src/pages/data/` | DataPage |
+| `apps/studio/src/renderer/src/pages/live-page.tsx` | LivePage |
+
+**packages/ui 내부 헬퍼** (export 안 됨):
+- `CostValue` — KRW + USD 표시
 - `PageSpinner` — 로딩 스피너
 
 ## Layout (`packages/ui/src/layout/`)
 
 ### `AppSidebar`
-- `collapsible="icon"` 방식 (shadcn Sidebar 프리미티브)
-- `useSidebar()` 훅으로 open 상태 접근
-- NavItem 목록: 개요(`/`), 비용(`/costs`), 프로젝트(`/projects`), 스킬(`/skills`), 라이브(`/live`), 설정(`/data`)
-- 하단: 테마 토글 버튼 (`toggleRef` 로 위치 계산)
+
+studio 앱 내부에 위치: `apps/studio/src/renderer/src/widgets/app-sidebar/index.tsx`
+- `@repo/ui`의 shadcn Sidebar 프리미티브 사용
+- `@tanstack/react-router`의 `Link`로 네비게이션 (studio 전용)
 
 ### `StatCard`
 ```ts
@@ -97,13 +105,12 @@ Badge, Button, Card(+Header/Title/Content/Footer/Description), Dialog, DropdownM
 
 ```ts
 // packages/ui/src/index.ts — barrel export
-export { OverviewPage, CostsPage, ... } from './pages/index';
-export { AppSidebar, StatCard, CostDisplay } from './layout/...';
-export { ActivityHeatmap, CostChart, ... } from './charts/...';
-export { DataProviderWrapper, useStats, useProjects } from './hooks/use-data';
-export { ThemeProvider, useTheme } from './hooks/use-theme';
-// shadcn 프리미티브
-export { SidebarProvider, SidebarTrigger, SidebarInset } from './components/ui/sidebar';
+// 유틸: cn
+// shadcn: Badge, Button, Card, Dialog, DropdownMenu, Input, Particles, ScrollArea, Sidebar*, Tabs, Tooltip
+// 레이아웃: StatCard, CostDisplay
+// 차트: ActivityHeatmap, CacheStatsCard, CostChart, ModelBreakdown, PeakHours, ProjectCostChart, ToolUsageChart, UsageOverTime, ...
+// 훅: DataProviderWrapper, useStats, useProjects, ThemeProvider, useTheme, useSidebar
+// ❌ AppSidebar, OverviewPage, CostsPage 등 Page 컴포넌트는 export하지 않음
 ```
 
 CSS는 별도 import 필요:

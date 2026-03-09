@@ -32,7 +32,7 @@ pnpm test         # Vitest 유닛 테스트
 | 레퍼런스                                       | 설명                                                |
 | ---------------------------------------------- | --------------------------------------------------- |
 | [styling.md](reference/styling.md)             | 스타일링 패턴, 테마 변수, glass-morphism, 코딩 규칙 |
-| [ui-components.md](reference/ui-components.md) | UI 패키지 컴포넌트, 페이지, 훅                      |
+| [ui-components.md](reference/ui-components.md) | UI 패키지 프리미티브, 차트, 훅                      |
 | [routing.md](reference/routing.md)             | TanStack Router 라우트, 데이터 패칭 패턴            |
 
 ### Electron IPC 채널 추가·수정, 서비스 레이어·데이터 파싱 작업 시 참조하세요.

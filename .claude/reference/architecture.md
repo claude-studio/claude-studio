@@ -22,7 +22,7 @@ claude-studio/
 
 ```
 apps/studio
-  ├── @repo/ui          (React UI 컴포넌트, 페이지, 훅)
+  ├── @repo/ui          (프리미티브, 차트, 훅 — 라우터 의존 없음)
   ├── @repo/shared      (타입, JSONL 파싱, 비용 계산)
   └── @repo/pixel-agents (Canvas 픽셀 오피스 엔진)
 
@@ -49,7 +49,10 @@ src/
 ├── preload/      # contextBridge API 노출 (api.ts)
 └── renderer/     # React 앱 (TanStack Router 라우트)
     └── src/
-        └── routes/  # 파일 기반 라우트
+        ├── pages/    # 페이지 컴포넌트 (FSD)
+        ├── widgets/  # 복합 위젯 (AppSidebar 등)
+        ├── providers/
+        └── routes/   # 파일 기반 라우트 (thin layer)
 ```
 
 ### apps/web — 랜딩 페이지
@@ -58,7 +61,8 @@ Vite + React. `@repo/ui` 컴포넌트 재사용, Vercel 배포.
 
 ### packages/ui — 공유 UI 라이브러리
 
-shadcn/ui 기반. pages/, charts/, layout/, hooks/, components/ui/ 구조.
+shadcn/ui 프리미티브, 차트, 훅 전용. 라우터(`@tanstack/react-router`) 의존 금지.
+charts/, layout/, hooks/, components/ui/ 구조.
 barrel export: `index.ts` → 소비자는 `import { X } from '@repo/ui'`
 
 ### packages/shared — 공유 데이터 레이어
@@ -109,7 +113,7 @@ DataProviderWrapper (React Context)
 useStats() / useProjects() / ... (TanStack Query 훅)
   │
   ▼
-UI 컴포넌트 (OverviewPage, CostsPage, ...)
+apps/studio 페이지 (pages/overview, pages/costs, ...)
 ```
 
 ### 실시간 에이전트 흐름 (Live)
