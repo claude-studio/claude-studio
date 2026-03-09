@@ -10,11 +10,10 @@ interface ActivityHeatmapProps {
 }
 
 function getIntensityStyle(count: number, max: number): CSSProperties {
-  if (count === 0) return { backgroundColor: 'rgba(58, 58, 60, 0.8)' }; // --muted dark
+  if (count === 0) return { backgroundColor: 'color-mix(in srgb, var(--muted-foreground) 15%, transparent)' };
   const ratio = count / max;
-  const opacity =
-    ratio < 0.2 ? 0.25 : ratio < 0.4 ? 0.45 : ratio < 0.6 ? 0.65 : ratio < 0.8 ? 0.82 : 1;
-  return { backgroundColor: `rgba(232, 149, 110, ${opacity})` }; // --primary dark #E8956E
+  const pct = ratio < 0.2 ? 25 : ratio < 0.4 ? 45 : ratio < 0.6 ? 60 : ratio < 0.8 ? 78 : 100;
+  return { backgroundColor: `color-mix(in srgb, var(--primary) ${pct}%, transparent)` };
 }
 
 export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
@@ -63,14 +62,14 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
       </div>
       <div className="flex items-center justify-end gap-1 text-[10px] text-muted-foreground">
         <span>적음</span>
-        {([0, 0.25, 0.45, 0.65, 0.82, 1] as const).map((opacity) => (
+        {([0, 25, 45, 60, 78, 100] as const).map((pct) => (
           <div
-            key={opacity}
+            key={pct}
             className="h-[10px] w-[10px] rounded-sm"
             style={
-              opacity === 0
-                ? { backgroundColor: 'rgba(58, 58, 60, 0.8)' }
-                : { backgroundColor: `rgba(232, 149, 110, ${opacity})` }
+              pct === 0
+                ? { backgroundColor: 'color-mix(in srgb, var(--muted-foreground) 15%, transparent)' }
+                : { backgroundColor: `color-mix(in srgb, var(--primary) ${pct}%, transparent)` }
             }
           />
         ))}

@@ -39,25 +39,25 @@ export function CacheStatsCard({ data }: CacheStatsCardProps) {
     <TooltipProvider delayDuration={300}>
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-lg bg-muted/50 p-3">
+          <div className="rounded-lg border border-border/50 p-3">
             <FieldLabel label="캐시 적중률" tooltip={TOOLTIPS.cacheHitRate} />
-            <p className="text-xl font-semibold mt-1">{data.cacheHitRate}%</p>
+            <p className="text-xl font-semibold font-mono mt-1">{data.cacheHitRate}%</p>
           </div>
-          <div className="rounded-lg bg-muted/50 p-3">
+          <div className="rounded-lg border border-border/50 p-3">
             <FieldLabel label="절약 비용" tooltip={TOOLTIPS.estimatedSavings} />
-            <p className="text-xl font-semibold mt-1 text-primary">
+            <p className="text-xl font-semibold font-mono mt-1 text-primary">
               {formatCost(data.estimatedSavingsUsd)}
             </p>
           </div>
-          <div className="rounded-lg bg-muted/50 p-3">
+          <div className="rounded-lg border border-border/50 p-3">
             <FieldLabel label="캐시 생성 토큰" tooltip={TOOLTIPS.cacheCreation} />
-            <p className="text-lg font-semibold mt-1">
+            <p className="text-lg font-semibold font-mono mt-1">
               {formatTokens(data.totalCacheCreationTokens)}
             </p>
           </div>
-          <div className="rounded-lg bg-muted/50 p-3">
+          <div className="rounded-lg border border-border/50 p-3">
             <FieldLabel label="캐시 읽기 토큰" tooltip={TOOLTIPS.cacheRead} />
-            <p className="text-lg font-semibold mt-1">{formatTokens(data.totalCacheReadTokens)}</p>
+            <p className="text-lg font-semibold font-mono mt-1">{formatTokens(data.totalCacheReadTokens)}</p>
           </div>
         </div>
 

@@ -36,12 +36,15 @@ export function ProjectCostChart({ data }: ProjectCostChartProps) {
         />
         <Tooltip
           contentStyle={{
-            backgroundColor: 'var(--card)',
+            backgroundColor: 'var(--popover)',
             border: '1px solid var(--border)',
             borderRadius: '8px',
             fontSize: '12px',
-            color: 'var(--card-foreground)',
+            color: 'var(--popover-foreground)',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
           }}
+          labelStyle={{ color: 'var(--popover-foreground)', fontWeight: 600 }}
+          itemStyle={{ color: 'var(--popover-foreground)' }}
           formatter={(v: number, _name: string, props: { payload?: ProjectCostItem }) => [
             formatCost(v),
             props.payload?.fullName ?? props.payload?.name ?? '비용',

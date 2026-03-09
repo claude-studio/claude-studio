@@ -23,35 +23,28 @@ export function DataPage({ settings }: DataPageProps) {
     : [];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">설정</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          로컬 머신의 ~/.claude/ 디렉토리에서 직접 데이터를 읽어옵니다.
-        </p>
-      </div>
-
-      <div className="grid gap-4">
-        <Card className="border-border/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium">
+    <div className="space-y-4">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <Card>
+          <CardHeader className="px-5 pt-5 pb-3">
+            <CardTitle className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               <Bot className="h-4 w-4" />
               현재 모델
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-base font-semibold">{settings?.model ?? '-'}</p>
+          <CardContent className="px-5 pb-5 pt-0">
+            <p className="text-base font-semibold font-mono">{settings?.model ?? '-'}</p>
           </CardContent>
         </Card>
 
-        <Card className="border-border/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium">
+        <Card>
+          <CardHeader className="px-5 pt-5 pb-3">
+            <CardTitle className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               <ShieldCheck className="h-4 w-4" />
               권한 모드
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-5 pb-5 pt-0">
             <p className="text-base font-semibold">
               {settings?.permissions?.defaultMode
                 ? (modeLabel[settings.permissions.defaultMode] ?? settings.permissions.defaultMode)
@@ -60,18 +53,18 @@ export function DataPage({ settings }: DataPageProps) {
           </CardContent>
         </Card>
 
-        <Card className="border-border/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium">
+        <Card className="md:col-span-2 xl:col-span-1">
+          <CardHeader className="px-5 pt-5 pb-3">
+            <CardTitle className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               <Puzzle className="h-4 w-4" />
               활성화된 플러그인
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-5 pb-5 pt-0">
             {plugins.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {plugins.map((name) => (
-                  <Badge key={name} variant="secondary" className="text-xs">
+                  <Badge key={name} variant="secondary" className="text-xs font-mono">
                     {name}
                   </Badge>
                 ))}

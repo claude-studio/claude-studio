@@ -62,72 +62,72 @@
 }
 
 :root {
-  --radius: 0.75rem;
-  --background: #FAF9F6;
-  --foreground: #1a1a1a;
-  --card: #FFFFFF;
-  --card-foreground: #1a1a1a;
+  --radius: 0.625rem;
+  --background: #F7F6F2;
+  --foreground: #0D0D0F;
+  --card: rgba(255, 255, 255, 0.85);
+  --card-foreground: #0D0D0F;
   --popover: #FFFFFF;
-  --popover-foreground: #1a1a1a;
-  --primary: #D4764E;
+  --popover-foreground: #0D0D0F;
+  --primary: #C4643A;
   --primary-foreground: #FFFFFF;
-  --secondary: #F5F0EB;
-  --secondary-foreground: #1a1a1a;
-  --muted: #F5F0EB;
-  --muted-foreground: #6B6B6B;
-  --accent: #F5F0EB;
-  --accent-foreground: #1a1a1a;
+  --secondary: #EDE9E3;
+  --secondary-foreground: #0D0D0F;
+  --muted: #EDE9E3;
+  --muted-foreground: #6E6B65;
+  --accent: #EDE9E3;
+  --accent-foreground: #0D0D0F;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: #E8E4DF;
-  --input: #E8E4DF;
-  --ring: #D4764E;
-  --chart-1: #D4764E;
-  --chart-2: #6B8AE6;
-  --chart-3: #5CB87A;
-  --chart-4: #E6C06B;
-  --chart-5: #9B6BE6;
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #1a1a1a;
-  --sidebar-primary: #D4764E;
+  --border: rgba(0, 0, 0, 0.09);
+  --input: #E5E1DB;
+  --ring: #C4643A;
+  --chart-1: #C4643A;
+  --chart-2: #3D7BA8;
+  --chart-3: #3D8F65;
+  --chart-4: #A07830;
+  --chart-5: #7058A0;
+  --sidebar: rgba(255, 255, 255, 0.7);
+  --sidebar-foreground: #0D0D0F;
+  --sidebar-primary: #C4643A;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #F5F0EB;
-  --sidebar-accent-foreground: #1a1a1a;
-  --sidebar-border: #E8E4DF;
-  --sidebar-ring: #D4764E;
+  --sidebar-accent: #EDE9E3;
+  --sidebar-accent-foreground: #0D0D0F;
+  --sidebar-border: rgba(0, 0, 0, 0.08);
+  --sidebar-ring: #C4643A;
 }
 
 .dark {
-  --background: #1C1C1E;
-  --foreground: #F8F8F7;
-  --card: #2C2C2E;
-  --card-foreground: #F8F8F7;
-  --popover: #2C2C2E;
-  --popover-foreground: #F8F8F7;
-  --primary: #E8956E;
-  --primary-foreground: #1C1C1E;
-  --secondary: #3A3A3C;
-  --secondary-foreground: #F8F8F7;
-  --muted: #3A3A3C;
-  --muted-foreground: #B0AFA8;
-  --accent: #3A3A3C;
-  --accent-foreground: #F8F8F7;
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: #3A3A3C;
-  --input: #3A3A3C;
-  --ring: #E8956E;
-  --chart-1: #E8956E;
-  --chart-2: #7B9AE6;
-  --chart-3: #6CC88A;
-  --chart-4: #F0D07B;
-  --chart-5: #AB7BF6;
-  --sidebar: #2C2C2E;
-  --sidebar-foreground: #F8F8F7;
-  --sidebar-primary: #E8956E;
-  --sidebar-primary-foreground: #1C1C1E;
-  --sidebar-accent: #3A3A3C;
-  --sidebar-accent-foreground: #F8F8F7;
-  --sidebar-border: #3A3A3C;
-  --sidebar-ring: #E8956E;
+  --background: #07070A;
+  --foreground: #EDEBE7;
+  --card: rgba(255, 255, 255, 0.035);
+  --card-foreground: #EDEBE7;
+  --popover: #18181C;
+  --popover-foreground: #EDEBE7;
+  --primary: #E8834E;
+  --primary-foreground: #07070A;
+  --secondary: #1C1C21;
+  --secondary-foreground: #EDEBE7;
+  --muted: #18181C;
+  --muted-foreground: #72706C;
+  --accent: #1C1C21;
+  --accent-foreground: #EDEBE7;
+  --destructive: oklch(0.65 0.22 22);
+  --border: rgba(255, 255, 255, 0.07);
+  --input: #1C1C21;
+  --ring: #E8834E;
+  --chart-1: #E8834E;
+  --chart-2: #64A0C8;
+  --chart-3: #5BAF82;
+  --chart-4: #D4A050;
+  --chart-5: #A07EC8;
+  --sidebar: rgba(255, 255, 255, 0.025);
+  --sidebar-foreground: #EDEBE7;
+  --sidebar-primary: #E8834E;
+  --sidebar-primary-foreground: #07070A;
+  --sidebar-accent: rgba(255, 255, 255, 0.05);
+  --sidebar-accent-foreground: #EDEBE7;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-ring: #E8834E;
 }
 
 @layer base {
@@ -139,7 +139,56 @@
   }
 }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
+/* ─── Background ambient glow ─── */
+.dark body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 45% at 12% 0%, rgba(232, 131, 78, 0.09) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 30% at 90% 100%, rgba(100, 160, 200, 0.05) 0%, transparent 60%);
+}
+
+body > #root {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Glass card base ─── */
+.dark .card-glass {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.card-glass {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(0, 0, 0, 0.07);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* View Transition - circular reveal for theme toggle */
+::view-transition-image-pair(root) {
+  isolation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+  display: block;
+}
+/* 기본: new가 위 (확장용) */
+::view-transition-old(root) { z-index: 0; }
+::view-transition-new(root) { z-index: 1; }
+
+/* 수축 모드: html에 data-theme-shrink 속성 시 old가 위 */
+html[data-theme-shrink]::view-transition-old(root) { z-index: 1; }
+html[data-theme-shrink]::view-transition-new(root) { z-index: 0; }
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--muted-foreground); }

@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { DataProviderWrapper } from '@repo/ui';
+import { DataProviderWrapper, ThemeProvider } from '@repo/ui';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 
 import { electronProvider } from './electron-provider';
@@ -68,8 +68,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <DataProviderWrapper provider={electronProvider}>
-        <DataChangedListener />
-        {children}
+        <ThemeProvider>
+          <DataChangedListener />
+          {children}
+        </ThemeProvider>
       </DataProviderWrapper>
     </QueryClientProvider>
   );

@@ -23,14 +23,30 @@ export {
   DialogTrigger,
 } from './components/ui/dialog';
 export { Input } from './components/ui/input';
+export {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuGroup,
+} from './components/ui/dropdown-menu';
 export { ScrollArea, ScrollBar } from './components/ui/scroll-area';
 export { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './components/ui/tooltip';
 
 // Layout
-export { Sidebar } from './layout/sidebar';
+export { AppSidebar, Sidebar } from './layout/sidebar';
 export { StatCard } from './layout/stat-card';
 export { CostDisplay } from './layout/cost-display';
+
+// Sidebar primitives (shadcn)
+export {
+  SidebarProvider,
+  SidebarTrigger,
+  SidebarInset,
+} from './components/ui/sidebar';
 
 // Charts
 export { ActivityHeatmap } from './charts/activity-heatmap';
@@ -46,6 +62,7 @@ export { UsageOverTime } from './charts/usage-over-time';
 
 // Hooks / Provider
 export { DataProviderWrapper, useProjects, useStats } from './hooks/use-data';
+export { ThemeProvider, useTheme } from './hooks/use-theme';
 
 // Pages
 export {
