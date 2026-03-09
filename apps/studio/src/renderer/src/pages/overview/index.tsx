@@ -1,4 +1,4 @@
-import { type DailyUsage } from '@repo/shared';
+import { type DailyUsage, type SessionInfo } from '@repo/shared';
 import { formatDateShort, formatNumber, formatTokens, timeAgo } from '@repo/shared';
 import {
   ActivityHeatmap,
@@ -16,7 +16,7 @@ import {
   UsageOverTime,
   useStats,
 } from '@repo/ui';
-import { DollarSign, FolderOpen, MessageSquare, Zap } from 'lucide-react';
+import { ChevronRight, DollarSign, FolderOpen, MessageSquare, Zap } from 'lucide-react';
 import { useState } from 'react';
 
 function getDateRangeDesc(dailyUsage: DailyUsage[]): string {
@@ -31,6 +31,85 @@ const CL = ({ children }: { children: React.ReactNode }) => (
     {children}
   </p>
 );
+
+function SessionTreeView({ sessions }: { sessions: SessionInfo[] }) {
+  const filtered = sessions.filter((s) => s.cost > 0);
+
+  const groups = filtered.reduce<Record<string, SessionInfo[]>>((acc, s) => {
+    const key = s.projectName;
+    if (!acc[key]) acc[key] = [];
+    acc[key]!.push(s);
+    return acc;
+  }, {});
+
+  const projectNames = Object.keys(groups);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(projectNames.map((k) => [k, true]))
+  );
+
+  const toggle = (name: string) =>
+    setExpanded((prev) => ({ ...prev, [name]: !prev[name] }));
+
+  if (filtered.length === 0) {
+    return <p className="text-muted-foreground text-sm text-center py-4">세션이 없습니다</p>;
+  }
+
+  return (
+    <div className="space-y-0.5">
+      {projectNames.map((projectName) => {
+        const projectSessions = groups[projectName]!;
+        const isOpen = expanded[projectName] ?? true;
+        const totalCost = projectSessions.reduce((sum, s) => sum + s.cost, 0);
+        const latestSession = projectSessions[0]!;
+
+        return (
+          <div key={projectName}>
+            <button
+              onClick={() => toggle(projectName)}
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/50 transition-colors group text-left"
+            >
+              <ChevronRight
+                className={`h-3.5 w-3.5 text-muted-foreground/60 shrink-0 transition-transform duration-150 ${
+                  isOpen ? 'rotate-90' : ''
+                }`}
+              />
+              <FolderOpen className="h-3.5 w-3.5 text-muted-foreground/60 shrink-0" />
+              <span className="text-sm font-medium flex-1 truncate">{projectName}</span>
+              <span className="text-[11px] text-muted-foreground/60 shrink-0">
+                {timeAgo(new Date(latestSession.lastTime))}
+              </span>
+              <span className="text-xs font-semibold font-mono text-primary shrink-0 tabular-nums">
+                <CostDisplay cost={totalCost} />
+              </span>
+            </button>
+
+            {isOpen && (
+              <div className="ml-5 border-l border-border/30 pl-2 space-y-0.5 mb-1">
+                {projectSessions.map((session) => (
+                  <div
+                    key={session.id}
+                    className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/30 transition-colors"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-border/60 shrink-0" />
+                    <span className="text-[12px] text-muted-foreground flex-1 truncate">
+                      {timeAgo(new Date(session.lastTime))}
+                    </span>
+                    <span className="text-[11px] text-muted-foreground/70 shrink-0">
+                      {session.messageCount}개
+                    </span>
+                    <span className="text-[12px] font-mono font-medium shrink-0 tabular-nums">
+                      <CostDisplay cost={session.cost} />
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export function OverviewPage() {
   const { data: stats, isLoading } = useStats();
@@ -97,6 +176,20 @@ export function OverviewPage() {
         </Card>
 
         <Card style={{ gridColumn: 'span 4' }}>
+          <CardHeader className="px-5 pt-5 pb-3"><CL>피크 시간대</CL></CardHeader>
+          <CardContent className="px-5 pb-5 pt-0">
+            <PeakHours data={stats.peakHours} />
+          </CardContent>
+        </Card>
+
+        <Card style={{ gridColumn: 'span 7' }}>
+          <CardHeader className="px-5 pt-5 pb-3"><CL>활동 히트맵</CL></CardHeader>
+          <CardContent className="px-5 pb-5 pt-0">
+            <ActivityHeatmap data={stats.activityData} />
+          </CardContent>
+        </Card>
+
+        <Card style={{ gridColumn: 'span 5' }}>
           <CardHeader className="px-5 pt-5 pb-3">
             <div className="flex items-center justify-between">
               <CL>모델별 분석</CL>
@@ -117,20 +210,6 @@ export function OverviewPage() {
           </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
             <ModelBreakdown data={stats.modelBreakdown} view={modelView} onViewChange={setModelView} />
-          </CardContent>
-        </Card>
-
-        <Card style={{ gridColumn: 'span 7' }}>
-          <CardHeader className="px-5 pt-5 pb-3"><CL>활동 히트맵</CL></CardHeader>
-          <CardContent className="px-5 pb-5 pt-0">
-            <ActivityHeatmap data={stats.activityData} />
-          </CardContent>
-        </Card>
-
-        <Card style={{ gridColumn: 'span 5' }}>
-          <CardHeader className="px-5 pt-5 pb-3"><CL>피크 시간대</CL></CardHeader>
-          <CardContent className="px-5 pb-5 pt-0">
-            <PeakHours data={stats.peakHours} />
           </CardContent>
         </Card>
 
@@ -164,39 +243,11 @@ export function OverviewPage() {
 
         <Card style={{ gridColumn: 'span 12' }}>
           <CardHeader className="px-5 pt-5 pb-3"><CL>최근 세션</CL></CardHeader>
-          <CardContent className="px-5 pb-4 pt-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border/40">
-              {stats.recentSessions
-                .filter((s) => s.cost > 0)
-                .map((session) => (
-                  <div
-                    key={session.id}
-                    className="flex items-center justify-between px-3 py-2.5 first:pl-0 last:pr-0"
-                  >
-                    <div className="min-w-0 pr-4">
-                      <p className="text-sm font-medium truncate">{session.projectName}</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">
-                        {timeAgo(new Date(session.lastTime))}
-                      </p>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <p className="text-sm font-semibold font-mono">
-                        <CostDisplay cost={session.cost} />
-                      </p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">
-                        {session.messageCount}개 메시지
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              {stats.recentSessions.length === 0 && (
-                <p className="text-muted-foreground text-sm text-center py-4 col-span-3">
-                  세션이 없습니다
-                </p>
-              )}
-            </div>
+          <CardContent className="px-4 pb-4 pt-0">
+            <SessionTreeView sessions={stats.recentSessions} />
           </CardContent>
         </Card>
+
       </div>
     </div>
   );

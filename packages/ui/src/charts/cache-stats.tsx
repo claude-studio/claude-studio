@@ -35,43 +35,62 @@ function FieldLabel({ label, tooltip }: { label: string; tooltip: string }) {
 }
 
 export function CacheStatsCard({ data }: CacheStatsCardProps) {
+  const missRate = 100 - data.cacheHitRate;
+
   return (
     <TooltipProvider delayDuration={300}>
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-lg border border-border/50 p-3">
+      <div className="space-y-3">
+        {/* 상단: 적중률 + 절약 비용 강조 */}
+        <div className="flex items-end justify-between gap-3 pb-3 border-b border-border/40">
+          <div>
             <FieldLabel label="캐시 적중률" tooltip={TOOLTIPS.cacheHitRate} />
-            <p className="text-xl font-semibold font-mono mt-1">{data.cacheHitRate}%</p>
+            <p className="text-3xl font-bold font-mono mt-1 tabular-nums">{data.cacheHitRate}%</p>
           </div>
-          <div className="rounded-lg border border-border/50 p-3">
+          <div className="text-right">
             <FieldLabel label="절약 비용" tooltip={TOOLTIPS.estimatedSavings} />
-            <p className="text-xl font-semibold font-mono mt-1 text-primary">
+            <p className="text-xl font-semibold font-mono mt-1 text-primary tabular-nums">
               {formatCost(data.estimatedSavingsUsd)}
             </p>
           </div>
-          <div className="rounded-lg border border-border/50 p-3">
-            <FieldLabel label="캐시 생성 토큰" tooltip={TOOLTIPS.cacheCreation} />
-            <p className="text-lg font-semibold font-mono mt-1">
-              {formatTokens(data.totalCacheCreationTokens)}
-            </p>
+        </div>
+
+        {/* 캐시 히트/미스 시각화 */}
+        <div className="space-y-1.5">
+          <div className="flex gap-1 h-2 w-full rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary/70 rounded-l-full transition-all"
+              style={{ width: `${data.cacheHitRate}%` }}
+            />
+            <div
+              className="h-full bg-muted flex-1 rounded-r-full transition-all"
+              style={{ width: `${missRate}%` }}
+            />
           </div>
-          <div className="rounded-lg border border-border/50 p-3">
-            <FieldLabel label="캐시 읽기 토큰" tooltip={TOOLTIPS.cacheRead} />
-            <p className="text-lg font-semibold font-mono mt-1">{formatTokens(data.totalCacheReadTokens)}</p>
+          <div className="flex justify-between text-[10px] text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary/70" />
+              히트 {data.cacheHitRate}%
+            </span>
+            <span className="flex items-center gap-1">
+              미스 {missRate}%
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
+            </span>
           </div>
         </div>
 
-        {/* 캐시 적중률 바 */}
-        <div>
-          <div className="flex justify-between text-xs text-muted-foreground mb-1.5">
-            <span>캐시 미스 (생성)</span>
-            <span>캐시 히트 (읽기)</span>
+        {/* 토큰 상세 */}
+        <div className="space-y-2 pt-1">
+          <div className="flex items-center justify-between">
+            <FieldLabel label="캐시 읽기 토큰" tooltip={TOOLTIPS.cacheRead} />
+            <p className="text-sm font-semibold font-mono tabular-nums text-primary">
+              {formatTokens(data.totalCacheReadTokens)}
+            </p>
           </div>
-          <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-            <div
-              className="h-full rounded-full bg-primary transition-all"
-              style={{ width: `${data.cacheHitRate}%` }}
-            />
+          <div className="flex items-center justify-between">
+            <FieldLabel label="캐시 생성 토큰" tooltip={TOOLTIPS.cacheCreation} />
+            <p className="text-sm font-medium font-mono tabular-nums text-muted-foreground">
+              {formatTokens(data.totalCacheCreationTokens)}
+            </p>
           </div>
         </div>
       </div>
