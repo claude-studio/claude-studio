@@ -17,11 +17,12 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "turbo": "^2.5.0",
-    "prettier": "catalog:",
     "@commitlint/cli": "catalog:",
     "@commitlint/config-conventional": "catalog:",
     "husky": "catalog:",
+    "lint-staged": "^16.3.2",
+    "prettier": "catalog:",
+    "turbo": "^2.5.0",
     "typescript": "catalog:"
   }
 }
