@@ -1,0 +1,2 @@
+#!/bin/sh
+/Applications/cmux.app/Contents/Resources/bin/cmux set-status last_commit "$(git log -1 --format="%cd" --date=format:"%Y-%m-%d %H:%M (%a)")" --icon checkmark --color "#30d158"
