@@ -1,8 +1,7 @@
+import { app } from 'electron';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-
-import { app } from 'electron';
 
 const PLUGIN_NAME = 'claude-studio';
 const PLUGIN_VERSION = '1.0.0';
@@ -22,13 +21,16 @@ const SETTINGS_PATH = path.join(CLAUDE_DIR, 'settings.json');
 
 interface InstalledPluginsFile {
   version: 2;
-  plugins: Record<string, Array<{
-    scope: string;
-    installPath: string;
-    version: string;
-    installedAt: string;
-    lastUpdated: string;
-  }>>;
+  plugins: Record<
+    string,
+    Array<{
+      scope: string;
+      installPath: string;
+      version: string;
+      installedAt: string;
+      lastUpdated: string;
+    }>
+  >;
 }
 
 function getResourcesPluginPath(): string {
@@ -68,7 +70,9 @@ function writeJsonFile(filePath: string, data: Record<string, unknown>): void {
 
 function readInstalledPlugins(): InstalledPluginsFile {
   try {
-    const data = JSON.parse(fs.readFileSync(INSTALLED_PLUGINS_PATH, 'utf8')) as InstalledPluginsFile;
+    const data = JSON.parse(
+      fs.readFileSync(INSTALLED_PLUGINS_PATH, 'utf8'),
+    ) as InstalledPluginsFile;
     if (data.version === 2 && data.plugins) return data;
   } catch {
     // ignore
@@ -98,13 +102,15 @@ export function installPlugin(): void {
   // 3. installed_plugins.json 업데이트 (version 2 포맷)
   const now = new Date().toISOString();
   const installedPlugins = readInstalledPlugins();
-  installedPlugins.plugins[PLUGIN_KEY] = [{
-    scope: 'user',
-    installPath: INSTALL_DIR,
-    version: PLUGIN_VERSION,
-    installedAt: now,
-    lastUpdated: now,
-  }];
+  installedPlugins.plugins[PLUGIN_KEY] = [
+    {
+      scope: 'user',
+      installPath: INSTALL_DIR,
+      version: PLUGIN_VERSION,
+      installedAt: now,
+      lastUpdated: now,
+    },
+  ];
   writeJsonFile(INSTALLED_PLUGINS_PATH, installedPlugins as unknown as Record<string, unknown>);
 
   // 4. settings.json의 enabledPlugins에 true 추가

@@ -3,7 +3,6 @@ export { cn } from './lib/utils';
 
 // Components
 export { Badge, badgeVariants } from './components/ui/badge';
-export { Particles } from './components/ui/particles';
 export { Button, buttonVariants } from './components/ui/button';
 export {
   Card,
@@ -23,23 +22,24 @@ export {
   DialogTitle,
   DialogTrigger,
 } from './components/ui/dialog';
-export { Input } from './components/ui/input';
 export {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuGroup,
 } from './components/ui/dropdown-menu';
+export { Input } from './components/ui/input';
+export { Particles } from './components/ui/particles';
 export { ScrollArea, ScrollBar } from './components/ui/scroll-area';
 export { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './components/ui/tooltip';
 
 // Layout
-export { StatCard } from './layout/stat-card';
 export { CostDisplay } from './layout/cost-display';
+export { StatCard } from './layout/stat-card';
 
 // Sidebar primitives (shadcn)
 export {
@@ -73,7 +73,6 @@ export { UsageOverTime } from './charts/usage-over-time';
 // Hooks / Provider
 export { DataProviderWrapper, useProjects, useStats } from './hooks/use-data';
 export { ThemeProvider, useTheme } from './hooks/use-theme';
-
 
 // CSS (consumers must import separately)
 // import '@repo/ui/globals.css'

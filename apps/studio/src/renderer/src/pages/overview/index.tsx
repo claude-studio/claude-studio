@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { type DailyUsage, type SessionInfo } from '@repo/shared';
 import { formatDateShort, formatNumber, formatTokens, timeAgo } from '@repo/shared';
 import {
@@ -16,8 +18,8 @@ import {
   UsageOverTime,
   useStats,
 } from '@repo/ui';
-import { ChevronRight, DollarSign, FolderOpen, MessageSquare, Zap } from 'lucide-react';
-import { useState } from 'react';
+
+import { ChevronRight, FolderOpen } from 'lucide-react';
 
 function getDateRangeDesc(dailyUsage: DailyUsage[]): string {
   const dates = dailyUsage.map((d) => d.date).sort();
@@ -44,11 +46,10 @@ function SessionTreeView({ sessions }: { sessions: SessionInfo[] }) {
 
   const projectNames = Object.keys(groups);
   const [expanded, setExpanded] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(projectNames.map((k) => [k, true]))
+    Object.fromEntries(projectNames.map((k) => [k, true])),
   );
 
-  const toggle = (name: string) =>
-    setExpanded((prev) => ({ ...prev, [name]: !prev[name] }));
+  const toggle = (name: string) => setExpanded((prev) => ({ ...prev, [name]: !prev[name] }));
 
   if (filtered.length === 0) {
     return <p className="text-muted-foreground text-sm text-center py-4">세션이 없습니다</p>;
@@ -129,7 +130,6 @@ export function OverviewPage() {
   return (
     <div className="space-y-3">
       <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(12, minmax(0, 1fr))' }}>
-
         <div style={{ gridColumn: 'span 3' }}>
           <StatCard
             featured
@@ -140,7 +140,6 @@ export function OverviewPage() {
                 ? `${dateRangeDesc} · D+${stats.lifetime.daysActive}`
                 : dateRangeDesc
             }
-            icon={<DollarSign />}
           />
         </div>
         <div style={{ gridColumn: 'span 3' }}>
@@ -148,7 +147,6 @@ export function OverviewPage() {
             title="총 토큰"
             value={formatTokens(stats.totalTokens)}
             description={`입력 ${formatTokens(stats.inputTokens)} / 출력 ${formatTokens(stats.outputTokens)}`}
-            icon={<Zap />}
           />
         </div>
         <div style={{ gridColumn: 'span 3' }}>
@@ -156,7 +154,6 @@ export function OverviewPage() {
             title="세션"
             value={formatNumber(stats.totalSessions)}
             description={`${stats.totalProjects}개 프로젝트`}
-            icon={<MessageSquare />}
           />
         </div>
         <div style={{ gridColumn: 'span 3' }}>
@@ -164,26 +161,31 @@ export function OverviewPage() {
             title="메시지"
             value={formatNumber(stats.totalMessages)}
             description={`툴 호출 ${formatNumber(stats.totalToolCalls)}회`}
-            icon={<FolderOpen />}
           />
         </div>
 
         <Card style={{ gridColumn: 'span 8' }}>
-          <CardHeader className="px-5 pt-5 pb-3"><CL>시간별 사용량</CL></CardHeader>
+          <CardHeader className="px-5 pt-5 pb-3">
+            <CL>시간별 사용량</CL>
+          </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
             <UsageOverTime data={stats.dailyUsage} />
           </CardContent>
         </Card>
 
         <Card style={{ gridColumn: 'span 4' }}>
-          <CardHeader className="px-5 pt-5 pb-3"><CL>피크 시간대</CL></CardHeader>
+          <CardHeader className="px-5 pt-5 pb-3">
+            <CL>피크 시간대</CL>
+          </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
             <PeakHours data={stats.peakHours} />
           </CardContent>
         </Card>
 
         <Card style={{ gridColumn: 'span 7' }}>
-          <CardHeader className="px-5 pt-5 pb-3"><CL>활동 히트맵</CL></CardHeader>
+          <CardHeader className="px-5 pt-5 pb-3">
+            <CL>활동 히트맵</CL>
+          </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
             <ActivityHeatmap data={stats.activityData} />
           </CardContent>
@@ -199,7 +201,9 @@ export function OverviewPage() {
                     key={v}
                     onClick={() => setModelView(v)}
                     className={`px-2 py-0.5 rounded-sm text-[9px] font-semibold transition-colors tracking-wide uppercase ${
-                      modelView === v ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'
+                      modelView === v
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
                     {v === 'cost' ? '비용' : '토큰'}
@@ -209,45 +213,58 @@ export function OverviewPage() {
             </div>
           </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
-            <ModelBreakdown data={stats.modelBreakdown} view={modelView} onViewChange={setModelView} />
+            <ModelBreakdown
+              data={stats.modelBreakdown}
+              view={modelView}
+              onViewChange={setModelView}
+            />
           </CardContent>
         </Card>
 
         <Card style={{ gridColumn: 'span 8' }}>
-          <CardHeader className="px-5 pt-5 pb-3"><CL>모델별 일별 비용</CL></CardHeader>
+          <CardHeader className="px-5 pt-5 pb-3">
+            <CL>모델별 일별 비용</CL>
+          </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
             <CostChart data={stats.dailyUsage} />
           </CardContent>
         </Card>
 
         <Card style={{ gridColumn: 'span 4' }}>
-          <CardHeader className="px-5 pt-5 pb-3"><CL>툴 사용 순위</CL></CardHeader>
+          <CardHeader className="px-5 pt-5 pb-3">
+            <CL>툴 사용 순위</CL>
+          </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
             <ToolUsageChart data={stats.toolUsage} />
           </CardContent>
         </Card>
 
         <Card style={{ gridColumn: 'span 4' }}>
-          <CardHeader className="px-5 pt-5 pb-3"><CL>캐시 절약 현황</CL></CardHeader>
+          <CardHeader className="px-5 pt-5 pb-3">
+            <CL>캐시 절약 현황</CL>
+          </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
             <CacheStatsCard data={stats.cacheStats} />
           </CardContent>
         </Card>
 
         <Card style={{ gridColumn: 'span 8' }}>
-          <CardHeader className="px-5 pt-5 pb-3"><CL>대화 패턴 분석</CL></CardHeader>
+          <CardHeader className="px-5 pt-5 pb-3">
+            <CL>대화 패턴 분석</CL>
+          </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
             <ConversationStatsCard data={stats.conversationStats} />
           </CardContent>
         </Card>
 
         <Card style={{ gridColumn: 'span 12' }}>
-          <CardHeader className="px-5 pt-5 pb-3"><CL>최근 세션</CL></CardHeader>
+          <CardHeader className="px-5 pt-5 pb-3">
+            <CL>최근 세션</CL>
+          </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
             <SessionTreeView sessions={stats.recentSessions} />
           </CardContent>
         </Card>
-
       </div>
     </div>
   );

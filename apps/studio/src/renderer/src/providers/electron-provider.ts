@@ -1,3 +1,4 @@
+import type { PixelAgentEvent } from '@repo/pixel-agents';
 import type {
   ClaudeSettings,
   DashboardStats,
@@ -7,8 +8,6 @@ import type {
   ProjectInfo,
   SkillInfo,
 } from '@repo/shared';
-
-import type { PixelAgentEvent } from '@repo/pixel-agents';
 
 declare global {
   interface Window {
@@ -26,7 +25,17 @@ declare global {
       getSkills: () => Promise<SkillInfo[]>;
       getCharacterSprites: () => Promise<unknown>;
       getWallSprites: () => Promise<unknown>;
-      getActiveAgents: () => Promise<Array<{ id: number; projectName: string; shortId: string; status: string; activeToolId: string | null; activeToolName: string | null; activeToolStatus: string | null }>>;
+      getActiveAgents: () => Promise<
+        Array<{
+          id: number;
+          projectName: string;
+          shortId: string;
+          status: string;
+          activeToolId: string | null;
+          activeToolName: string | null;
+          activeToolStatus: string | null;
+        }>
+      >;
       startLiveWatching: () => Promise<void>;
       stopLiveWatching: () => Promise<void>;
       onLiveAgentEvent: (callback: (event: PixelAgentEvent) => void) => () => void;
@@ -36,7 +45,6 @@ declare global {
     };
   }
 }
-
 
 function reviveDates(obj: unknown): unknown {
   if (obj instanceof Date) return obj;

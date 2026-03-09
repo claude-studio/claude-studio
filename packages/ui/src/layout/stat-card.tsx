@@ -6,7 +6,6 @@ interface StatCardProps {
   title: string;
   value: ReactNode;
   description?: string;
-  icon: ReactNode;
   trend?: {
     value: number;
     label: string;

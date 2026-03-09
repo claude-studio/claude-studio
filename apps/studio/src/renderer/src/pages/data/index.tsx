@@ -1,5 +1,6 @@
 import { type ClaudeSettings } from '@repo/shared';
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@repo/ui';
+
 import { Bot, Download, Puzzle, ShieldCheck, Trash2, Wifi } from 'lucide-react';
 
 interface DataPageProps {

@@ -1,5 +1,6 @@
 import type { PixelAgentEvent } from '../messages';
 import { extractToolName } from '../tool-utils';
+
 import type { OfficeState } from '../engine/office-state';
 
 export function processPixelAgentEvent(os: OfficeState, event: PixelAgentEvent): void {

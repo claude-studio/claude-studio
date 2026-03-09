@@ -1,6 +1,7 @@
 import { formatCost, formatNumber, formatTokens, getModelShortName, timeAgo } from '@repo/shared';
 import { Badge, Card, CardContent, useProjects } from '@repo/ui';
 import { Link } from '@tanstack/react-router';
+
 import { Clock, FolderOpen } from 'lucide-react';
 
 function PageSpinner() {
@@ -43,16 +44,28 @@ export function ProjectsPage() {
 
                 <div className="grid grid-cols-3 gap-2 mt-auto">
                   <div>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">비용</p>
-                    <p className="text-xs font-medium font-mono mt-0.5">{formatCost(project.totalCost)}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
+                      비용
+                    </p>
+                    <p className="text-xs font-medium font-mono mt-0.5">
+                      {formatCost(project.totalCost)}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">토큰</p>
-                    <p className="text-xs font-medium font-mono mt-0.5">{formatTokens(project.totalTokens)}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
+                      토큰
+                    </p>
+                    <p className="text-xs font-medium font-mono mt-0.5">
+                      {formatTokens(project.totalTokens)}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">세션</p>
-                    <p className="text-xs font-medium font-mono mt-0.5">{formatNumber(project.sessionCount)}개</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
+                      세션
+                    </p>
+                    <p className="text-xs font-medium font-mono mt-0.5">
+                      {formatNumber(project.sessionCount)}개
+                    </p>
                   </div>
                 </div>
 

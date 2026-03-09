@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, type CSSProperties } from 'react';
+import { type CSSProperties, useEffect, useRef, useState } from 'react';
 
 interface ActivityData {
   date: string;
@@ -13,7 +13,8 @@ const WEEKS = 24;
 const GAP = 4;
 
 function getIntensityStyle(count: number, max: number): CSSProperties {
-  if (count === 0) return { backgroundColor: 'color-mix(in srgb, var(--muted-foreground) 15%, transparent)' };
+  if (count === 0)
+    return { backgroundColor: 'color-mix(in srgb, var(--muted-foreground) 15%, transparent)' };
   const ratio = count / max;
   const pct = ratio < 0.2 ? 25 : ratio < 0.4 ? 45 : ratio < 0.6 ? 60 : ratio < 0.8 ? 78 : 100;
   return { backgroundColor: `color-mix(in srgb, var(--primary) ${pct}%, transparent)` };
@@ -84,7 +85,9 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
               width: cell,
               height: cell,
               ...(pct === 0
-                ? { backgroundColor: 'color-mix(in srgb, var(--muted-foreground) 15%, transparent)' }
+                ? {
+                    backgroundColor: 'color-mix(in srgb, var(--muted-foreground) 15%, transparent)',
+                  }
                 : { backgroundColor: `color-mix(in srgb, var(--primary) ${pct}%, transparent)` }),
             }}
           />

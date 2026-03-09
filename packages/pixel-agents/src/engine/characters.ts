@@ -1,18 +1,15 @@
 import {
-  SEAT_REST_MAX_SEC,
-  SEAT_REST_MIN_SEC,
   TYPE_FRAME_DURATION_SEC,
   WALK_FRAME_DURATION_SEC,
   WALK_SPEED_PX_PER_SEC,
   WANDER_MOVES_BEFORE_REST_MAX,
   WANDER_MOVES_BEFORE_REST_MIN,
-  WANDER_PAUSE_MAX_SEC,
-  WANDER_PAUSE_MIN_SEC,
 } from '../constants';
-import { findPath } from '../layout/tile-map';
-import type { CharacterSprites } from '../sprites/sprite-data';
 import type { Character, Seat, SpriteData, TileType as TileTypeVal } from '../types';
 import { CharacterState, Direction, TILE_SIZE } from '../types';
+
+import { findPath } from '../layout/tile-map';
+import type { CharacterSprites } from '../sprites/sprite-data';
 
 const READING_TOOLS = new Set(['Read', 'Grep', 'Glob', 'WebFetch', 'WebSearch']);
 
@@ -28,7 +25,12 @@ export function tileCenter(col: number, row: number): { x: number; y: number } {
   };
 }
 
-function directionBetween(fromCol: number, fromRow: number, toCol: number, toRow: number): Direction {
+function directionBetween(
+  fromCol: number,
+  fromRow: number,
+  toCol: number,
+  toRow: number,
+): Direction {
   const dc = toCol - fromCol;
   const dr = toRow - fromRow;
   if (dc > 0) return Direction.RIGHT;
@@ -96,19 +98,6 @@ export function updateCharacter(
         ch.frameTimer -= TYPE_FRAME_DURATION_SEC;
         ch.frame = (ch.frame + 1) % 2;
       }
-      if (!ch.isActive) {
-        if (ch.seatTimer > 0) {
-          ch.seatTimer -= dt;
-          break;
-        }
-        ch.seatTimer = 0;
-        ch.state = CharacterState.IDLE;
-        ch.frame = 0;
-        ch.frameTimer = 0;
-        ch.wanderTimer = randomRange(WANDER_PAUSE_MIN_SEC, WANDER_PAUSE_MAX_SEC);
-        ch.wanderCount = 0;
-        ch.wanderLimit = randomInt(WANDER_MOVES_BEFORE_REST_MIN, WANDER_MOVES_BEFORE_REST_MAX);
-      }
       break;
     }
 
@@ -130,6 +119,11 @@ export function updateCharacter(
         ch.x = center.x;
         ch.y = center.y;
 
+        // isActive=false로 이동 완료 → 도구 말풍선 해제
+        if (!ch.isActive) {
+          ch.currentTool = null;
+        }
+
         if (ch.isActive) {
           // 작업 중 — 자리에 도착하면 TYPE, 아니면 계속 이동
           if (ch.seatId) {
@@ -141,7 +135,14 @@ export function updateCharacter(
               ch.dir = seat.facingDir;
             } else {
               // 아직 자리가 아님 — 경로 재탐색
-              const newPath = findPath(ch.tileCol, ch.tileRow, seat.seatCol, seat.seatRow, tileMap, blockedTiles);
+              const newPath = findPath(
+                ch.tileCol,
+                ch.tileRow,
+                seat.seatCol,
+                seat.seatRow,
+                tileMap,
+                blockedTiles,
+              );
               if (newPath.length > 0) {
                 ch.path = newPath;
                 ch.moveProgress = 0;
@@ -157,7 +158,11 @@ export function updateCharacter(
         } else {
           // isActive=false — lounge seat 또는 work seat 도착 체크
           const loungeSeat = ch.loungeSeatId ? seats.get(ch.loungeSeatId) : null;
-          if (loungeSeat && ch.tileCol === loungeSeat.seatCol && ch.tileRow === loungeSeat.seatRow) {
+          if (
+            loungeSeat &&
+            ch.tileCol === loungeSeat.seatCol &&
+            ch.tileRow === loungeSeat.seatRow
+          ) {
             ch.state = CharacterState.TYPE;
             ch.dir = loungeSeat.facingDir;
           } else {
@@ -193,7 +198,14 @@ export function updateCharacter(
         if (seat) {
           const lastStep = ch.path[ch.path.length - 1];
           if (!lastStep || lastStep.col !== seat.seatCol || lastStep.row !== seat.seatRow) {
-            const newPath = findPath(ch.tileCol, ch.tileRow, seat.seatCol, seat.seatRow, tileMap, blockedTiles);
+            const newPath = findPath(
+              ch.tileCol,
+              ch.tileRow,
+              seat.seatCol,
+              seat.seatRow,
+              tileMap,
+              blockedTiles,
+            );
             if (newPath.length > 0) {
               ch.path = newPath;
               ch.moveProgress = 0;
@@ -210,11 +222,13 @@ export function getCharacterSprite(ch: Character, sprites: CharacterSprites): Sp
   switch (ch.state) {
     case CharacterState.TYPE: {
       if (ch.isActive) {
-        // 작업 중: typing/reading frame 5~6 반복 (frame % 2)
-        const workFrames = isReadingTool(ch.currentTool) ? sprites.reading[ch.dir] : sprites.typing[ch.dir];
+        // 작업 중: typing/reading frame 3~4 (workSeq) 반복 (frame % 2)
+        const workFrames = isReadingTool(ch.currentTool)
+          ? sprites.reading[ch.dir]
+          : sprites.typing[ch.dir];
         return workFrames[ch.frame % 2]!;
       } else {
-        // 대기(isActive=false): idle 앉기 frame 3~4 반복
+        // 대기(isActive=false): idle 앉기 frame 5~6 (idleSeq) 반복
         const idleSitFrames = sprites.idle[ch.dir];
         return idleSitFrames[ch.frame % 2]!;
       }
@@ -228,10 +242,6 @@ export function getCharacterSprite(ch: Character, sprites: CharacterSprites): Sp
     default:
       return sprites.walk[ch.dir][1]!;
   }
-}
-
-function randomRange(min: number, max: number): number {
-  return min + Math.random() * (max - min);
 }
 
 function randomInt(min: number, max: number): number {

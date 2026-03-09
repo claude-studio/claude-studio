@@ -1,4 +1,15 @@
 // Types (const enums and interfaces)
+export type {
+  Character,
+  FloorColor,
+  FurnitureCatalogEntry,
+  FurnitureInstance,
+  OfficeLayout,
+  PlacedFurniture,
+  Seat,
+  SpriteData,
+  ToolActivity,
+} from './types';
 export {
   CharacterState,
   DEFAULT_COLS,
@@ -11,17 +22,6 @@ export {
   TILE_SIZE,
   TileType,
 } from './types';
-export type {
-  Character,
-  FloorColor,
-  FurnitureCatalogEntry,
-  FurnitureInstance,
-  OfficeLayout,
-  PlacedFurniture,
-  Seat,
-  SpriteData,
-  ToolActivity,
-} from './types';
 
 // Messages
 export type {
@@ -29,47 +29,52 @@ export type {
   AgentCreatedEvent,
   AgentIdleEvent,
   AgentSessionEndEvent,
-  AgentWorkingEvent,
   AgentToolDoneEvent,
   AgentToolPermissionEvent,
   AgentToolsClearEvent,
   AgentToolStartEvent,
+  AgentWorkingEvent,
   PixelAgentEvent,
   PixelAgentEventType,
 } from './messages';
 
 // Engine
-export { OfficeState } from './engine/office-state';
 export { startGameLoop } from './engine/game-loop';
-export { renderOffice } from './engine/renderer';
+export { OfficeState } from './engine/office-state';
 export type { RenderState } from './engine/renderer';
+export { renderOffice } from './engine/renderer';
 
 // Sprites
 export { getCachedSprite, getOutlineSprite } from './sprites/sprite-cache';
-export { getCharacterSprites, setCharacterTemplates } from './sprites/sprite-data';
 export type { CharacterSprites } from './sprites/sprite-data';
+export { getCharacterSprites, setCharacterTemplates } from './sprites/sprite-data';
 
 // Layout
-export { findPath, getWalkableTiles, isWalkable } from './layout/tile-map';
 export {
   createDefaultLayout,
   layoutToFurnitureInstances,
   layoutToSeats,
   layoutToTileMap,
 } from './layout/layout-serializer';
+export { findPath, getWalkableTiles, isWalkable } from './layout/tile-map';
 
 // Hooks
 export { processPixelAgentEvent } from './hooks/use-pixel-messages';
 
 // Components
-export { OfficeCanvas } from './components/OfficeCanvas';
 export type { OfficeCanvasProps } from './components/OfficeCanvas';
+export { OfficeCanvas } from './components/OfficeCanvas';
 
 // Utils
 export { defaultZoom, extractToolName } from './tool-utils';
 
 // Floor/Wall tiles
-export { getColorizedFloorSprite, hasFloorSprites, setFloorSprites, WALL_COLOR } from './floor-tiles';
+export {
+  getColorizedFloorSprite,
+  hasFloorSprites,
+  setFloorSprites,
+  WALL_COLOR,
+} from './floor-tiles';
 export { hasWallSprites, setWallSprites } from './wall-tiles';
 
 // Colorize

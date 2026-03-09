@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+
 import { cn } from '@repo/ui';
 
 // 공유 IntersectionObserver — 모든 ScrollReveal 인스턴스가 하나의 옵저버를 사용

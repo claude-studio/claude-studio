@@ -1,14 +1,14 @@
+import { BrowserWindow } from 'electron';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-
-import { BrowserWindow } from 'electron';
 
 import type { HookEvent, LiveAgentEvent, LiveAgentState } from './live-types';
 import { clearAgentActivity } from './timer-manager';
 import { processTranscriptLine } from './transcript-parser';
 
 const IDLE_DESPAWN_MS = 60 * 1000;
+const SCAN_ACTIVE_WINDOW_MS = 10 * 60 * 1000; // 앱 시작 시 스캔 기준: 최근 10분 이내
 const JSONL_PATTERN = /\.jsonl$/;
 
 const agents = new Map<number, LiveAgentState>();
@@ -20,7 +20,7 @@ const fileLastActivity = new Map<string, number>();
 let dirWatcher: fs.FSWatcher | null = null;
 let nextAgentId = 1;
 const fileToAgentId = new Map<string, number>();
-const dirToAgentId = new Map<string, number>(); // 프로젝트 디렉토리 → 활성 에이전트 (1디렉토리 1에이전트)
+const dirToAgentIds = new Map<string, Set<number>>(); // 프로젝트 디렉토리 → 활성 에이전트 집합
 const sessionToAgentId = new Map<string, number>(); // 훅 session_id → 에이전트 ID
 
 function emit(event: object): void {
@@ -128,7 +128,9 @@ function spawnAgent(jsonlFile: string, projectName: string): number {
 
   agents.set(agentId, agent);
   fileToAgentId.set(jsonlFile, agentId);
-  dirToAgentId.set(path.dirname(jsonlFile), agentId);
+  const dirKey = path.dirname(jsonlFile);
+  if (!dirToAgentIds.has(dirKey)) dirToAgentIds.set(dirKey, new Set());
+  dirToAgentIds.get(dirKey)!.add(agentId);
   fileLastActivity.set(jsonlFile, Date.now());
 
   const shortId = path.basename(jsonlFile, '.jsonl').slice(0, 8);
@@ -151,14 +153,8 @@ function spawnAgent(jsonlFile: string, projectName: string): number {
       emit({ type: 'agentToolStart', id: agentId, toolId, toolName, status });
     }
   } else {
-    // idle — 파일이 최근이면 working으로 스폰, 아니면 idle 타이머 시작
-    const mtime = getFileMtime(jsonlFile);
-    if (Date.now() - mtime < IDLE_DESPAWN_MS) {
-      agent.status = 'working';
-      emit({ type: 'agentWorking', id: agentId });
-    } else {
-      startIdleTimer(agentId);
-    }
+    // idle — idle 타이머 시작 (작업은 hook 이벤트로 트리거됨)
+    startIdleTimer(agentId);
   }
 
   return agentId;
@@ -175,7 +171,7 @@ function despawnAgent(agentId: number): void {
   fileToAgentId.delete(filePath);
   fileLastActivity.delete(filePath);
   const dirPath = path.dirname(filePath);
-  if (dirToAgentId.get(dirPath) === agentId) dirToAgentId.delete(dirPath);
+  dirToAgentIds.get(dirPath)?.delete(agentId);
 
   // session → agentId 매핑 정리
   for (const [sid, aid] of sessionToAgentId) {
@@ -238,25 +234,15 @@ function unwatchFile(jsonlFile: string): void {
   }
 }
 
-function trySpawnFile(filePath: string): void {
+function trySpawnFile(filePath: string, maxAgeMs = IDLE_DESPAWN_MS): void {
   if (!JSONL_PATTERN.test(filePath)) return;
   if (/[/\\]subagents[/\\]/.test(filePath)) return;
   if (fileToAgentId.has(filePath)) return;
 
   const mtime = getFileMtime(filePath);
-  if (Date.now() - mtime >= IDLE_DESPAWN_MS) return;
+  if (Date.now() - mtime >= maxAgeMs) return;
 
   const dirPath = path.dirname(filePath);
-
-  // 같은 디렉토리에 이미 활성 에이전트가 있으면 despawn 후 교체
-  const existingAgentId = dirToAgentId.get(dirPath);
-  if (existingAgentId !== undefined) {
-    const existing = agents.get(existingAgentId);
-    if (existing) {
-      unwatchFile(existing.jsonlFile);
-      despawnAgent(existingAgentId);
-    }
-  }
 
   const projectName = projectNameFromDir(dirPath);
   spawnAgent(filePath, projectName);
@@ -272,7 +258,7 @@ function scanExistingFiles(): void {
         if (!fs.statSync(dirPath).isDirectory()) continue;
         for (const file of fs.readdirSync(dirPath)) {
           if (!JSONL_PATTERN.test(file)) continue;
-          trySpawnFile(path.join(dirPath, file));
+          trySpawnFile(path.join(dirPath, file), SCAN_ACTIVE_WINDOW_MS);
         }
       } catch {
         // skip unreadable dirs
@@ -290,14 +276,18 @@ export function startLiveWatcher(): void {
   scanExistingFiles();
 
   try {
-    dirWatcher = fs.watch(projectsDir, { persistent: false, recursive: true }, (_event, filename) => {
-      if (!filename) return;
-      const filePath = path.join(projectsDir, filename);
-      trySpawnFile(filePath);
-      if (fileToAgentId.has(filePath)) {
-        processFile(filePath);
-      }
-    });
+    dirWatcher = fs.watch(
+      projectsDir,
+      { persistent: false, recursive: true },
+      (_event, filename) => {
+        if (!filename) return;
+        const filePath = path.join(projectsDir, filename);
+        trySpawnFile(filePath);
+        if (fileToAgentId.has(filePath)) {
+          processFile(filePath);
+        }
+      },
+    );
     dirWatcher.on('error', () => {
       dirWatcher = null;
     });
@@ -364,7 +354,9 @@ export function processHookEvent(event: HookEvent): void {
 
     agents.set(agentId, agent);
     fileToAgentId.set(jsonlFile, agentId);
-    dirToAgentId.set(path.dirname(jsonlFile), agentId);
+    const hookDirKey = path.dirname(jsonlFile);
+    if (!dirToAgentIds.has(hookDirKey)) dirToAgentIds.set(hookDirKey, new Set());
+    dirToAgentIds.get(hookDirKey)!.add(agentId);
     if (session_id) sessionToAgentId.set(session_id, agentId);
 
     emit({ type: 'agentCreated', id: agentId, projectName, shortId });
@@ -394,7 +386,13 @@ export function processHookEvent(event: HookEvent): void {
       agent.activeToolIds.add(tool_use_id);
       agent.activeToolNames.set(tool_use_id, tool_name);
       agent.activeToolStatuses.set(tool_use_id, '');
-      emit({ type: 'agentToolStart', id: agentId, toolId: tool_use_id, toolName: tool_name, status: '' });
+      emit({
+        type: 'agentToolStart',
+        id: agentId,
+        toolId: tool_use_id,
+        toolName: tool_name,
+        status: '',
+      });
     }
 
     // 권한 요청 타이머 (8초 후 permission 이벤트)

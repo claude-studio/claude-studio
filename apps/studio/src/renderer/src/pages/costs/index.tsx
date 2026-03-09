@@ -1,3 +1,5 @@
+import { useMemo, useState } from 'react';
+
 import { type DailyUsage } from '@repo/shared';
 import { formatDateShort, formatTokens } from '@repo/shared';
 import {
@@ -13,8 +15,8 @@ import {
   useProjects,
   useStats,
 } from '@repo/ui';
-import { ArrowDown, ArrowUp, Minus, TrendingDown, TrendingUp, Zap } from 'lucide-react';
-import { useMemo, useState } from 'react';
+
+import { Minus, TrendingDown, TrendingUp } from 'lucide-react';
 
 type PeriodFilter = 'all' | 'month' | 'week';
 
@@ -96,14 +98,17 @@ export function CostsPage() {
     [filteredDaily, period],
   );
   const thisMonthCost = useMemo(
-    () => (stats ? sumDailyUsage(stats.dailyUsage.filter((d) => d.date.startsWith(thisMonth))).cost : 0),
+    () =>
+      stats ? sumDailyUsage(stats.dailyUsage.filter((d) => d.date.startsWith(thisMonth))).cost : 0,
     [stats, thisMonth],
   );
   const lastMonthCost = useMemo(
-    () => (stats ? sumDailyUsage(stats.dailyUsage.filter((d) => d.date.startsWith(lastMonth))).cost : 0),
+    () =>
+      stats ? sumDailyUsage(stats.dailyUsage.filter((d) => d.date.startsWith(lastMonth))).cost : 0,
     [stats, lastMonth],
   );
-  const monthDiff = lastMonthCost > 0 ? ((thisMonthCost - lastMonthCost) / lastMonthCost) * 100 : null;
+  const monthDiff =
+    lastMonthCost > 0 ? ((thisMonthCost - lastMonthCost) / lastMonthCost) * 100 : null;
 
   const topProjects = useMemo(
     () =>
@@ -148,22 +153,44 @@ export function CostsPage() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatCard title="총 비용" value={<CostDisplay cost={totals.cost} />} description={periodDesc} icon={<Zap className="h-4 w-4" />} />
-        <StatCard title="입력 토큰" value={formatTokens(totals.inputTokens)} description={periodDesc} icon={<ArrowDown className="h-4 w-4" />} />
-        <StatCard title="출력 토큰" value={formatTokens(totals.outputTokens)} description={periodDesc} icon={<ArrowUp className="h-4 w-4" />} />
-        <StatCard title="총 토큰" value={formatTokens(totals.inputTokens + totals.outputTokens)} description={periodDesc} icon={<Zap className="h-4 w-4" />} />
+        <StatCard
+          title="총 비용"
+          value={<CostDisplay cost={totals.cost} />}
+          description={periodDesc}
+        />
+        <StatCard
+          title="입력 토큰"
+          value={formatTokens(totals.inputTokens)}
+          description={periodDesc}
+        />
+        <StatCard
+          title="출력 토큰"
+          value={formatTokens(totals.outputTokens)}
+          description={periodDesc}
+        />
+        <StatCard
+          title="총 토큰"
+          value={formatTokens(totals.inputTokens + totals.outputTokens)}
+          description={periodDesc}
+        />
       </div>
 
       <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(12, minmax(0, 1fr))' }}>
         <Card style={{ gridColumn: 'span 8' }}>
-          <CardHeader className="px-5 pt-5 pb-3"><CT>일별 비용</CT></CardHeader>
-          <CardContent className="px-5 pb-5 pt-0"><CostChart data={filteredDaily} /></CardContent>
+          <CardHeader className="px-5 pt-5 pb-3">
+            <CT>일별 비용</CT>
+          </CardHeader>
+          <CardContent className="px-5 pb-5 pt-0">
+            <CostChart data={filteredDaily} />
+          </CardContent>
         </Card>
 
         <div style={{ gridColumn: 'span 4' }} className="flex flex-col gap-3">
           <Card className="flex-1">
             <CardContent className="p-5 h-full flex flex-col justify-between">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.2em]">이번 달</p>
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.2em]">
+                이번 달
+              </p>
               <div>
                 <p className="text-3xl font-bold font-mono tracking-tight leading-none mt-3">
                   <CostDisplay cost={thisMonthCost} />
@@ -175,10 +202,20 @@ export function CostsPage() {
           <Card className="flex-1">
             <CardContent className="p-5 h-full flex flex-col justify-between">
               <div className="flex items-center justify-between">
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.2em]">지난 달</p>
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.2em]">
+                  지난 달
+                </p>
                 {monthDiff !== null && (
-                  <div className={`flex items-center gap-0.5 text-[11px] font-semibold ${monthDiff > 0 ? 'text-red-400' : monthDiff < 0 ? 'text-emerald-500' : 'text-muted-foreground'}`}>
-                    {monthDiff > 0 ? <TrendingUp className="h-3 w-3" /> : monthDiff < 0 ? <TrendingDown className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
+                  <div
+                    className={`flex items-center gap-0.5 text-[11px] font-semibold ${monthDiff > 0 ? 'text-red-400' : monthDiff < 0 ? 'text-emerald-500' : 'text-muted-foreground'}`}
+                  >
+                    {monthDiff > 0 ? (
+                      <TrendingUp className="h-3 w-3" />
+                    ) : monthDiff < 0 ? (
+                      <TrendingDown className="h-3 w-3" />
+                    ) : (
+                      <Minus className="h-3 w-3" />
+                    )}
                     {Math.abs(monthDiff).toFixed(1)}%
                   </div>
                 )}
@@ -194,19 +231,31 @@ export function CostsPage() {
         </div>
 
         <Card style={{ gridColumn: 'span 7' }}>
-          <CardHeader className="px-5 pt-5 pb-3"><CT>시간별 사용량</CT></CardHeader>
-          <CardContent className="px-5 pb-5 pt-0"><UsageOverTime data={filteredDaily} /></CardContent>
+          <CardHeader className="px-5 pt-5 pb-3">
+            <CT>시간별 사용량</CT>
+          </CardHeader>
+          <CardContent className="px-5 pb-5 pt-0">
+            <UsageOverTime data={filteredDaily} />
+          </CardContent>
         </Card>
 
         <Card style={{ gridColumn: 'span 5' }}>
-          <CardHeader className="px-5 pt-5 pb-3"><CT>모델별 분석</CT></CardHeader>
-          <CardContent className="px-5 pb-5 pt-0"><ModelBreakdown data={stats.modelBreakdown} /></CardContent>
+          <CardHeader className="px-5 pt-5 pb-3">
+            <CT>모델별 분석</CT>
+          </CardHeader>
+          <CardContent className="px-5 pb-5 pt-0">
+            <ModelBreakdown data={stats.modelBreakdown} />
+          </CardContent>
         </Card>
 
         {topProjects.length > 0 && (
           <Card style={{ gridColumn: 'span 12' }}>
-            <CardHeader className="px-5 pt-5 pb-3"><CT>프로젝트별 비용 순위</CT></CardHeader>
-            <CardContent className="px-5 pb-5 pt-0"><ProjectCostChart data={topProjects} /></CardContent>
+            <CardHeader className="px-5 pt-5 pb-3">
+              <CT>프로젝트별 비용 순위</CT>
+            </CardHeader>
+            <CardContent className="px-5 pb-5 pt-0">
+              <ProjectCostChart data={topProjects} />
+            </CardContent>
           </Card>
         )}
       </div>

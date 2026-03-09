@@ -1,11 +1,11 @@
 import type {
+  Direction as DirectionType,
   FurnitureInstance,
   OfficeLayout,
   PlacedFurniture,
   Seat,
   TileType as TileTypeVal,
 } from '../types';
-import type { Direction as DirectionType } from '../types';
 import { Direction, FurnitureType, TILE_SIZE, TileType } from '../types';
 
 // ── Sprites ──────────────────────────────────────────────────────
@@ -13,25 +13,27 @@ import { Direction, FurnitureType, TILE_SIZE, TileType } from '../types';
 const SIMPLE_SPRITES: Record<string, string[][]> = {};
 
 function solidSprite(color: string, w = TILE_SIZE, h = TILE_SIZE): string[][] {
-  return Array.from({ length: h }, (_, r) =>
-    Array.from({ length: w }, (__, c) => {
-      if (r === 0 || r === h - 1 || c === 0 || c === w - 1) return '#000000';
-      return color;
-    }) as string[],
+  return Array.from(
+    { length: h },
+    (_, r) =>
+      Array.from({ length: w }, (__, c) => {
+        if (r === 0 || r === h - 1 || c === 0 || c === w - 1) return '#000000';
+        return color;
+      }) as string[],
   );
 }
 
 function getSimpleSprite(type: string): string[][] {
   if (!SIMPLE_SPRITES[type]) {
     const colors: Record<string, string> = {
-      [FurnitureType.CHAIR]:      '#6B3A2A',
-      [FurnitureType.DESK]:       '#A07828',
-      [FurnitureType.PLANT]:      '#3D8B37',
-      [FurnitureType.LAMP]:       '#CCCC44',
-      [FurnitureType.BOOKSHELF]:  '#7A5C2A',
-      [FurnitureType.COOLER]:     '#5599BB',
+      [FurnitureType.CHAIR]: '#6B3A2A',
+      [FurnitureType.DESK]: '#A07828',
+      [FurnitureType.PLANT]: '#3D8B37',
+      [FurnitureType.LAMP]: '#CCCC44',
+      [FurnitureType.BOOKSHELF]: '#7A5C2A',
+      [FurnitureType.COOLER]: '#5599BB',
       [FurnitureType.WHITEBOARD]: '#DDDDDD',
-      [FurnitureType.PC]:         '#334455',
+      [FurnitureType.PC]: '#334455',
     };
     const color = colors[type] ?? '#666666';
     SIMPLE_SPRITES[type] = solidSprite(color);
@@ -108,9 +110,24 @@ export function createDefaultLayout(): OfficeLayout {
   // pairs: 각 그룹의 C 위치 col 배열, rows: 앉는 행 배열
   const placeCDRow = (chairCols: number[], row: number, prefix: string) => {
     for (const cc of chairCols) {
-      furniture.push({ uid: `${prefix}-c-${cc}-${uid++}`, type: FurnitureType.CHAIR, col: cc,     row });
-      furniture.push({ uid: `${prefix}-d-${cc}-${uid++}`, type: FurnitureType.DESK,  col: cc + 1, row });
-      furniture.push({ uid: `${prefix}-pc-${cc}-${uid++}`, type: FurnitureType.PC,   col: cc + 1, row });
+      furniture.push({
+        uid: `${prefix}-c-${cc}-${uid++}`,
+        type: FurnitureType.CHAIR,
+        col: cc,
+        row,
+      });
+      furniture.push({
+        uid: `${prefix}-d-${cc}-${uid++}`,
+        type: FurnitureType.DESK,
+        col: cc + 1,
+        row,
+      });
+      furniture.push({
+        uid: `${prefix}-pc-${cc}-${uid++}`,
+        type: FurnitureType.PC,
+        col: cc + 1,
+        row,
+      });
     }
   };
 
@@ -126,10 +143,10 @@ export function createDefaultLayout(): OfficeLayout {
   }
 
   // ── 왼쪽 장식 ─────────────────────────────────────────────────
-  furniture.push({ uid: `cooler-${uid++}`, type: FurnitureType.COOLER, col: 1,  row: 7  });
-  furniture.push({ uid: `plant-a-${uid++}`, type: FurnitureType.PLANT, col: 1,  row: 12 });
+  furniture.push({ uid: `cooler-${uid++}`, type: FurnitureType.COOLER, col: 1, row: 7 });
+  furniture.push({ uid: `plant-a-${uid++}`, type: FurnitureType.PLANT, col: 1, row: 12 });
   furniture.push({ uid: `plant-b-${uid++}`, type: FurnitureType.PLANT, col: 11, row: 12 });
-  furniture.push({ uid: `lamp-a-${uid++}`,  type: FurnitureType.LAMP,  col: 12, row: 3  });
+  furniture.push({ uid: `lamp-a-${uid++}`, type: FurnitureType.LAMP, col: 12, row: 3 });
 
   // ── 오른쪽 대기 구역 (col 14-24) — 업무 구역과 동일한 CD 구조 ──
   // C D . C D  (row r)  → lc- prefix로 lounge seat 등록
@@ -137,9 +154,24 @@ export function createDefaultLayout(): OfficeLayout {
   const loungeChairCols = [14, 17, 20, 22];
   for (const row of [1, 2, 4, 5]) {
     for (const cc of loungeChairCols) {
-      furniture.push({ uid: `lc-c-${cc}-${row}-${uid++}`, type: FurnitureType.CHAIR, col: cc,     row });
-      furniture.push({ uid: `lc-d-${cc}-${row}-${uid++}`, type: FurnitureType.DESK,  col: cc + 1, row });
-      furniture.push({ uid: `lc-pc-${cc}-${row}-${uid++}`, type: FurnitureType.PC,   col: cc + 1, row });
+      furniture.push({
+        uid: `lc-c-${cc}-${row}-${uid++}`,
+        type: FurnitureType.CHAIR,
+        col: cc,
+        row,
+      });
+      furniture.push({
+        uid: `lc-d-${cc}-${row}-${uid++}`,
+        type: FurnitureType.DESK,
+        col: cc + 1,
+        row,
+      });
+      furniture.push({
+        uid: `lc-pc-${cc}-${row}-${uid++}`,
+        type: FurnitureType.PC,
+        col: cc + 1,
+        row,
+      });
     }
   }
 
@@ -192,10 +224,13 @@ export function layoutToSeats(furniture: PlacedFurniture[]): Map<string, Seat> {
       // "Facing toward desk" means the character's front (DOWN sprite) is visible
       // when the desk is above/to-the-side, so we invert the offset.
       let facingDir: DirectionType = Direction.RIGHT;
-      if (deskPositions.has(`${chair.col + 1},${chair.row}`)) facingDir = Direction.RIGHT; // desk right → face right
-      else if (deskPositions.has(`${chair.col - 1},${chair.row}`)) facingDir = Direction.LEFT;  // desk left → face left
-      else if (deskPositions.has(`${chair.col},${chair.row - 1}`)) facingDir = Direction.DOWN;  // desk above → face down
-      else if (deskPositions.has(`${chair.col},${chair.row + 1}`)) facingDir = Direction.UP;    // desk below → face up
+      if (deskPositions.has(`${chair.col + 1},${chair.row}`))
+        facingDir = Direction.RIGHT; // desk right → face right
+      else if (deskPositions.has(`${chair.col - 1},${chair.row}`))
+        facingDir = Direction.LEFT; // desk left → face left
+      else if (deskPositions.has(`${chair.col},${chair.row - 1}`))
+        facingDir = Direction.DOWN; // desk above → face down
+      else if (deskPositions.has(`${chair.col},${chair.row + 1}`)) facingDir = Direction.UP; // desk below → face up
 
       seats.set(chair.uid, {
         uid: chair.uid,
@@ -212,10 +247,12 @@ export function layoutToSeats(furniture: PlacedFurniture[]): Map<string, Seat> {
 export function getBlockedTiles(furniture: PlacedFurniture[]): Set<string> {
   const blocked = new Set<string>();
   for (const item of furniture) {
-    if (item.type === FurnitureType.DESK ||
-        item.type === FurnitureType.BOOKSHELF ||
-        item.type === FurnitureType.COOLER ||
-        item.type === FurnitureType.WHITEBOARD) {
+    if (
+      item.type === FurnitureType.DESK ||
+      item.type === FurnitureType.BOOKSHELF ||
+      item.type === FurnitureType.COOLER ||
+      item.type === FurnitureType.WHITEBOARD
+    ) {
       blocked.add(`${item.col},${item.row}`);
     }
   }

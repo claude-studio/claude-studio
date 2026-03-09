@@ -1,20 +1,9 @@
 import {
   HUE_SHIFT_MIN_DEG,
   HUE_SHIFT_RANGE_DEG,
-  INACTIVE_SEAT_TIMER_MIN_SEC,
-  INACTIVE_SEAT_TIMER_RANGE_SEC,
-  MATRIX_EFFECT_DURATION_SEC,
   PALETTE_COUNT,
   WAITING_BUBBLE_DURATION_SEC,
 } from '../constants';
-import {
-  createDefaultLayout,
-  getBlockedTiles,
-  layoutToFurnitureInstances,
-  layoutToSeats,
-  layoutToTileMap,
-} from '../layout/layout-serializer';
-import { findPath, getWalkableTiles, isWalkable } from '../layout/tile-map';
 import type {
   Character,
   FurnitureInstance,
@@ -23,6 +12,15 @@ import type {
   TileType as TileTypeVal,
 } from '../types';
 import { CharacterState, Direction, MATRIX_EFFECT_DURATION } from '../types';
+
+import {
+  createDefaultLayout,
+  getBlockedTiles,
+  layoutToFurnitureInstances,
+  layoutToSeats,
+  layoutToTileMap,
+} from '../layout/layout-serializer';
+import { findPath, getWalkableTiles, isWalkable } from '../layout/tile-map';
 import { createCharacter, tileCenter, updateCharacter } from './characters';
 
 function matrixEffectSeeds(): number[] {
@@ -58,7 +56,6 @@ export class OfficeState {
     this.furniture = layoutToFurnitureInstances(this.layout.furniture);
     this.walkableTiles = getWalkableTiles(this.tileMap, this.blockedTiles);
   }
-
 
   private ownSeatKey(ch: Character): string | null {
     if (!ch.seatId) return null;
@@ -128,13 +125,20 @@ export class OfficeState {
     const midCol = Math.floor(this.layout.cols * 0.6);
     const lounge = this.walkableTiles.filter((t) => t.col > midCol);
     if (lounge.length > 0) return lounge[Math.floor(Math.random() * lounge.length)]!;
-    if (this.walkableTiles.length > 0) return this.walkableTiles[Math.floor(Math.random() * this.walkableTiles.length)]!;
+    if (this.walkableTiles.length > 0)
+      return this.walkableTiles[Math.floor(Math.random() * this.walkableTiles.length)]!;
     return { col: 1, row: 1 };
   }
 
   addAgent(
     id: number,
-    opts: { palette?: number; hueShift?: number; seatId?: string; skipSpawnEffect?: boolean; folderName?: string } = {},
+    opts: {
+      palette?: number;
+      hueShift?: number;
+      seatId?: string;
+      skipSpawnEffect?: boolean;
+      folderName?: string;
+    } = {},
   ): void {
     if (this.characters.has(id)) return;
 
@@ -173,7 +177,7 @@ export class OfficeState {
     ch.tileCol = loungeSeat?.seatCol ?? Math.floor(this.layout.cols * 0.8);
     ch.tileRow = loungeSeat?.seatRow ?? Math.floor(this.layout.rows / 2);
     ch.loungeSeatId = loungeSeatId;
-    ch.state = loungeSeat ? CharacterState.TYPE : CharacterState.IDLE;
+    ch.state = CharacterState.TYPE;
     ch.dir = loungeSeat ? loungeSeat.facingDir : Direction.DOWN;
     ch.isActive = false;
 
@@ -274,9 +278,11 @@ export class OfficeState {
     if (!ch) return;
     ch.isActive = active;
     if (!active) {
-      ch.seatTimer = -1;
-      ch.path = [];
-      ch.moveProgress = 0;
+      // 이동 중이면 경로를 유지 — 도착 후 상태 전환은 characters.ts에서 처리
+      if (ch.state !== CharacterState.WALK) {
+        ch.path = [];
+        ch.moveProgress = 0;
+      }
     }
   }
 
@@ -308,11 +314,14 @@ export class OfficeState {
     let startCol = ch.tileCol;
     let startRow = ch.tileRow;
     if (!isWalkable(startCol, startRow, this.tileMap, this.blockedTiles)) {
-      const nearest = this.walkableTiles.reduce((best, t) => {
-        const d = Math.abs(t.col - startCol) + Math.abs(t.row - startRow);
-        const bd = Math.abs(best.col - startCol) + Math.abs(best.row - startRow);
-        return d < bd ? t : best;
-      }, this.walkableTiles[0] ?? { col: 1, row: 1 });
+      const nearest = this.walkableTiles.reduce(
+        (best, t) => {
+          const d = Math.abs(t.col - startCol) + Math.abs(t.row - startRow);
+          const bd = Math.abs(best.col - startCol) + Math.abs(best.row - startRow);
+          return d < bd ? t : best;
+        },
+        this.walkableTiles[0] ?? { col: 1, row: 1 },
+      );
       startCol = nearest.col;
       startRow = nearest.row;
       const nearestPos = tileCenter(startCol, startRow);
@@ -322,7 +331,14 @@ export class OfficeState {
       ch.y = nearestPos.y;
     }
 
-    const path = findPath(startCol, startRow, seat.seatCol, seat.seatRow, this.tileMap, this.blockedTiles);
+    const path = findPath(
+      startCol,
+      startRow,
+      seat.seatCol,
+      seat.seatRow,
+      this.tileMap,
+      this.blockedTiles,
+    );
 
     if (key) this.blockedTiles.add(key);
 
@@ -341,7 +357,10 @@ export class OfficeState {
 
   setAgentTool(id: number, tool: string | null): void {
     const ch = this.characters.get(id);
-    if (ch) ch.currentTool = tool;
+    if (!ch) return;
+    // 이동 중 tool 초기화(null)는 스킵 — 도착 후 말풍선이 자연스럽게 유지됨
+    if (tool === null && ch.state === CharacterState.WALK) return;
+    ch.currentTool = tool;
   }
 
   /** 도구 완료 후 캐릭터를 lounge seat으로 복귀 */
@@ -378,7 +397,14 @@ export class OfficeState {
     const loungeWasBlocked = this.blockedTiles.has(loungeKey);
     if (loungeWasBlocked) this.blockedTiles.delete(loungeKey);
 
-    const path = findPath(ch.tileCol, ch.tileRow, loungeSeat.seatCol, loungeSeat.seatRow, this.tileMap, this.blockedTiles);
+    const path = findPath(
+      ch.tileCol,
+      ch.tileRow,
+      loungeSeat.seatCol,
+      loungeSeat.seatRow,
+      this.tileMap,
+      this.blockedTiles,
+    );
 
     if (key) this.blockedTiles.add(key);
     if (loungeWasBlocked) this.blockedTiles.add(loungeKey);
@@ -398,17 +424,26 @@ export class OfficeState {
 
   showPermissionBubble(id: number): void {
     const ch = this.characters.get(id);
-    if (ch) { ch.bubbleType = 'permission'; ch.bubbleTimer = 0; }
+    if (ch) {
+      ch.bubbleType = 'permission';
+      ch.bubbleTimer = 0;
+    }
   }
 
   clearPermissionBubble(id: number): void {
     const ch = this.characters.get(id);
-    if (ch?.bubbleType === 'permission') { ch.bubbleType = null; ch.bubbleTimer = 0; }
+    if (ch?.bubbleType === 'permission') {
+      ch.bubbleType = null;
+      ch.bubbleTimer = 0;
+    }
   }
 
   showWaitingBubble(id: number): void {
     const ch = this.characters.get(id);
-    if (ch) { ch.bubbleType = 'waiting'; ch.bubbleTimer = WAITING_BUBBLE_DURATION_SEC; }
+    if (ch) {
+      ch.bubbleType = 'waiting';
+      ch.bubbleTimer = WAITING_BUBBLE_DURATION_SEC;
+    }
   }
 
   update(dt: number): void {

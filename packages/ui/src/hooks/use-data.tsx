@@ -1,8 +1,15 @@
 import { createContext, type ReactNode, useContext } from 'react';
 
-import type { DashboardStats, DataProvider, ProjectInfo, SessionDetail, SessionInfo } from '@repo/shared';
+import type {
+  DashboardStats,
+  DataProvider,
+  ProjectInfo,
+  SessionDetail,
+  SessionInfo,
+} from '@repo/shared';
 import { keepPreviousData, useQuery, type UseQueryResult } from '@tanstack/react-query';
 
+// DataProvider 확장 접근자용 — unknown으로 대체 시 인덱스 접근 불가
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyProvider = DataProvider & Record<string, any>;
 
@@ -15,7 +22,11 @@ export function DataProviderWrapper({
   provider: DataProvider;
   children: ReactNode;
 }) {
-  return <DataProviderContext.Provider value={provider as AnyProvider}>{children}</DataProviderContext.Provider>;
+  return (
+    <DataProviderContext.Provider value={provider as AnyProvider}>
+      {children}
+    </DataProviderContext.Provider>
+  );
 }
 
 export const TeamsProviderWrapper = DataProviderWrapper;

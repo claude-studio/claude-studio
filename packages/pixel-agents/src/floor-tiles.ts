@@ -1,5 +1,5 @@
-import { FALLBACK_FLOOR_COLOR, TILE_SIZE } from './constants';
 import { clearColorizeCache, getColorizedSprite } from './colorize';
+import { FALLBACK_FLOOR_COLOR, TILE_SIZE } from './constants';
 import type { FloorColor, SpriteData } from './types';
 
 /** Default solid gray 16×16 tile */

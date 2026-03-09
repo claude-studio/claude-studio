@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 type Theme = 'dark' | 'light';
 
@@ -20,7 +28,9 @@ function applyTheme(theme: Theme) {
   root.classList.add(theme);
   try {
     localStorage.setItem('theme', theme);
-  } catch {}
+  } catch {
+    // localStorage 접근 불가 환경 (SSR, 브라우저 정책) — 무시
+  }
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -78,10 +88,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         // 라이트 → 다크: 새 다크 뷰가 원형으로 확장
         document.documentElement.animate(
           {
-            clipPath: [
-              `circle(0px at ${x}px ${y}px)`,
-              `circle(${endRadius}px at ${x}px ${y}px)`,
-            ],
+            clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${endRadius}px at ${x}px ${y}px)`],
           },
           {
             duration: 680,
@@ -93,10 +100,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         // 다크 → 라이트: 기존 다크 뷰가 원형으로 수축하며 라이트 노출
         document.documentElement.animate(
           {
-            clipPath: [
-              `circle(${endRadius}px at ${x}px ${y}px)`,
-              `circle(0px at ${x}px ${y}px)`,
-            ],
+            clipPath: [`circle(${endRadius}px at ${x}px ${y}px)`, `circle(0px at ${x}px ${y}px)`],
           },
           {
             duration: 680,
@@ -113,9 +117,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleRef, toggle }}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={{ theme, toggleRef, toggle }}>{children}</ThemeContext.Provider>
   );
 }
 

@@ -4,18 +4,10 @@ import {
   BUBBLE_VERTICAL_OFFSET_PX,
   CHARACTER_SITTING_OFFSET_PX,
   CHARACTER_Z_SORT_OFFSET,
-  FALLBACK_FLOOR_COLOR,
   GRID_LINE_COLOR,
   TILE_SIZE,
-  WAITING_BUBBLE_DURATION_SEC,
 } from '../constants';
 import { getColorizedFloorSprite, WALL_COLOR } from '../floor-tiles';
-import { getCachedSprite } from '../sprites/sprite-cache';
-import {
-  BUBBLE_PERMISSION_SPRITE,
-  BUBBLE_WAITING_SPRITE,
-  getCharacterSprites,
-} from '../sprites/sprite-data';
 import type {
   Character,
   FloorColor,
@@ -24,6 +16,13 @@ import type {
   TileType as TileTypeVal,
 } from '../types';
 import { CharacterState, TileType } from '../types';
+
+import { getCachedSprite } from '../sprites/sprite-cache';
+import {
+  BUBBLE_PERMISSION_SPRITE,
+  BUBBLE_WAITING_SPRITE,
+  getCharacterSprites,
+} from '../sprites/sprite-data';
 import { getCharacterSprite } from './characters';
 
 export function renderTileGrid(
@@ -40,7 +39,7 @@ export function renderTileGrid(
 
   for (let r = 0; r < tmRows; r++) {
     for (let c = 0; c < tmCols; c++) {
-      const tile = tileMap[r]![c]!
+      const tile = tileMap[r]![c]!;
       if (tile === TileType.VOID) continue;
 
       if (tile === TileType.WALL) {

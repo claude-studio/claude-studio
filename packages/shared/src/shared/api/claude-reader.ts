@@ -200,6 +200,7 @@ function getSessionsFromDir(projectsDir: string): ParsedSession[] {
   return sessions;
 }
 
+// JSONL 메시지는 비정형 외부 데이터라 any 불가피 — Zod 스키마 적용 시 제거 가능
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyMessage = Record<string, any>;
 
@@ -798,6 +799,7 @@ export function getSkills(claudeDir?: string): SkillInfo[] {
 
 // --- stats-cache.json reader ---
 
+// stats-cache.json은 Claude Code 내부 포맷으로 스키마 미정 — any 불가피
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function readStatsCache(claudeDir?: string): Record<string, any> | null {
   const filePath = path.join(claudeDir ?? getClaudeDir(), 'stats-cache.json');

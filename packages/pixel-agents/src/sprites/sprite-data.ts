@@ -128,67 +128,71 @@ const PALETTES: [string, string, string][] = [
 ];
 
 export interface CharacterSprites {
-  walk: Record<Direction, SpriteData[]>;    // 5 frames (0→1→2→1→0)
-  stand: Record<Direction, SpriteData>;     // 1 frame (1) — 서있기
-  idle: Record<Direction, SpriteData[]>;    // 2 frames (3, 4) — 앉기 대기
-  typing: Record<Direction, SpriteData[]>;  // 2 frames (5, 6)
-  reading: Record<Direction, SpriteData[]>; // 2 frames (5, 6)
+  walk: Record<Direction, SpriteData[]>; // 5 frames (0→1→2→1→0)
+  stand: Record<Direction, SpriteData>; // 1 frame (1) — 서있기
+  idle: Record<Direction, SpriteData[]>; // 2 frames (5, 6) — 앉기 대기
+  typing: Record<Direction, SpriteData[]>; // 2 frames (3, 4) — 앉기 작업중
+  reading: Record<Direction, SpriteData[]>; // 2 frames (3, 4) — 앉기 작업중
 }
 
 let characterTemplates: CharacterSprites[] | null = null;
 
 /** Called when extension loads external sprite sheets */
-export function setCharacterTemplates(raw: Array<{ down: string[][][]; up: string[][][]; right: string[][][] }>): void {
+export function setCharacterTemplates(
+  raw: Array<{ down: string[][][]; up: string[][][]; right: string[][][] }>,
+): void {
   characterTemplates = raw.map((ch) => {
     const downFrames = ch.down.map((f) => f as SpriteData);
     const upFrames = ch.up.map((f) => f as SpriteData);
     const rightFrames = ch.right.map((f) => f as SpriteData);
     // Mirror right for left
-    const leftFrames = rightFrames.map((frame) =>
-      frame.map((row) => [...row].reverse()),
-    );
+    const leftFrames = rightFrames.map((frame) => frame.map((row) => [...row].reverse()));
 
     // frame 0: 걷기A, frame 1: 정면(서있기), frame 2: 걷기B
     // frame 3~4: 앉기 idle, frame 5~6: 앉기 작업중
     // 걷기 순서: 0→1→2→1→0 루프
     const walkSeq = (frames: SpriteData[]) => [
-      frames[0]!, frames[1]!, frames[2]!, frames[1]!, frames[0]!,
+      frames[0]!,
+      frames[1]!,
+      frames[2]!,
+      frames[1]!,
+      frames[0]!,
     ];
-    // idle 앉기: frame 3, 4
-    const idleSeq = (frames: SpriteData[]) => [frames[3]!, frames[4]!];
-    // 작업중 앉기: frame 5, 6
-    const workSeq = (frames: SpriteData[]) => [frames[5]!, frames[6]!];
+    // idle 앉기: frame 5, 6
+    const idleSeq = (frames: SpriteData[]) => [frames[5]!, frames[6]!];
+    // 작업중 앉기: frame 3, 4
+    const workSeq = (frames: SpriteData[]) => [frames[3]!, frames[4]!];
 
     return {
       walk: {
-        [Dir.DOWN]:  walkSeq(downFrames),
-        [Dir.UP]:    walkSeq(upFrames),
+        [Dir.DOWN]: walkSeq(downFrames),
+        [Dir.UP]: walkSeq(upFrames),
         [Dir.RIGHT]: walkSeq(rightFrames),
-        [Dir.LEFT]:  walkSeq(leftFrames),
+        [Dir.LEFT]: walkSeq(leftFrames),
       },
       stand: {
-        [Dir.DOWN]:  downFrames[1]!,
-        [Dir.UP]:    upFrames[1]!,
+        [Dir.DOWN]: downFrames[1]!,
+        [Dir.UP]: upFrames[1]!,
         [Dir.RIGHT]: rightFrames[1]!,
-        [Dir.LEFT]:  leftFrames[1]!,
+        [Dir.LEFT]: leftFrames[1]!,
       },
       idle: {
-        [Dir.DOWN]:  idleSeq(downFrames),
-        [Dir.UP]:    idleSeq(upFrames),
+        [Dir.DOWN]: idleSeq(downFrames),
+        [Dir.UP]: idleSeq(upFrames),
         [Dir.RIGHT]: idleSeq(rightFrames),
-        [Dir.LEFT]:  idleSeq(leftFrames),
+        [Dir.LEFT]: idleSeq(leftFrames),
       },
       typing: {
-        [Dir.DOWN]:  workSeq(downFrames),
-        [Dir.UP]:    workSeq(upFrames),
+        [Dir.DOWN]: workSeq(downFrames),
+        [Dir.UP]: workSeq(upFrames),
         [Dir.RIGHT]: workSeq(rightFrames),
-        [Dir.LEFT]:  workSeq(leftFrames),
+        [Dir.LEFT]: workSeq(leftFrames),
       },
       reading: {
-        [Dir.DOWN]:  workSeq(downFrames),
-        [Dir.UP]:    workSeq(upFrames),
+        [Dir.DOWN]: workSeq(downFrames),
+        [Dir.UP]: workSeq(upFrames),
         [Dir.RIGHT]: workSeq(rightFrames),
-        [Dir.LEFT]:  workSeq(leftFrames),
+        [Dir.LEFT]: workSeq(leftFrames),
       },
     };
   });
@@ -211,12 +215,18 @@ function buildBuiltinSprites(paletteIdx: number): CharacterSprites {
     readFrames[dir] = [0, 1].map((i) => makeTypeFrame(hair, body, skin, i));
   }
 
-  return { walk: walkFrames, stand: standFrames, idle: idleFrames, typing: typeFrames, reading: readFrames };
+  return {
+    walk: walkFrames,
+    stand: standFrames,
+    idle: idleFrames,
+    typing: typeFrames,
+    reading: readFrames,
+  };
 }
 
 const builtinCache: CharacterSprites[] = [];
 
-export function getCharacterSprites(paletteIdx: number, hueShift = 0): CharacterSprites {
+export function getCharacterSprites(paletteIdx: number, _hueShift = 0): CharacterSprites {
   const idx = paletteIdx % PALETTES.length;
   if (characterTemplates && characterTemplates[idx]) {
     return characterTemplates[idx]!;

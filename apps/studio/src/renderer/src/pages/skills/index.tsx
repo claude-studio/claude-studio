@@ -1,7 +1,9 @@
+import { useState } from 'react';
+
 import { type SkillInfo } from '@repo/shared';
 import { Badge, Dialog, DialogContent, DialogHeader, DialogTitle, ScrollArea } from '@repo/ui';
+
 import { Wand2 } from 'lucide-react';
-import { useState } from 'react';
 
 function PageSpinner() {
   return (

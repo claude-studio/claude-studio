@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { OfficeCanvas, OfficeState, processPixelAgentEvent, setCharacterTemplates, setWallSprites } from '@repo/pixel-agents';
+
 import type { PixelAgentEvent } from '@repo/pixel-agents';
+import {
+  OfficeCanvas,
+  OfficeState,
+  processPixelAgentEvent,
+  setCharacterTemplates,
+  setWallSprites,
+} from '@repo/pixel-agents';
 
 interface ActiveAgent {
   id: number;
@@ -42,7 +49,9 @@ export function LivePage() {
     // 2. 구독 등록 후 스프라이트 + 에이전트 로드
     api.getCharacterSprites().then((characters) => {
       if (characters) {
-        setCharacterTemplates(characters as Array<{ down: string[][][]; up: string[][][]; right: string[][][] }>);
+        setCharacterTemplates(
+          characters as Array<{ down: string[][][]; up: string[][][]; right: string[][][] }>,
+        );
       }
     });
 
@@ -56,7 +65,10 @@ export function LivePage() {
       console.log('[LivePage] getActiveAgents:', agents);
       setActiveAgents(agents.map((a) => ({ id: a.id, projectName: a.projectName })));
       for (const agent of agents) {
-        officeStateRef.current!.addAgent(agent.id, { skipSpawnEffect: true, folderName: agent.shortId });
+        officeStateRef.current!.addAgent(agent.id, {
+          skipSpawnEffect: true,
+          folderName: agent.shortId,
+        });
       }
     });
 
@@ -73,7 +85,9 @@ export function LivePage() {
       <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">라이브 에이전트</span>
-          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-sm bg-primary/15 text-primary uppercase tracking-wide">Beta</span>
+          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-sm bg-primary/15 text-primary uppercase tracking-wide">
+            Beta
+          </span>
           {activeAgents.length > 0 && (
             <span className="flex items-center gap-1 text-xs text-emerald-500">
               <span className="relative flex h-1.5 w-1.5">
@@ -88,24 +102,23 @@ export function LivePage() {
           <button
             onClick={() => setZoom((z) => Math.max(1, z - 1))}
             className="w-6 h-6 flex items-center justify-center rounded border border-border hover:border-primary/30 hover:text-primary text-muted-foreground text-sm leading-none transition-colors"
-          >−</button>
+          >
+            −
+          </button>
           <span className="text-xs text-muted-foreground font-mono w-8 text-center">{zoom}x</span>
           <button
             onClick={() => setZoom((z) => Math.min(10, z + 1))}
             className="w-6 h-6 flex items-center justify-center rounded border border-border hover:border-primary/30 hover:text-primary text-muted-foreground text-sm leading-none transition-colors"
-          >+</button>
+          >
+            +
+          </button>
         </div>
       </div>
 
       {/* Canvas area */}
       <div className="flex-1 relative overflow-hidden min-h-0">
-        <OfficeCanvas
-          officeState={officeState}
-          zoom={zoom}
-          onZoomChange={setZoom}
-        />
+        <OfficeCanvas officeState={officeState} zoom={zoom} onZoomChange={setZoom} />
       </div>
-
     </div>
   );
 }

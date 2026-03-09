@@ -11,7 +11,7 @@ export function hasWallSprites(): boolean {
   return wallSprites !== null;
 }
 
-export function wallColorToHex(color: { h: number; s: number; b: number; c: number }): string {
+export function wallColorToHex(_color: { h: number; s: number; b: number; c: number }): string {
   // Simple fallback: slightly shift the default wall color based on hue
   return '#3A3A5C';
 }

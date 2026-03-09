@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react';
 
-import { startGameLoop } from '../engine/game-loop';
-import { renderOffice } from '../engine/renderer';
-import type { OfficeState } from '../engine/office-state';
 import { TILE_SIZE } from '../types';
+
+import { startGameLoop } from '../engine/game-loop';
+import type { OfficeState } from '../engine/office-state';
+import { renderOffice } from '../engine/renderer';
 
 export interface OfficeCanvasProps {
   officeState: OfficeState;
@@ -18,7 +19,12 @@ function fitZoom(canvasW: number, canvasH: number, cols: number, rows: number): 
   return Math.max(1, Math.min(zx, zy));
 }
 
-export function OfficeCanvas({ officeState, zoom: zoomProp, onZoomChange, className }: OfficeCanvasProps) {
+export function OfficeCanvas({
+  officeState,
+  zoom: zoomProp,
+  onZoomChange,
+  className,
+}: OfficeCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const zoomRef = useRef(zoomProp ?? 2);
 
@@ -70,14 +76,20 @@ export function OfficeCanvas({ officeState, zoom: zoomProp, onZoomChange, classN
         const offsetX = Math.floor((canvas.width - mapW) / 2);
         const offsetY = Math.floor((canvas.height - mapH) / 2);
 
-        renderOffice(ctx, {
-          tileMap: officeState.tileMap,
-          furniture: officeState.furniture,
-          characters: officeState.getCharacters(),
-          tileColors: layout.tileColors ?? undefined,
-          cols: layout.cols,
-          rows: layout.rows,
-        }, offsetX, offsetY, zoom);
+        renderOffice(
+          ctx,
+          {
+            tileMap: officeState.tileMap,
+            furniture: officeState.furniture,
+            characters: officeState.getCharacters(),
+            tileColors: layout.tileColors ?? undefined,
+            cols: layout.cols,
+            rows: layout.rows,
+          },
+          offsetX,
+          offsetY,
+          zoom,
+        );
       },
     });
 
@@ -86,7 +98,6 @@ export function OfficeCanvas({ officeState, zoom: zoomProp, onZoomChange, classN
       resizeObserver.disconnect();
     };
   }, [officeState]);
-
 
   return (
     <canvas
