@@ -17,23 +17,23 @@ export function ConversationStatsCard({ data }: ConversationStatsCardProps) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <div className="rounded-lg bg-muted/50 p-3">
+        <div className="rounded-lg border border-border/50 p-3">
           <p className="text-xs text-muted-foreground">평균 세션 길이</p>
-          <p className="text-lg font-semibold mt-1">{formatDuration(data.avgSessionDurationMs)}</p>
+          <p className="text-lg font-semibold font-mono mt-1">{formatDuration(data.avgSessionDurationMs)}</p>
         </div>
-        <div className="rounded-lg bg-muted/50 p-3">
+        <div className="rounded-lg border border-border/50 p-3">
           <p className="text-xs text-muted-foreground">세션당 평균 메시지</p>
-          <p className="text-lg font-semibold mt-1">{Math.round(data.avgMessagesPerSession)}개</p>
+          <p className="text-lg font-semibold font-mono mt-1">{Math.round(data.avgMessagesPerSession)}개</p>
         </div>
-        <div className="rounded-lg bg-muted/50 p-3">
+        <div className="rounded-lg border border-border/50 p-3">
           <p className="text-xs text-muted-foreground">입력 토큰/메시지</p>
-          <p className="text-lg font-semibold mt-1">
+          <p className="text-lg font-semibold font-mono mt-1">
             {formatTokens(Math.round(data.avgInputTokensPerMessage))}
           </p>
         </div>
-        <div className="rounded-lg bg-muted/50 p-3">
+        <div className="rounded-lg border border-border/50 p-3">
           <p className="text-xs text-muted-foreground">출력 토큰/메시지</p>
-          <p className="text-lg font-semibold mt-1">
+          <p className="text-lg font-semibold font-mono mt-1">
             {formatTokens(Math.round(data.avgOutputTokensPerMessage))}
           </p>
         </div>

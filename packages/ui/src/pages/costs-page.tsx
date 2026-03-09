@@ -3,13 +3,13 @@ import { useMemo, useState } from 'react';
 import type { DailyUsage } from '@repo/shared';
 import { formatDateShort, formatTokens } from '@repo/shared';
 
-import { DollarSign, Minus, TrendingDown, TrendingUp } from 'lucide-react';
+import { ArrowDown, ArrowUp, DollarSign, Minus, TrendingDown, TrendingUp, Zap } from 'lucide-react';
 
 import { CostChart } from '../charts/cost-chart';
 import { ModelBreakdown } from '../charts/model-breakdown';
 import { ProjectCostChart } from '../charts/project-cost-chart';
 import { UsageOverTime } from '../charts/usage-over-time';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent, CardHeader } from '../components/ui/card';
 import { useProjects, useStats } from '../hooks/use-data';
 import { StatCard } from '../layout/stat-card';
 import { CostValue } from './cost-value';
@@ -119,19 +119,20 @@ export function CostsPage() {
   if (isLoading) return <PageSpinner />;
   if (!stats) return <div className="text-muted-foreground">데이터가 없습니다</div>;
 
+  const CT = ({ children }: { children: React.ReactNode }) => (
+    <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">{children}</p>
+  );
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">비용</h1>
-          <p className="text-muted-foreground text-sm mt-1">토큰 사용량 및 비용 분석</p>
-        </div>
-        <div className="flex gap-1 rounded-lg border border-border/50 p-1">
+    <div className="space-y-4">
+      {/* 기간 필터 */}
+      <div className="flex justify-end">
+        <div className="flex gap-0.5 rounded border border-border p-0.5">
           {PERIOD_OPTIONS.map((opt) => (
             <button
               key={opt.value}
               onClick={() => setPeriod(opt.value)}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              className={`px-3 py-1 rounded-sm text-[10px] font-medium transition-colors tracking-wide ${
                 period === opt.value
                   ? 'bg-primary/10 text-primary'
                   : 'text-muted-foreground hover:text-foreground'
@@ -143,114 +144,77 @@ export function CostsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard
-          title="총 비용"
-          value={<CostValue cost={totals.cost} />}
-          description={periodDesc}
-          icon={<DollarSign className="h-4 w-4" />}
-        />
-        <StatCard
-          title="입력 토큰"
-          value={formatTokens(totals.inputTokens)}
-          description={periodDesc}
-          icon={<TrendingUp className="h-4 w-4" />}
-        />
-        <StatCard
-          title="출력 토큰"
-          value={formatTokens(totals.outputTokens)}
-          description={periodDesc}
-          icon={<TrendingUp className="h-4 w-4" />}
-        />
-        <StatCard
-          title="총 토큰"
-          value={formatTokens(totals.inputTokens + totals.outputTokens)}
-          description={periodDesc}
-          icon={<TrendingUp className="h-4 w-4" />}
-        />
+      {/* 통계 카드 4열 */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <StatCard title="총 비용" value={<CostValue cost={totals.cost} />} description={periodDesc} icon={<DollarSign className="h-4 w-4" />} />
+        <StatCard title="입력 토큰" value={formatTokens(totals.inputTokens)} description={periodDesc} icon={<ArrowDown className="h-4 w-4" />} />
+        <StatCard title="출력 토큰" value={formatTokens(totals.outputTokens)} description={periodDesc} icon={<ArrowUp className="h-4 w-4" />} />
+        <StatCard title="총 토큰" value={formatTokens(totals.inputTokens + totals.outputTokens)} description={periodDesc} icon={<Zap className="h-4 w-4" />} />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <Card className="border-border/50">
-          <CardContent className="p-4">
-            <p className="text-xs text-muted-foreground">이번 달</p>
-            <p className="text-xl font-semibold mt-1">
-              <CostValue cost={thisMonthCost} />
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">{thisMonth}</p>
-          </CardContent>
+      {/* Bento 12열 */}
+      <div className="grid gap-3" style={{ gridTemplateColumns: 'repeat(12, minmax(0, 1fr))' }}>
+
+        {/* 일별 비용 (8칸) */}
+        <Card style={{ gridColumn: 'span 8' }}>
+          <CardHeader className="px-5 pt-5 pb-3"><CT>일별 비용</CT></CardHeader>
+          <CardContent className="px-5 pb-5 pt-0"><CostChart data={filteredDaily} /></CardContent>
         </Card>
-        <Card className="border-border/50">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-muted-foreground">지난 달</p>
-              {monthDiff !== null && (
-                <div
-                  className={`flex items-center gap-0.5 text-xs font-medium ${
-                    monthDiff > 0
-                      ? 'text-red-400'
-                      : monthDiff < 0
-                        ? 'text-green-400'
-                        : 'text-muted-foreground'
-                  }`}
-                >
-                  {monthDiff > 0 ? (
-                    <TrendingUp className="h-3 w-3" />
-                  ) : monthDiff < 0 ? (
-                    <TrendingDown className="h-3 w-3" />
-                  ) : (
-                    <Minus className="h-3 w-3" />
-                  )}
-                  {Math.abs(monthDiff).toFixed(1)}%
-                </div>
-              )}
-            </div>
-            <p className="text-xl font-semibold mt-1">
-              <CostValue cost={lastMonthCost} />
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">{lastMonth}</p>
-          </CardContent>
+
+        {/* 이번 달 / 지난 달 (4칸 세로 스택) */}
+        <div style={{ gridColumn: 'span 4' }} className="flex flex-col gap-3">
+          <Card className="flex-1">
+            <CardContent className="p-5 h-full flex flex-col justify-between">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.2em]">이번 달</p>
+              <div>
+                <p className="text-3xl font-bold font-mono tracking-tight leading-none mt-3">
+                  <CostValue cost={thisMonthCost} />
+                </p>
+                <p className="text-[11px] text-muted-foreground mt-2 font-mono">{thisMonth}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="flex-1">
+            <CardContent className="p-5 h-full flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.2em]">지난 달</p>
+                {monthDiff !== null && (
+                  <div className={`flex items-center gap-0.5 text-[11px] font-semibold ${monthDiff > 0 ? 'text-red-400' : monthDiff < 0 ? 'text-emerald-500' : 'text-muted-foreground'}`}>
+                    {monthDiff > 0 ? <TrendingUp className="h-3 w-3" /> : monthDiff < 0 ? <TrendingDown className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
+                    {Math.abs(monthDiff).toFixed(1)}%
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="text-3xl font-bold font-mono tracking-tight leading-none mt-3">
+                  <CostValue cost={lastMonthCost} />
+                </p>
+                <p className="text-[11px] text-muted-foreground mt-2 font-mono">{lastMonth}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* 시간별 사용량 (7칸) */}
+        <Card style={{ gridColumn: 'span 7' }}>
+          <CardHeader className="px-5 pt-5 pb-3"><CT>시간별 사용량</CT></CardHeader>
+          <CardContent className="px-5 pb-5 pt-0"><UsageOverTime data={filteredDaily} /></CardContent>
         </Card>
+
+        {/* 모델별 분석 (5칸) */}
+        <Card style={{ gridColumn: 'span 5' }}>
+          <CardHeader className="px-5 pt-5 pb-3"><CT>모델별 분석</CT></CardHeader>
+          <CardContent className="px-5 pb-5 pt-0"><ModelBreakdown data={stats.modelBreakdown} /></CardContent>
+        </Card>
+
+        {/* 프로젝트별 비용 순위 (12칸 전체) */}
+        {topProjects.length > 0 && (
+          <Card style={{ gridColumn: 'span 12' }}>
+            <CardHeader className="px-5 pt-5 pb-3"><CT>프로젝트별 비용 순위</CT></CardHeader>
+            <CardContent className="px-5 pb-5 pt-0"><ProjectCostChart data={topProjects} /></CardContent>
+          </Card>
+        )}
       </div>
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Card className="border-border/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">일별 비용</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CostChart data={filteredDaily} />
-          </CardContent>
-        </Card>
-        <Card className="border-border/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">모델별 분석</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ModelBreakdown data={stats.modelBreakdown} />
-          </CardContent>
-        </Card>
-      </div>
-
-      {topProjects.length > 0 && (
-        <Card className="border-border/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">프로젝트별 비용 순위</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ProjectCostChart data={topProjects} />
-          </CardContent>
-        </Card>
-      )}
-
-      <Card className="border-border/50">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">시간별 사용량</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <UsageOverTime data={filteredDaily} />
-        </CardContent>
-      </Card>
     </div>
   );
 }

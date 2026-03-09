@@ -68,33 +68,37 @@ export function LivePage() {
   const officeState = officeStateRef.current;
 
   return (
-    <div className="flex flex-col h-full bg-gray-950 text-white">
+    <div className="flex flex-col h-full bg-background text-foreground">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-200">라이브 에이전트 (작업중)</span>
+          <span className="text-sm font-medium">라이브 에이전트</span>
+          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-sm bg-primary/15 text-primary uppercase tracking-wide">Beta</span>
           {activeAgents.length > 0 && (
-            <span className="flex items-center gap-1 text-xs text-emerald-400">
-              <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="flex items-center gap-1 text-xs text-emerald-500">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-60" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+              </span>
               {activeAgents.length}명 활성
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <button
             onClick={() => setZoom((z) => Math.max(1, z - 1))}
-            className="w-6 h-6 flex items-center justify-center rounded bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm leading-none"
+            className="w-6 h-6 flex items-center justify-center rounded border border-border hover:border-primary/30 hover:text-primary text-muted-foreground text-sm leading-none transition-colors"
           >−</button>
-          <span className="text-xs text-gray-500 w-8 text-center">{zoom}x</span>
+          <span className="text-xs text-muted-foreground font-mono w-8 text-center">{zoom}x</span>
           <button
             onClick={() => setZoom((z) => Math.min(10, z + 1))}
-            className="w-6 h-6 flex items-center justify-center rounded bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm leading-none"
+            className="w-6 h-6 flex items-center justify-center rounded border border-border hover:border-primary/30 hover:text-primary text-muted-foreground text-sm leading-none transition-colors"
           >+</button>
         </div>
       </div>
 
       {/* Canvas area */}
-      <div className="flex-1 relative overflow-hidden">
+      <div className="flex-1 relative overflow-hidden min-h-0">
         <OfficeCanvas
           officeState={officeState}
           zoom={zoom}
