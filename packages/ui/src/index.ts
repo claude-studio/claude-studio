@@ -3,6 +3,7 @@ export { cn } from './lib/utils';
 
 // Components
 export { Badge, badgeVariants } from './components/ui/badge';
+export { Particles } from './components/ui/particles';
 export { Button, buttonVariants } from './components/ui/button';
 export {
   Card,

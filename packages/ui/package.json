@@ -30,6 +30,7 @@
     "@tanstack/react-router": "catalog:",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
+    "framer-motion": "^12.35.2",
     "lucide-react": "catalog:",
     "radix-ui": "^1.4.3",
     "react": "catalog:",

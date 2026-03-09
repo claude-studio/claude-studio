@@ -1,4 +1,6 @@
-import type { DailyUsage } from '@repo/shared';
+import { useState } from 'react';
+
+import type { DailyUsage, SessionInfo } from '@repo/shared';
 import { formatDate, formatNumber, formatTokens, timeAgo } from '@repo/shared';
 import {
   ActivityHeatmap,
@@ -19,7 +21,8 @@ import {
 } from '@repo/ui';
 import { createFileRoute } from '@tanstack/react-router';
 
-import { DollarSign, FolderOpen, MessageSquare, Zap } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronRight, DollarSign, Folder, FolderOpen, MessageSquare, Zap } from 'lucide-react';
 
 function toDateStr(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -53,6 +56,102 @@ function getLast30DayTrend(
     label: '전 30일 대비',
     positiveIsGood: false,
   };
+}
+
+function SessionTree({ sessions }: { sessions: SessionInfo[] }) {
+  const filtered = sessions.filter((s) => s.cost > 0);
+  const grouped = filtered.reduce<Record<string, SessionInfo[]>>((acc, s) => {
+    if (!acc[s.projectName]) acc[s.projectName] = [];
+    acc[s.projectName]!.push(s);
+    return acc;
+  }, {});
+
+  const projectNames = Object.keys(grouped).sort(
+    (a, b) =>
+      grouped[b]!.reduce((sum, s) => sum + s.cost, 0) -
+      grouped[a]!.reduce((sum, s) => sum + s.cost, 0),
+  );
+
+  const [expanded, setExpanded] = useState<Record<string, boolean>>(
+    Object.fromEntries(projectNames.map((k, i) => [k, i === 0])),
+  );
+
+  if (filtered.length === 0) {
+    return <p className="text-muted-foreground text-sm text-center py-4">세션이 없습니다</p>;
+  }
+
+  return (
+    <div className="space-y-1">
+      {projectNames.map((name) => {
+        const projectSessions = grouped[name]!;
+        const totalCost = projectSessions.reduce((sum, s) => sum + s.cost, 0);
+        const isOpen = expanded[name] ?? false;
+
+        return (
+          <div key={name}>
+            <button
+              onClick={() => setExpanded((prev) => ({ ...prev, [name]: !isOpen }))}
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted/40 transition-colors text-left"
+            >
+              <ChevronRight
+                className={`h-3.5 w-3.5 text-muted-foreground shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}
+              />
+              {isOpen ? (
+                <FolderOpen className="h-3.5 w-3.5 text-primary shrink-0" />
+              ) : (
+                <Folder className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+              )}
+              <span className="text-sm font-medium truncate flex-1">{name}</span>
+              <span className="text-xs text-muted-foreground shrink-0">
+                {projectSessions.length}개 세션
+              </span>
+              <span className="text-xs font-mono font-semibold shrink-0">
+                <CostDisplay cost={totalCost} />
+              </span>
+            </button>
+
+            <AnimatePresence initial={false}>
+              {isOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2, ease: 'easeInOut' }}
+                  className="overflow-hidden"
+                >
+                  <div className="ml-6 pl-3 border-l border-primary/20 space-y-0.5 py-0.5">
+                    {projectSessions.map((session, idx) => (
+                      <div
+                        key={session.id}
+                        className="flex items-center justify-between px-2 py-1.5 rounded hover:bg-muted/30 transition-colors"
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-xs text-muted-foreground shrink-0">
+                            {idx === projectSessions.length - 1 ? '└─' : '├─'}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {timeAgo(new Date(session.lastTime))}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <span className="text-xs text-muted-foreground">
+                            {formatNumber(session.messageCount)}개 메시지
+                          </span>
+                          <span className="text-xs font-mono font-semibold">
+                            <CostDisplay cost={session.cost} />
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 export const Route = createFileRoute('/')({
@@ -193,30 +292,7 @@ function OverviewPage() {
           <CardTitle className="text-sm font-medium">최근 세션</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            {stats.recentSessions.map((session) => (
-              <div
-                key={session.id}
-                className="flex items-center justify-between py-2 border-b border-border/50 last:border-0"
-              >
-                <div>
-                  <p className="text-sm font-medium">{session.projectName}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {timeAgo(new Date(session.lastTime))}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium">
-                    <CostDisplay cost={session.cost} />
-                  </p>
-                  <p className="text-xs text-muted-foreground">{session.messageCount}개 메시지</p>
-                </div>
-              </div>
-            ))}
-            {stats.recentSessions.length === 0 && (
-              <p className="text-muted-foreground text-sm text-center py-4">세션이 없습니다</p>
-            )}
-          </div>
+          <SessionTree sessions={stats.recentSessions} />
         </CardContent>
       </Card>
     </div>

@@ -1,4 +1,4 @@
-import { AppSidebar, SidebarProvider, SidebarTrigger } from '@repo/ui';
+import { AppSidebar, Particles, SidebarProvider, SidebarTrigger, useTheme } from '@repo/ui';
 import { createRootRoute, Outlet, useRouter, useRouterState } from '@tanstack/react-router';
 
 import { ArrowLeft } from 'lucide-react';
@@ -55,17 +55,32 @@ function ErrorComponent({ error }: { error: Error }) {
   );
 }
 
-export const Route = createRootRoute({
-  component: () => (
+function RootLayout() {
+  const { theme } = useTheme();
+  const particleColor = theme === 'dark' ? '#E8834E' : '#C4643A';
+
+  return (
     <SidebarProvider>
       <AppSidebar />
       <main className="flex-1 h-svh overflow-hidden flex flex-col">
         <TopBar />
-        <div className="flex-1 overflow-y-auto px-6 py-5">
+        {/* 파티클: main 영역에 fixed로 고정 (스크롤과 무관하게 화면을 따라다님) */}
+        <Particles
+          className="fixed inset-0 z-0 pointer-events-none"
+          quantity={60}
+          color={particleColor}
+          ease={80}
+          staticity={40}
+        />
+        <div className="relative z-10 flex-1 overflow-y-auto px-6 py-5">
           <Outlet />
         </div>
       </main>
     </SidebarProvider>
-  ),
+  );
+}
+
+export const Route = createRootRoute({
+  component: RootLayout,
   errorComponent: ErrorComponent,
 });

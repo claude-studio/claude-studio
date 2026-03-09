@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import { useRef, useState, useEffect, type CSSProperties } from 'react';
 
 interface ActivityData {
   date: string;
@@ -9,6 +9,10 @@ interface ActivityHeatmapProps {
   data: ActivityData[];
 }
 
+const WEEKS = 24;
+const GAP = 4;
+const DAY_LABEL_WIDTH = 16;
+
 function getIntensityStyle(count: number, max: number): CSSProperties {
   if (count === 0) return { backgroundColor: 'color-mix(in srgb, var(--muted-foreground) 15%, transparent)' };
   const ratio = count / max;
@@ -17,13 +21,30 @@ function getIntensityStyle(count: number, max: number): CSSProperties {
 }
 
 export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [cell, setCell] = useState(16);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const calc = () => {
+      const totalWidth = el.clientWidth - DAY_LABEL_WIDTH - 4;
+      const c = Math.floor((totalWidth - GAP * (WEEKS - 1)) / WEEKS);
+      setCell(Math.max(c, 8));
+    };
+    calc();
+    const ro = new ResizeObserver(calc);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const step = cell + GAP;
+  const gridHeight = 7 * step - GAP;
   const max = Math.max(...data.map((d) => d.count), 1);
 
-  // Build last 24 weeks grid
   const today = new Date();
   const weeks: { date: string; count: number }[][] = [];
-
-  for (let w = 23; w >= 0; w--) {
+  for (let w = WEEKS - 1; w >= 0; w--) {
     const week: { date: string; count: number }[] = [];
     for (let d = 0; d < 7; d++) {
       const date = new Date(today);
@@ -35,42 +56,59 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
     weeks.push(week);
   }
 
-  const dayLabels = ['일', '월', '화', '수', '목', '금', '토'];
+  const DAY_LABELS = [
+    { idx: 1, label: '월' },
+    { idx: 3, label: '수' },
+    { idx: 5, label: '금' },
+  ];
 
   return (
-    <div className="space-y-2">
-      <div className="flex gap-1 overflow-x-auto pb-1">
-        <div className="flex flex-col gap-1 mr-1">
-          {dayLabels.map((day, i) => (
-            <div key={day} className="h-[13px] text-[9px] text-muted-foreground flex items-center">
-              {i % 2 === 1 ? day : ''}
+    <div ref={containerRef} className="space-y-2 w-full">
+      <div className="flex gap-1">
+        {/* 요일 라벨 */}
+        <div className="relative shrink-0" style={{ width: DAY_LABEL_WIDTH, height: gridHeight }}>
+          {DAY_LABELS.map(({ idx, label }) => (
+            <span
+              key={label}
+              className="absolute text-[9px] text-muted-foreground leading-none"
+              style={{ top: idx * step + cell / 2, transform: 'translateY(-50%)', right: 2 }}
+            >
+              {label}
+            </span>
+          ))}
+        </div>
+
+        {/* 셀 그리드 */}
+        <div className="flex flex-1" style={{ gap: GAP }}>
+          {weeks.map((week, wi) => (
+            <div key={wi} className="flex flex-col flex-1" style={{ gap: GAP }}>
+              {week.map((day) => (
+                <div
+                  key={day.date}
+                  title={`${day.date}: ${day.count}개 메시지`}
+                  className="rounded-sm transition-colors w-full"
+                  style={{ height: cell, ...getIntensityStyle(day.count, max) }}
+                />
+              ))}
             </div>
           ))}
         </div>
-        {weeks.map((week, wi) => (
-          <div key={wi} className="flex flex-col gap-1">
-            {week.map((day) => (
-              <div
-                key={day.date}
-                title={`${day.date}: ${day.count}개 메시지`}
-                className="h-[13px] w-[13px] rounded-sm transition-colors"
-                style={getIntensityStyle(day.count, max)}
-              />
-            ))}
-          </div>
-        ))}
       </div>
+
+      {/* 범례 */}
       <div className="flex items-center justify-end gap-1 text-[10px] text-muted-foreground">
         <span>적음</span>
         {([0, 25, 45, 60, 78, 100] as const).map((pct) => (
           <div
             key={pct}
-            className="h-[10px] w-[10px] rounded-sm"
-            style={
-              pct === 0
+            className="rounded-sm shrink-0"
+            style={{
+              width: cell,
+              height: cell,
+              ...(pct === 0
                 ? { backgroundColor: 'color-mix(in srgb, var(--muted-foreground) 15%, transparent)' }
-                : { backgroundColor: `color-mix(in srgb, var(--primary) ${pct}%, transparent)` }
-            }
+                : { backgroundColor: `color-mix(in srgb, var(--primary) ${pct}%, transparent)` }),
+            }}
           />
         ))}
         <span>많음</span>
