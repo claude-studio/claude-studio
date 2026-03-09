@@ -1,4 +1,5 @@
 import { app, BrowserWindow, shell } from 'electron';
+import { existsSync } from 'fs';
 import { join } from 'path';
 
 import { registerAllIpcHandlers } from './ipc/index';
@@ -12,12 +13,9 @@ function getAssetsRoot(): string {
   const appPath = app.getAppPath();
   // electron-vite dev: appPath = apps/studio
   // prod: appPath = resources/app
-  const candidates = [
-    join(appPath, 'public', 'assets'),
-    join(appPath, '..', 'public', 'assets'),
-  ];
+  const candidates = [join(appPath, 'public', 'assets'), join(appPath, '..', 'public', 'assets')];
   for (const p of candidates) {
-    if (require('fs').existsSync(p)) return p;
+    if (existsSync(p)) return p;
   }
   return join(appPath, 'public', 'assets');
 }
@@ -32,7 +30,7 @@ function createWindow(): void {
     autoHideMenuBar: true,
     titleBarStyle: 'default',
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: join(__dirname, '../preload/index.cjs'),
       sandbox: false,
       contextIsolation: true,
       nodeIntegration: false,

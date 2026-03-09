@@ -25,6 +25,14 @@ export default defineConfig({
         '@repo/shared': resolve('../../packages/shared/src'),
       },
     },
+    build: {
+      rollupOptions: {
+        output: {
+          format: 'cjs',
+          entryFileNames: '[name].cjs',
+        },
+      },
+    },
   },
   renderer: {
     server: {

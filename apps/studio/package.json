@@ -1,5 +1,6 @@
 {
   "name": "@repo/studio",
+  "type": "module",
   "version": "1.0.0",
   "description": "Claude Code usage dashboard desktop app",
   "author": "Claude Studio",

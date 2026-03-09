@@ -1,5 +1,6 @@
 {
   "name": "@repo/ui",
+  "type": "module",
   "version": "0.0.1",
   "private": true,
   "exports": {
@@ -27,7 +28,6 @@
     "@radix-ui/react-tooltip": "^1.1.0",
     "@repo/shared": "workspace:*",
     "@tanstack/react-query": "catalog:",
-    "@tanstack/react-router": "catalog:",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "framer-motion": "catalog:",
