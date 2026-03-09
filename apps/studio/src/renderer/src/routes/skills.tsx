@@ -1,6 +1,7 @@
-import { SkillsPage } from '@repo/ui';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+
+import { SkillsPage } from '../pages/skills';
 
 export const Route = createFileRoute('/skills')({
   component: function SkillsRoute() {

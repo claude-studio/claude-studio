@@ -38,15 +38,24 @@ export { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './components/ui/tooltip';
 
 // Layout
-export { AppSidebar, Sidebar } from './layout/sidebar';
 export { StatCard } from './layout/stat-card';
 export { CostDisplay } from './layout/cost-display';
 
 // Sidebar primitives (shadcn)
 export {
-  SidebarProvider,
-  SidebarTrigger,
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarHeader,
   SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarSeparator,
+  SidebarTrigger,
+  useSidebar,
 } from './components/ui/sidebar';
 
 // Charts
@@ -65,15 +74,6 @@ export { UsageOverTime } from './charts/usage-over-time';
 export { DataProviderWrapper, useProjects, useStats } from './hooks/use-data';
 export { ThemeProvider, useTheme } from './hooks/use-theme';
 
-// Pages
-export {
-  CostsPage,
-  DataPage,
-  OverviewPage,
-  ProjectDetailPage,
-  ProjectsPage,
-  SkillsPage,
-} from './pages/index';
 
 // CSS (consumers must import separately)
 // import '@repo/ui/globals.css'

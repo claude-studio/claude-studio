@@ -1,6 +1,7 @@
-import { DataPage } from '@repo/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+
+import { DataPage } from '../pages/data';
 
 export const Route = createFileRoute('/data')({
   component: function DataRoute() {

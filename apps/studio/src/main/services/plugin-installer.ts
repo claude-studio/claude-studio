@@ -17,8 +17,19 @@ const INSTALL_DIR = path.join(
   PLUGIN_VERSION,
 );
 const CLAUDE_DIR = path.join(os.homedir(), '.claude');
-const INSTALLED_PLUGINS_PATH = path.join(CLAUDE_DIR, 'installed_plugins.json');
+const INSTALLED_PLUGINS_PATH = path.join(CLAUDE_DIR, 'plugins', 'installed_plugins.json');
 const SETTINGS_PATH = path.join(CLAUDE_DIR, 'settings.json');
+
+interface InstalledPluginsFile {
+  version: 2;
+  plugins: Record<string, Array<{
+    scope: string;
+    installPath: string;
+    version: string;
+    installedAt: string;
+    lastUpdated: string;
+  }>>;
+}
 
 function getResourcesPluginPath(): string {
   // dev: app.getAppPath() = apps/studio
@@ -55,9 +66,19 @@ function writeJsonFile(filePath: string, data: Record<string, unknown>): void {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + '\n', 'utf8');
 }
 
+function readInstalledPlugins(): InstalledPluginsFile {
+  try {
+    const data = JSON.parse(fs.readFileSync(INSTALLED_PLUGINS_PATH, 'utf8')) as InstalledPluginsFile;
+    if (data.version === 2 && data.plugins) return data;
+  } catch {
+    // ignore
+  }
+  return { version: 2, plugins: {} };
+}
+
 export function isPluginInstalled(): boolean {
-  const data = readJsonFile(INSTALLED_PLUGINS_PATH);
-  return PLUGIN_KEY in data;
+  const data = readInstalledPlugins();
+  return PLUGIN_KEY in data.plugins;
 }
 
 export function installPlugin(): void {
@@ -75,13 +96,16 @@ export function installPlugin(): void {
   }
 
   // 3. installed_plugins.json 업데이트 (version 2 포맷)
-  const installedPlugins = readJsonFile(INSTALLED_PLUGINS_PATH);
-  installedPlugins[PLUGIN_KEY] = {
+  const now = new Date().toISOString();
+  const installedPlugins = readInstalledPlugins();
+  installedPlugins.plugins[PLUGIN_KEY] = [{
+    scope: 'user',
+    installPath: INSTALL_DIR,
     version: PLUGIN_VERSION,
-    installedAt: new Date().toISOString(),
-    type: 'local',
-  };
-  writeJsonFile(INSTALLED_PLUGINS_PATH, installedPlugins);
+    installedAt: now,
+    lastUpdated: now,
+  }];
+  writeJsonFile(INSTALLED_PLUGINS_PATH, installedPlugins as unknown as Record<string, unknown>);
 
   // 4. settings.json의 enabledPlugins에 true 추가
   const settings = readJsonFile(SETTINGS_PATH);
@@ -107,9 +131,9 @@ export function uninstallPlugin(): void {
 
   // 2. installed_plugins.json에서 제거
   try {
-    const installedPlugins = readJsonFile(INSTALLED_PLUGINS_PATH);
-    delete installedPlugins[PLUGIN_KEY];
-    writeJsonFile(INSTALLED_PLUGINS_PATH, installedPlugins);
+    const installedPlugins = readInstalledPlugins();
+    delete installedPlugins.plugins[PLUGIN_KEY];
+    writeJsonFile(INSTALLED_PLUGINS_PATH, installedPlugins as unknown as Record<string, unknown>);
   } catch {
     // ignore
   }

@@ -11,7 +11,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@repo/ui": "workspace:*",
     "@repo/shared": "workspace:*",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-query": "catalog:",
@@ -19,7 +18,8 @@
     "react-dom": "catalog:",
     "@fontsource/geist-sans": "catalog:",
     "@fontsource/geist-mono": "catalog:",
-    "lucide-react": "catalog:"
+    "lucide-react": "catalog:",
+    "@repo/ui": "workspace:*"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

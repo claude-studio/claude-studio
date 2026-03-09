@@ -1,7 +1,9 @@
-import { AppSidebar, Particles, SidebarProvider, SidebarTrigger, useTheme } from '@repo/ui';
+import { Particles, SidebarProvider, SidebarTrigger, useTheme } from '@repo/ui';
 import { createRootRoute, Outlet, useRouter, useRouterState } from '@tanstack/react-router';
 
 import { ArrowLeft } from 'lucide-react';
+
+import { AppSidebar } from '../widgets/app-sidebar';
 
 const PAGE_TITLES: Record<string, string> = {
   '/': '개요',
@@ -64,7 +66,6 @@ function RootLayout() {
       <AppSidebar />
       <main className="flex-1 h-svh overflow-hidden flex flex-col">
         <TopBar />
-        {/* 파티클: main 영역에 fixed로 고정 (스크롤과 무관하게 화면을 따라다님) */}
         <Particles
           className="fixed inset-0 z-0 pointer-events-none"
           quantity={60}
