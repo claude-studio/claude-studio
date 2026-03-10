@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.0](https://github.com/claude-studio/claude-studio/compare/claude-studio-v1.2.0...claude-studio-v1.3.0) (2026-03-10)
+
+
+### Other Changes
+
+* feature-plan 폴더 제거 ([6dbf037](https://github.com/claude-studio/claude-studio/commit/6dbf037a9052ab7556e7c075fe4d0b45300d3e3c))
+* github profile 스크린샷 추가 ([96a01b2](https://github.com/claude-studio/claude-studio/commit/96a01b2789f31bb364c4028ce1ed19734f6ead87))
+
+
+### Features
+
+* **skills:** setup-project 스킬 추가 ([4f8c8c9](https://github.com/claude-studio/claude-studio/commit/4f8c8c978d124bd76f5996f5b4106cacb52247db))
+
 ## [1.2.0](https://github.com/claude-studio/claude-studio/compare/claude-studio-v1.1.0...claude-studio-v1.2.0) (2026-03-09)
 
 
