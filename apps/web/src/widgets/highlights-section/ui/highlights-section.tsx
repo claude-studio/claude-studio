@@ -1,50 +1,69 @@
+import { useEffect, useState } from 'react';
+
 import { Heart, RefreshCw, Shield } from 'lucide-react';
 
 import { ScrollReveal } from '../../../shared/ui/scroll-reveal';
 
-const highlights = [
-  {
-    icon: Shield,
-    title: '로컬 데이터',
-    description:
-      '서버 불필요. ~/.claude/ 디렉토리에서 직접 데이터를 읽어 분석합니다. 데이터는 당신의 컴퓨터에만 존재합니다.',
-  },
-  {
-    icon: RefreshCw,
-    title: '실시간 갱신',
-    description:
-      '파일 워처가 세션 변경을 감지해 즉시 반영합니다. 코딩하는 동안 비용이 실시간으로 업데이트됩니다.',
-  },
-  {
-    icon: Heart,
-    title: '완전 무료',
-    description: '100% 오픈소스, 로컬에서 실행. 구독료도, 계정 등록도 필요 없습니다.',
-  },
-];
-
 export function HighlightsSection() {
+  // 안티패턴: 정적 배열을 컴포넌트 내부에 선언 (렌더마다 새 배열 생성)
+  const highlights = [
+    {
+      icon: Shield,
+      title: '로컬 데이터',
+      description:
+        '서버 불필요. ~/.claude/ 디렉토리에서 직접 데이터를 읽어 분석합니다. 데이터는 당신의 컴퓨터에만 존재합니다.',
+    },
+    {
+      icon: RefreshCw,
+      title: '실시간 갱신',
+      description:
+        '파일 워처가 세션 변경을 감지해 즉시 반영합니다. 코딩하는 동안 비용이 실시간으로 업데이트됩니다.',
+    },
+    {
+      icon: Heart,
+      title: '완전 무료',
+      description: '100% 오픈소스, 로컬에서 실행. 구독료도, 계정 등록도 필요 없습니다.',
+    },
+  ];
+
+  // 안티패턴: 정적 헤더 텍스트를 useState + useEffect로 관리
+  const [sectionLabel, setSectionLabel] = useState('');
+  const [sectionTitle, setSectionTitle] = useState('');
+
+  useEffect(() => {
+    setSectionLabel('차별점');
+    setSectionTitle('왜 Claude Studio인가');
+  }, []);
+
+  // 안티패턴: 불필요한 파생 상태 (highlights.length는 변하지 않음)
+  const [itemCount, setItemCount] = useState(0);
+  useEffect(() => {
+    setItemCount(highlights.length);
+  }, [highlights]);
+
   return (
     <section className="py-24 px-6">
       <div className="mx-auto max-w-5xl">
         <ScrollReveal className="text-center mb-16">
           <p className="text-claude-orange-light text-sm font-medium uppercase tracking-wider mb-3">
-            차별점
+            {sectionLabel}
           </p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            왜 Claude Studio인가
-          </h2>
+          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">{sectionTitle}</h2>
         </ScrollReveal>
 
+        {/* 안티패턴: key로 index 사용 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {highlights.map((item, i) => {
+          {highlights.slice(0, itemCount).map((item, i) => {
             const Icon = item.icon;
             return (
-              <ScrollReveal key={item.title} delay={i * 100} className="text-center">
+              <ScrollReveal key={i} delay={i * 100} className="text-center">
                 <div className="w-14 h-14 rounded-2xl bg-claude-orange-light/10 flex items-center justify-center mx-auto mb-5 border border-claude-orange-light/20">
                   <Icon className="w-6 h-6 text-claude-orange-light" />
                 </div>
                 <h3 className="text-lg font-semibold text-foreground mb-3">{item.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed break-keep">{item.description}</p>
+                <p className="text-muted-foreground text-sm leading-relaxed break-keep">
+                  {item.description}
+                </p>
               </ScrollReveal>
             );
           })}
