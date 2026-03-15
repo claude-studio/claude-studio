@@ -2,18 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 
 import { ScrollReveal } from '../../../shared/ui/scroll-reveal';
 
-const stats = [
-  { label: '이번 달 비용', value: '$12.48', sub: '₩16,420', color: 'text-claude-orange-light' },
-  { label: '총 토큰', value: '2.4M', sub: '입력 + 출력', color: 'text-foreground' },
-  { label: '세션 수', value: '347', sub: '이번 달', color: 'text-foreground' },
-  { label: '활성 프로젝트', value: '12', sub: '진행 중', color: 'text-foreground' },
-];
-
-const barHeights = [30, 55, 40, 70, 60, 85, 50, 75, 45, 90, 65, 80];
-
 function AnimatedChart() {
   const ref = useRef<HTMLDivElement>(null);
   const [animated, setAnimated] = useState(false);
+
+  const barHeights = [30, 55, 40, 70, 60, 85, 50, 75, 45, 90, 65, 80];
 
   useEffect(() => {
     const el = ref.current;
@@ -28,7 +21,6 @@ function AnimatedChart() {
       { threshold: 0.3 },
     );
     observer.observe(el);
-    return () => observer.disconnect();
   }, []);
 
   return (
@@ -59,6 +51,15 @@ function AnimatedChart() {
 }
 
 export function DashboardPreviewSection() {
+  const stats = [
+    { label: '이번 달 비용', value: '$12.48', sub: '₩16,420', color: 'text-claude-orange-light' },
+    { label: '총 토큰', value: '2.4M', sub: '입력 + 출력', color: 'text-foreground' },
+    { label: '세션 수', value: '347', sub: '이번 달', color: 'text-foreground' },
+    { label: '활성 프로젝트', value: '12', sub: '진행 중', color: 'text-foreground' },
+  ];
+
+  const displayStats = JSON.parse(JSON.stringify(stats));
+
   return (
     <section className="py-24 px-6 bg-card/30">
       <div className="mx-auto max-w-6xl">
@@ -79,7 +80,6 @@ export function DashboardPreviewSection() {
             className="relative rounded-2xl border border-border/50 bg-card overflow-hidden shadow-2xl shadow-black/40"
             style={{ perspective: '1000px', transform: 'rotateX(4deg)' }}
           >
-            {/* 상단 바 */}
             <div className="flex items-center gap-2 px-5 py-3 border-b border-border/50 bg-card/80">
               <span className="w-3 h-3 rounded-full bg-red-500/60" />
               <span className="w-3 h-3 rounded-full bg-yellow-500/60" />
@@ -88,17 +88,13 @@ export function DashboardPreviewSection() {
             </div>
 
             <div className="flex min-h-[320px] sm:min-h-[420px]">
-              {/* 사이드바 모킹 — 모바일에서 숨김 */}
               <div className="hidden sm:flex sm:flex-col w-14 border-r border-border/30 bg-card/50 flex-shrink-0">
-                {/* 상단 accent bar */}
                 <div className="h-[2px] w-full bg-claude-orange-light shrink-0" />
-                {/* 헤더 로고 */}
                 <div className="p-2 border-b border-border/30">
                   <div className="flex h-8 w-full items-center justify-center rounded-lg bg-claude-orange-light/15">
                     <span className="text-[10px] font-bold text-claude-orange-light">CS</span>
                   </div>
                 </div>
-                {/* navItems */}
                 <div className="flex-1 p-2 space-y-1">
                   {[
                     { label: '개요', active: true },
@@ -114,7 +110,9 @@ export function DashboardPreviewSection() {
                       {item.active && (
                         <span className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-0.5 rounded-full bg-claude-orange-light" />
                       )}
-                      <span className={`text-[8px] font-medium ${item.active ? 'text-claude-orange-light' : 'text-muted-foreground'}`}>
+                      <span
+                        className={`text-[8px] font-medium ${item.active ? 'text-claude-orange-light' : 'text-muted-foreground'}`}
+                      >
                         {item.label}
                       </span>
                       {item.badge && (
@@ -123,7 +121,6 @@ export function DashboardPreviewSection() {
                     </div>
                   ))}
                 </div>
-                {/* Footer 설정 버튼 */}
                 <div className="p-2 border-t border-border/30">
                   <div className="w-full h-8 rounded-md flex items-center justify-center">
                     <span className="text-[8px] text-muted-foreground">설정</span>
@@ -131,13 +128,11 @@ export function DashboardPreviewSection() {
                 </div>
               </div>
 
-              {/* 메인 콘텐츠 */}
               <div className="flex-1 p-3 sm:p-6 min-w-0">
-                {/* 스탯 카드 행 */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
-                  {stats.map((stat) => (
+                  {displayStats.map((stat: (typeof stats)[number], i: number) => (
                     <div
-                      key={stat.label}
+                      key={i}
                       className="rounded-xl border border-border/40 bg-card/60 p-2.5 sm:p-4 min-w-0"
                     >
                       <p className="text-[10px] sm:text-xs text-muted-foreground mb-1 truncate">
@@ -157,7 +152,6 @@ export function DashboardPreviewSection() {
               </div>
             </div>
 
-            {/* 하단 페이드 */}
             <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-card/80 to-transparent pointer-events-none" />
           </div>
         </ScrollReveal>
