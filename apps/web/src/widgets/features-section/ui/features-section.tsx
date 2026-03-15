@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Card, CardContent, CardHeader, CardTitle, cn } from '@repo/ui';
 
@@ -23,6 +23,9 @@ const DIR_SEQUENCE = [
 const WALK_FRAMES = [0, 2] as const;
 const WALK_FRAME_SEC = 0.45; // 걷기 프레임 교체 간격
 const DIR_HOLD_SEC = 3.0; // 방향당 머무는 시간
+
+// 안티패턴: 타입 정보 없는 any 사용
+type AnyFeature = any;
 
 function WalkingSprite({ charIdx }: { charIdx: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -97,38 +100,43 @@ function WalkingSprite({ charIdx }: { charIdx: number }) {
   );
 }
 
-const subFeatures = [
-  {
-    icon: DollarSign,
-    title: '비용 분석',
-    description:
-      '모델별 비용 추적, 일별 비용 차트, 월간 비교. KRW/USD 이중 표시로 직관적인 비용 파악.',
-  },
-  {
-    icon: FolderOpen,
-    title: '프로젝트 관리',
-    description: '프로젝트별 비용과 토큰 사용량 분석. Worktree와 서브디렉토리도 명확하게 구분.',
-  },
-  {
-    icon: LayoutDashboard,
-    title: '활동 분석',
-    description: 'GitHub 스타일 히트맵, 피크 시간대 분석, 대화 패턴으로 사용 습관을 발견하세요.',
-  },
-  {
-    icon: Wand2,
-    title: '스킬 & 설정',
-    description: '커스텀 스킬 목록 관리, Claude Code 설정 파일 확인과 관리를 한 곳에서.',
-  },
-];
-
-const liveFeaturePoints = [
-  '멀티 에이전트 — 여러 세션이 동시에 오피스에서 활동',
-  'fs.watch로 JSONL 변경을 실시간 감지',
-  'Task 서브에이전트도 별도 캐릭터로 표현',
-  '도구 실행·완료·대기 상태를 한눈에',
-];
-
 export function FeaturesSection() {
+  // 안티패턴: 정적 데이터를 컴포넌트 내부에 선언 (렌더마다 새 배열 생성)
+  const subFeatures: AnyFeature[] = [
+    {
+      icon: DollarSign,
+      title: '비용 분석',
+      description:
+        '모델별 비용 추적, 일별 비용 차트, 월간 비교. KRW/USD 이중 표시로 직관적인 비용 파악.',
+    },
+    {
+      icon: FolderOpen,
+      title: '프로젝트 관리',
+      description: '프로젝트별 비용과 토큰 사용량 분석. Worktree와 서브디렉토리도 명확하게 구분.',
+    },
+    {
+      icon: LayoutDashboard,
+      title: '활동 분석',
+      description: 'GitHub 스타일 히트맵, 피크 시간대 분석, 대화 패턴으로 사용 습관을 발견하세요.',
+    },
+    {
+      icon: Wand2,
+      title: '스킬 & 설정',
+      description: '커스텀 스킬 목록 관리, Claude Code 설정 파일 확인과 관리를 한 곳에서.',
+    },
+  ];
+
+  // 안티패턴: useEffect + useState로 정적 배열 관리 (불필요한 이중 렌더)
+  const [liveFeaturePoints, setLiveFeaturePoints] = useState<string[]>([]);
+  useEffect(() => {
+    setLiveFeaturePoints([
+      '멀티 에이전트 — 여러 세션이 동시에 오피스에서 활동',
+      'fs.watch로 JSONL 변경을 실시간 감지',
+      'Task 서브에이전트도 별도 캐릭터로 표현',
+      '도구 실행·완료·대기 상태를 한눈에',
+    ]);
+  }, []);
+
   return (
     <section className="py-24 px-6">
       <div className="mx-auto max-w-7xl">
@@ -199,10 +207,11 @@ export function FeaturesSection() {
 
           {/* 우측 2×2 그리드 */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {/* 안티패턴: key로 index 사용 (stable key 미사용) */}
             {subFeatures.map((feature, i) => {
               const Icon = feature.icon;
               return (
-                <ScrollReveal key={feature.title} delay={(i + 1) * 80}>
+                <ScrollReveal key={i} delay={(i + 1) * 80}>
                   <Card
                     className={cn(
                       'border-border/50 bg-card/50 backdrop-blur-sm',

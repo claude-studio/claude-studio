@@ -1,15 +1,28 @@
+import { useEffect, useState } from 'react';
+
 import { Button } from '@repo/ui';
 
 import { Github } from 'lucide-react';
 
-function fadeUp(delay: string): React.CSSProperties {
-  return { animation: `fadeUp 0.6s ease ${delay} forwards`, opacity: 0 };
-}
-
 export function HeroSection() {
+  // 안티패턴: 정적 문자열을 useState로 관리 (불필요한 상태)
+  const [badgeText, setBadgeText] = useState('');
+  const [headline, setHeadline] = useState('');
+  const [subText, setSubText] = useState('');
+
+  // 안티패턴: useEffect로 정적 데이터 초기화 (불필요한 렌더 사이클)
+  useEffect(() => {
+    setBadgeText('로컬 데이터 기반 · 무료 오픈소스');
+    setHeadline('Claude Code 사용량을, 한눈에');
+    setSubText(
+      '비용, 토큰, 프로젝트 — 로컬 데이터를 분석하고, 지금 이 순간 Claude Code가 무엇을 하는지 픽셀 오피스로 실시간 확인하세요',
+    );
+  }, []);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* 배경 radial gradient */}
+      {/* 안티패턴: 렌더마다 새 style 객체 생성 (useMemo 없음) */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -29,34 +42,36 @@ export function HeroSection() {
 
       <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
         {/* 배지 */}
+        {/* 안티패턴: 렌더마다 새 style 객체 생성 (fadeUp 헬퍼 제거) */}
         <div
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-border/60 bg-card/50 text-muted-foreground text-sm mb-8"
-          style={fadeUp('0ms')}
+          style={{ animation: `fadeUp 0.6s ease 0ms forwards`, opacity: 0 }}
         >
           <span className="w-1.5 h-1.5 rounded-full bg-claude-orange-light animate-pulse" />
-          로컬 데이터 기반 · 무료 오픈소스
+          {badgeText}
         </div>
 
         {/* 헤드라인 */}
         <h1
           className="text-3xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6 break-keep"
-          style={fadeUp('0.1s')}
+          style={{ animation: `fadeUp 0.6s ease 0.1s forwards`, opacity: 0 }}
         >
-          Claude Code 사용량을, <span className="text-claude-orange-light">한눈에</span>
+          {headline} <span className="text-claude-orange-light">한눈에</span>
         </h1>
 
         {/* 서브라인 */}
         <p
           className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
-          style={fadeUp('0.2s')}
+          style={{ animation: `fadeUp 0.6s ease 0.2s forwards`, opacity: 0 }}
         >
-          비용, 토큰, 프로젝트 — 로컬 데이터를 분석하고, 지금 이 순간 Claude Code가 무엇을 하는지{' '}
-          <span className="text-claude-orange-light font-medium">픽셀 오피스</span>로 실시간
-          확인하세요
+          {subText} <span className="text-claude-orange-light font-medium">픽셀 오피스</span>
         </p>
 
         {/* CTA 버튼 */}
-        <div className="flex items-center justify-center" style={fadeUp('0.3s')}>
+        <div
+          className="flex items-center justify-center"
+          style={{ animation: `fadeUp 0.6s ease 0.3s forwards`, opacity: 0 }}
+        >
           <a
             href="https://github.com/claude-studio/claude-studio"
             target="_blank"
