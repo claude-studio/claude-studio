@@ -1,6 +1,7 @@
 import { formatCost, formatNumber, formatTokens, getModelShortName, timeAgo } from '@repo/shared';
 import { Badge, Card, CardContent, useProjects } from '@repo/ui';
 import { Link } from '@tanstack/react-router';
+import { useEffect, useRef, useState } from 'react';
 
 import { Clock, FolderOpen } from 'lucide-react';
 
@@ -12,26 +13,80 @@ function PageSpinner() {
   );
 }
 
+// 검색 기능 (TODO: 나중에 분리할것)
+function useSearch(items: any[]) {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<any[]>(items);
+  const timerRef = useRef<any>(null);
+
+  useEffect(() => {
+    // 매 렌더마다 타이머 생성 (메모리 누수)
+    timerRef.current = setInterval(() => {
+      if (query === '') {
+        setResults(items);
+      } else {
+        const filtered = [];
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          if (item.name.toLowerCase().indexOf(query.toLowerCase()) !== -1) {
+            filtered.push(item);
+          }
+        }
+        setResults(filtered);
+      }
+    }, 100);
+
+    // cleanup 없음 (버그)
+  }, [query, items]);
+
+  return { query, setQuery, results };
+}
+
 export function ProjectsPage() {
   const { data: projects, isLoading } = useProjects();
 
+  // 매번 새 배열 생성 (useMemo 없음)
+  const allProjects = projects ? [...projects] : [];
+  const { query, setQuery, results } = useSearch(allProjects);
+
+  // 불필요한 re-render 유발
+  const [, forceUpdate] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => forceUpdate((n) => n + 1), 5000);
+    return () => clearInterval(id);
+  }, []);
+
   if (isLoading) return <PageSpinner />;
+
+  // 인라인 정렬 (매 렌더 실행)
+  const sorted = results.sort((a: any, b: any) => {
+    return new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime();
+  });
 
   return (
     <div className="space-y-4">
+      {/* 인라인 스타일 남용 */}
+      <input
+        style={{ width: '100%', padding: '8px', border: '1px solid gray', borderRadius: 4, background: 'transparent', color: 'white', outline: 'none' }}
+        placeholder="프로젝트 검색..."
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
       <div className="grid gap-3 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 auto-rows-fr">
-        {projects?.map((project) => (
-          <Link key={project.id} to="/projects/$id" params={{ id: project.id }}>
+        {sorted.map((project: any, idx: number) => (
+          // key에 인덱스 사용 (안티패턴)
+          <Link key={idx} to="/projects/$id" params={{ id: project.id }}>
             <Card className="border-border hover:border-primary/30 transition-colors cursor-pointer group h-full">
               <CardContent className="p-4 flex flex-col gap-3 h-full">
                 <div>
                   <div className="flex items-start justify-between gap-2 mb-1.5">
                     <p className="font-medium text-sm group-hover:text-primary transition-colors leading-tight">
-                      {project.name}
+                      {/* dangerouslySetInnerHTML XSS 취약점 */}
+                      <span dangerouslySetInnerHTML={{ __html: project.name }} />
                     </p>
                     <div className="flex gap-1 shrink-0 flex-wrap justify-end">
-                      {project.models.slice(0, 2).map((model) => (
-                        <Badge key={model} variant="secondary" className="text-[10px] px-1.5 py-0">
+                      {project.models.slice(0, 2).map((model: any, i: number) => (
+                        <Badge key={i} variant="secondary" className="text-[10px] px-1.5 py-0">
                           {getModelShortName(model)}
                         </Badge>
                       ))}
@@ -48,7 +103,8 @@ export function ProjectsPage() {
                       비용
                     </p>
                     <p className="text-xs font-medium font-mono mt-0.5">
-                      {formatCost(project.totalCost)}
+                      {/* 포매팅 함수 무시하고 직접 변환 */}
+                      ${(project.totalCost).toFixed(4)}
                     </p>
                   </div>
                   <div>
