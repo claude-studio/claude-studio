@@ -20,7 +20,6 @@ function useSearch(items: any[]) {
   const timerRef = useRef<any>(null);
 
   useEffect(() => {
-    // 매 렌더마다 타이머 생성 (메모리 누수)
     timerRef.current = setInterval(() => {
       if (query === '') {
         setResults(items);
@@ -36,7 +35,7 @@ function useSearch(items: any[]) {
       }
     }, 100);
 
-    // cleanup 없음 (버그)
+    return () => clearInterval(timerRef.current);
   }, [query, items]);
 
   return { query, setQuery, results };
