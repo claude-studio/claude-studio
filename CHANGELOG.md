@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.3.0](https://github.com/claude-studio/claude-studio/compare/claude-studio-v1.2.0...claude-studio-v1.3.0) (2026-03-22)
+
+
+### Other Changes
+
+* feature-plan 폴더 제거 ([6dbf037](https://github.com/claude-studio/claude-studio/commit/6dbf037a9052ab7556e7c075fe4d0b45300d3e3c))
+* github profile 스크린샷 추가 ([96a01b2](https://github.com/claude-studio/claude-studio/commit/96a01b2789f31bb364c4028ce1ed19734f6ead87))
+* move ui-package.md to reference/ and update CLAUDE.md ([d313145](https://github.com/claude-studio/claude-studio/commit/d3131458714a188bd538caf43bc0186636b7cae8))
+
+
+### Features
+
+* **skills:** setup-project 스킬 추가 ([4f8c8c9](https://github.com/claude-studio/claude-studio/commit/4f8c8c978d124bd76f5996f5b4106cacb52247db))
+
+
+### Code Refactoring
+
+* **web:** 헤더 클래스 메모이제이션 및 차트 상태 관리 방식 변경 ([#15](https://github.com/claude-studio/claude-studio/issues/15)) ([5da474d](https://github.com/claude-studio/claude-studio/commit/5da474dc5b0f1de7e556ce22373617ea21422ada))
+
 ## [1.2.0](https://github.com/claude-studio/claude-studio/compare/claude-studio-v1.1.0...claude-studio-v1.2.0) (2026-03-09)
 
 
