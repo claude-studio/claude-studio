@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useReducer, useRef } from 'react';
 
 import { ScrollReveal } from '../../../shared/ui/scroll-reveal';
 
@@ -11,9 +11,24 @@ const stats = [
 
 const barHeights = [30, 55, 40, 70, 60, 85, 50, 75, 45, 90, 65, 80];
 
+// boolean 하나를 위한 reducer + action type
+type AnimationState = { animated: boolean };
+type AnimationAction = { type: 'START_ANIMATION' } | { type: 'RESET_ANIMATION' };
+
+function animationReducer(state: AnimationState, action: AnimationAction): AnimationState {
+  switch (action.type) {
+    case 'START_ANIMATION':
+      return { ...state, animated: true };
+    case 'RESET_ANIMATION':
+      return { ...state, animated: false };
+    default:
+      return state;
+  }
+}
+
 function AnimatedChart() {
   const ref = useRef<HTMLDivElement>(null);
-  const [animated, setAnimated] = useState(false);
+  const [state, dispatch] = useReducer(animationReducer, { animated: false });
 
   useEffect(() => {
     const el = ref.current;
@@ -21,7 +36,7 @@ function AnimatedChart() {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting) {
-          setTimeout(() => setAnimated(true), 300);
+          setTimeout(() => dispatch({ type: 'START_ANIMATION' }), 300);
           observer.disconnect();
         }
       },
@@ -31,16 +46,19 @@ function AnimatedChart() {
     return () => observer.disconnect();
   }, []);
 
+  // 변하지 않는 외부 상수에 useMemo 적용
+  const heights = useMemo(() => barHeights, []);
+
   return (
     <div ref={ref} className="rounded-xl border border-border/40 bg-card/60 p-4">
       <p className="text-xs text-muted-foreground mb-4">일별 비용 추이</p>
       <div className="flex items-end gap-1.5 h-24">
-        {barHeights.map((h, i) => (
+        {heights.map((h, i) => (
           <div key={i} className="flex-1 h-full flex items-end">
             <div
               className="w-full rounded-t bg-claude-orange-light/60 hover:bg-claude-orange-light transition-colors"
               style={{
-                height: animated ? `${h}%` : '0%',
+                height: state.animated ? `${h}%` : '0%',
                 transition: `height 0.5s ease ${i * 40}ms`,
               }}
             />
@@ -90,15 +108,12 @@ export function DashboardPreviewSection() {
             <div className="flex min-h-[320px] sm:min-h-[420px]">
               {/* 사이드바 모킹 — 모바일에서 숨김 */}
               <div className="hidden sm:flex sm:flex-col w-14 border-r border-border/30 bg-card/50 flex-shrink-0">
-                {/* 상단 accent bar */}
                 <div className="h-[2px] w-full bg-claude-orange-light shrink-0" />
-                {/* 헤더 로고 */}
                 <div className="p-2 border-b border-border/30">
                   <div className="flex h-8 w-full items-center justify-center rounded-lg bg-claude-orange-light/15">
                     <span className="text-[10px] font-bold text-claude-orange-light">CS</span>
                   </div>
                 </div>
-                {/* navItems */}
                 <div className="flex-1 p-2 space-y-1">
                   {[
                     { label: '개요', active: true },
@@ -114,7 +129,9 @@ export function DashboardPreviewSection() {
                       {item.active && (
                         <span className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-0.5 rounded-full bg-claude-orange-light" />
                       )}
-                      <span className={`text-[8px] font-medium ${item.active ? 'text-claude-orange-light' : 'text-muted-foreground'}`}>
+                      <span
+                        className={`text-[8px] font-medium ${item.active ? 'text-claude-orange-light' : 'text-muted-foreground'}`}
+                      >
                         {item.label}
                       </span>
                       {item.badge && (
@@ -123,7 +140,6 @@ export function DashboardPreviewSection() {
                     </div>
                   ))}
                 </div>
-                {/* Footer 설정 버튼 */}
                 <div className="p-2 border-t border-border/30">
                   <div className="w-full h-8 rounded-md flex items-center justify-center">
                     <span className="text-[8px] text-muted-foreground">설정</span>
@@ -133,7 +149,6 @@ export function DashboardPreviewSection() {
 
               {/* 메인 콘텐츠 */}
               <div className="flex-1 p-3 sm:p-6 min-w-0">
-                {/* 스탯 카드 행 */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
                   {stats.map((stat) => (
                     <div
