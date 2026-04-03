@@ -20,6 +20,7 @@
   "dependencies": {
     "@fontsource/geist-mono": "catalog:",
     "@fontsource/geist-sans": "catalog:",
+    "@repo/i18n": "workspace:*",
     "@repo/pixel-agents": "workspace:*",
     "@repo/shared": "workspace:*",
     "@repo/ui": "workspace:*",

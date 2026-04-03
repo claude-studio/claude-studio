@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@repo/i18n": "workspace:*",
     "@repo/shared": "workspace:*",
     "@tanstack/react-router": "catalog:",
     "@tanstack/react-query": "catalog:",
