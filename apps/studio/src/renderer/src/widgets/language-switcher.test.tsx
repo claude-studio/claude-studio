@@ -45,15 +45,23 @@ describe('LanguageSwitcher', () => {
     );
 
     const group = screen.getByRole('radiogroup', { name: /Language/i });
+    const user = userEvent.setup();
     const englishOption = screen.getByRole('radio', { name: /Current language: English/i });
     const koreanOption = screen.getByRole('radio', { name: /Switch to 한국어/i });
 
     expect(group.contains(englishOption)).toBe(true);
     expect(group.contains(koreanOption)).toBe(true);
-    expect(englishOption.getAttribute('aria-checked')).toBe('true');
-    expect(koreanOption.getAttribute('aria-checked')).toBe('false');
+    expect((englishOption as HTMLInputElement).checked).toBe(true);
+    expect((koreanOption as HTMLInputElement).checked).toBe(false);
 
     englishOption.focus();
     expect(document.activeElement).toBe(englishOption);
+
+    await user.click(koreanOption);
+
+    await waitFor(() => {
+      expect(persistLocale).toHaveBeenCalledWith('ko');
+      expect((koreanOption as HTMLInputElement).checked).toBe(true);
+    });
   });
 });

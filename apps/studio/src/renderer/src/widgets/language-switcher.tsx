@@ -45,38 +45,40 @@ export function LanguageSwitcher({ mode = 'compact' }: LanguageSwitcherProps) {
           const isCurrent = option.code === locale;
 
           return (
-            <button
+            <label
               key={option.code}
-              type="button"
-              role="radio"
-              aria-checked={isCurrent}
-              aria-current={isCurrent ? 'true' : undefined}
-              aria-disabled={isChanging ? 'true' : undefined}
-              lang={option.code}
-              onClick={() => {
-                if (isChanging || isCurrent) {
-                  return;
-                }
-
-                void setLocale(option.code);
-              }}
-              aria-label={
-                isCurrent
-                  ? tStudio('shell.currentLanguage', {
-                      language: languageLabels[option.code],
-                    })
-                  : tStudio('language.switchTo', {
-                      language: languageLabels[option.code],
-                    })
-              }
               className={cn(
-                'rounded-lg border px-4 py-3 text-left transition-colors',
+                'block rounded-lg border px-4 py-3 text-left transition-colors',
                 isCurrent
                   ? 'border-primary bg-primary/5'
                   : 'border-border hover:border-primary/40 hover:bg-muted/40',
                 isChanging && 'opacity-70',
               )}
             >
+              <input
+                type="radio"
+                name="studio-language"
+                lang={option.code}
+                checked={isCurrent}
+                disabled={isChanging}
+                onChange={() => {
+                  if (isCurrent) {
+                    return;
+                  }
+
+                  void setLocale(option.code);
+                }}
+                aria-label={
+                  isCurrent
+                    ? tStudio('shell.currentLanguage', {
+                        language: languageLabels[option.code],
+                      })
+                    : tStudio('language.switchTo', {
+                        language: languageLabels[option.code],
+                      })
+                }
+                className="sr-only"
+              />
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1">
                   <p className="text-sm font-semibold">{option.label}</p>
@@ -95,7 +97,7 @@ export function LanguageSwitcher({ mode = 'compact' }: LanguageSwitcherProps) {
                   {isCurrent ? tStudio('language.current') : option.code.toUpperCase()}
                 </span>
               </div>
-            </button>
+            </label>
           );
         })}
       </div>
