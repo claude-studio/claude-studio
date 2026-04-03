@@ -30,4 +30,28 @@ describe('createBrowserLocaleStorage', () => {
 
     expect(localeStorage.getSavedLocale()).toBeNull();
   });
+
+  it('fails closed when accessing localStorage itself throws', () => {
+    const originalDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      get() {
+        throw new Error('blocked');
+      },
+    });
+
+    try {
+      const localeStorage = createBrowserLocaleStorage();
+
+      expect(localeStorage.getSavedLocale()).toBeNull();
+      expect(() => localeStorage.setSavedLocale('ko')).not.toThrow();
+    } finally {
+      if (originalDescriptor) {
+        Object.defineProperty(globalThis, 'localStorage', originalDescriptor);
+      } else {
+        delete (globalThis as { localStorage?: Storage }).localStorage;
+      }
+    }
+  });
 });

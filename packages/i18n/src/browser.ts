@@ -4,7 +4,7 @@ export type LocaleStorage = Pick<Storage, 'getItem' | 'setItem'>;
 
 export type BrowserLocaleStorageOptions = {
   key?: string;
-  storage?: LocaleStorage;
+  storage?: LocaleStorage | null;
 };
 
 export type BrowserLocaleStorage = {
@@ -28,18 +28,30 @@ export function detectBrowserLocale(
 
 export function createBrowserLocaleStorage({
   key = WEB_LOCALE_STORAGE_KEY,
-  storage = globalThis.localStorage,
+  storage,
 }: BrowserLocaleStorageOptions = {}): BrowserLocaleStorage {
+  const getStorage = (): LocaleStorage | null => {
+    if (storage !== undefined) {
+      return storage;
+    }
+
+    try {
+      return globalThis.localStorage;
+    } catch {
+      return null;
+    }
+  };
+
   return {
     getSavedLocale() {
       try {
-        return resolveLocaleChange(storage?.getItem(key) ?? '');
+        return resolveLocaleChange(getStorage()?.getItem(key) ?? '');
       } catch {
         return null;
       }
     },
     setSavedLocale(locale) {
-      storage?.setItem(key, locale);
+      getStorage()?.setItem(key, locale);
     },
     storageKey: key,
   };
