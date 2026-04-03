@@ -1,4 +1,12 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import type { i18n } from 'i18next';
 import type { ReactNode } from 'react';
@@ -36,32 +44,74 @@ export function AppLocaleProvider({
   initialLocale,
   onLocaleChange,
 }: AppLocaleProviderProps) {
-  const [locale, setCurrentLocale] = useState<AppLocale>(initialLocale);
+  const [locale, setCurrentLocale] = useState<AppLocale>(() =>
+    getCurrentLocale(i18n, initialLocale),
+  );
   const [isChanging, setIsChanging] = useState(false);
+  const queuedChangesRef = useRef(Promise.resolve());
+  const pendingChangesRef = useRef(0);
+
+  useEffect(() => {
+    const syncLocale = (nextLanguage?: string) => {
+      setCurrentLocale(
+        resolveLocaleChange(nextLanguage ?? i18n.resolvedLanguage ?? i18n.language) ??
+          initialLocale,
+      );
+    };
+
+    syncLocale();
+    i18n.on('languageChanged', syncLocale);
+
+    return () => {
+      i18n.off('languageChanged', syncLocale);
+    };
+  }, [i18n, initialLocale]);
+
+  const setLocale = useCallback(
+    async (nextLocale: AppLocale) => {
+      const normalizedLocale = resolveLocaleChange(nextLocale);
+
+      if (normalizedLocale === null) {
+        return;
+      }
+
+      pendingChangesRef.current += 1;
+      setIsChanging(true);
+
+      const runChange = async () => {
+        const currentLocale = getCurrentLocale(i18n, initialLocale);
+
+        if (normalizedLocale === currentLocale) {
+          return;
+        }
+
+        await onLocaleChange?.(normalizedLocale);
+        await i18n.changeLanguage(normalizedLocale);
+      };
+
+      const result = queuedChangesRef.current.then(runChange);
+      queuedChangesRef.current = result.catch(() => {});
+
+      try {
+        await result;
+      } finally {
+        pendingChangesRef.current -= 1;
+
+        if (pendingChangesRef.current === 0) {
+          setIsChanging(false);
+        }
+      }
+    },
+    [i18n, initialLocale, onLocaleChange],
+  );
 
   const value = useMemo<AppLocaleContextValue>(
     () => ({
       isChanging,
       locale,
-      async setLocale(nextLocale) {
-        const normalizedLocale = resolveLocaleChange(nextLocale);
-
-        if (normalizedLocale === null || normalizedLocale === locale) {
-          return;
-        }
-
-        setIsChanging(true);
-
-        try {
-          await i18n.changeLanguage(normalizedLocale);
-          setCurrentLocale(normalizedLocale);
-          await onLocaleChange?.(normalizedLocale);
-        } finally {
-          setIsChanging(false);
-        }
-      },
+      setLocale,
     }),
-    [i18n, isChanging, locale, onLocaleChange],
+    [isChanging, locale, setLocale],
   );
 
   return (
@@ -79,4 +129,8 @@ export function useAppLocale(): AppLocaleContextValue {
   }
 
   return value;
+}
+
+function getCurrentLocale(i18n: i18n, fallbackLocale: AppLocale): AppLocale {
+  return resolveLocaleChange(i18n.resolvedLanguage ?? i18n.language) ?? fallbackLocale;
 }

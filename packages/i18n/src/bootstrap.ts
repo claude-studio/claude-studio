@@ -17,11 +17,23 @@ export async function bootstrapI18n({
   detectLocale,
   getSavedLocale,
 }: LocaleBootstrapInput = {}): Promise<LocaleBootstrapResult> {
-  const savedLocale = getSavedLocale ? await getSavedLocale() : null;
+  const savedLocale = await readSavedLocale(getSavedLocale);
   const { locale } = resolveLocaleBootstrap(savedLocale, detectLocale);
 
   return {
     i18n: await initI18n(locale),
     initialLocale: locale,
   };
+}
+
+async function readSavedLocale(getSavedLocale?: LocaleReader): Promise<string | null> {
+  if (!getSavedLocale) {
+    return null;
+  }
+
+  try {
+    return await getSavedLocale();
+  } catch {
+    return null;
+  }
 }

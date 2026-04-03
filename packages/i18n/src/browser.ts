@@ -32,7 +32,11 @@ export function createBrowserLocaleStorage({
 }: BrowserLocaleStorageOptions = {}): BrowserLocaleStorage {
   return {
     getSavedLocale() {
-      return resolveLocaleChange(storage?.getItem(key) ?? '');
+      try {
+        return resolveLocaleChange(storage?.getItem(key) ?? '');
+      } catch {
+        return null;
+      }
     },
     setSavedLocale(locale) {
       storage?.setItem(key, locale);
