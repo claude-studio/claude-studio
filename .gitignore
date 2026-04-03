@@ -9,3 +9,5 @@ release/
 coverage/
 .playwright-mcp/
 .vercel
+!docs/
+!docs/**
