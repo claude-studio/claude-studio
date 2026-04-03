@@ -1,7 +1,7 @@
 const settings = {
   locale: 'Locale',
   english: 'English',
-  korean: 'Korean',
+  korean: '한국어',
   appearance: 'Appearance',
   notifications: 'Notifications',
   system: 'System',

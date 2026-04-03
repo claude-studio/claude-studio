@@ -2,23 +2,25 @@ import { Particles, SidebarProvider, SidebarTrigger, useTheme } from '@repo/ui';
 import { createRootRoute, Outlet, useRouter, useRouterState } from '@tanstack/react-router';
 
 import { ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import { AppSidebar } from '../widgets/app-sidebar';
-
-const PAGE_TITLES: Record<string, string> = {
-  '/': '개요',
-  '/projects': '프로젝트',
-  '/costs': '비용',
-  '/skills': '스킬',
-  '/data': '설정',
-  '/live': '라이브',
-};
+import { LanguageSwitcher } from '../widgets/language-switcher';
 
 function TopBar() {
   const routerState = useRouterState();
+  const { t } = useTranslation('navigation');
   const path = routerState.location.pathname;
+  const pageTitles: Record<string, string> = {
+    '/': t('overview'),
+    '/projects': t('projects'),
+    '/costs': t('costs'),
+    '/skills': t('skills'),
+    '/data': t('settings'),
+    '/live': t('live'),
+  };
   const title =
-    Object.entries(PAGE_TITLES).find(([key]) =>
+    Object.entries(pageTitles).find(([key]) =>
       key === '/' ? path === '/' : path.startsWith(key),
     )?.[1] ?? '';
 
@@ -27,12 +29,16 @@ function TopBar() {
       <SidebarTrigger className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
       <div className="h-3.5 w-px bg-border" />
       <span className="text-sm font-medium tracking-tight">{title}</span>
+      <div className="ml-auto">
+        <LanguageSwitcher />
+      </div>
     </div>
   );
 }
 
 function ErrorComponent({ error }: { error: Error }) {
   const router = useRouter();
+  const { t } = useTranslation('studio');
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -45,7 +51,7 @@ function ErrorComponent({ error }: { error: Error }) {
               className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors w-fit"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              뒤로가기
+              {t('shell.back')}
             </button>
             <div className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
               {error.message}
