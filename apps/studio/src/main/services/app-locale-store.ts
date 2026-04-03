@@ -1,8 +1,8 @@
+import { type AppLocale, normalizeLocale } from '@repo/i18n';
+
+import { app } from 'electron';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-
-import { normalizeLocale, type AppLocale } from '@repo/i18n';
-import { app } from 'electron';
 
 const APP_LOCALE_FILE = path.join('settings', 'app-locale.json');
 

@@ -1,7 +1,7 @@
 import i18next, { type i18n } from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-import { DEFAULT_LOCALE, NAMESPACES, SUPPORTED_LOCALES, type AppLocale } from './config';
+import { type AppLocale, DEFAULT_LOCALE, NAMESPACES, SUPPORTED_LOCALES } from './config';
 import { resources } from './resources';
 
 export async function initI18n(locale: AppLocale = DEFAULT_LOCALE): Promise<i18n> {

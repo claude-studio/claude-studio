@@ -1,4 +1,4 @@
-import { normalizeLocale, type AppLocale } from '@repo/i18n';
+import { normalizeLocale } from '@repo/i18n';
 import { getClaudeSettings, getSkills } from '@repo/shared';
 
 import { ipcMain } from 'electron';

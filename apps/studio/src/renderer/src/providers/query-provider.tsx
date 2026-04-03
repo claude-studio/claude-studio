@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { type AppLocale, AppLocaleProvider, type I18nProviderProps } from '@repo/i18n';
 import { DataProviderWrapper, ThemeProvider } from '@repo/ui';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 
@@ -64,15 +65,27 @@ function DataChangedListener() {
   return null;
 }
 
-export function Providers({ children }: { children: React.ReactNode }) {
+type ProvidersProps = {
+  children: React.ReactNode;
+  i18n: I18nProviderProps['i18n'];
+  initialLocale: AppLocale;
+};
+
+export function Providers({ children, i18n, initialLocale }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
-      <DataProviderWrapper provider={electronProvider}>
-        <ThemeProvider>
-          <DataChangedListener />
-          {children}
-        </ThemeProvider>
-      </DataProviderWrapper>
+      <AppLocaleProvider
+        i18n={i18n}
+        initialLocale={initialLocale}
+        onLocaleChange={(locale) => window.electronAPI.setAppLocale(locale)}
+      >
+        <DataProviderWrapper provider={electronProvider}>
+          <ThemeProvider>
+            <DataChangedListener />
+            {children}
+          </ThemeProvider>
+        </DataProviderWrapper>
+      </AppLocaleProvider>
     </QueryClientProvider>
   );
 }
