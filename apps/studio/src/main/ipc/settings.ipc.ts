@@ -1,4 +1,4 @@
-import type { AppLocale } from '@repo/i18n';
+import { normalizeLocale, type AppLocale } from '@repo/i18n';
 import { getClaudeSettings, getSkills } from '@repo/shared';
 
 import { ipcMain } from 'electron';
@@ -18,7 +18,13 @@ export function registerSettingsHandlers(): void {
   ipcMain.handle(IpcChannel.GetAppLocale, async () => {
     return appLocaleStore.getAppLocale();
   });
-  ipcMain.handle(IpcChannel.SetAppLocale, async (_event, locale: AppLocale) => {
-    await appLocaleStore.setAppLocale(locale);
+  ipcMain.handle(IpcChannel.SetAppLocale, async (_event, locale: unknown) => {
+    const normalizedLocale = typeof locale === 'string' ? normalizeLocale(locale) : null;
+
+    if (normalizedLocale === null) {
+      return;
+    }
+
+    await appLocaleStore.setAppLocale(normalizedLocale);
   });
 }

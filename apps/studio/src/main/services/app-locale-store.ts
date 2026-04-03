@@ -33,8 +33,14 @@ export function createAppLocaleStore({ rootDir }: AppLocaleStoreOptions): AppLoc
       }
     },
     async setAppLocale(locale) {
+      const normalizedLocale = normalizeLocale(locale);
+
+      if (normalizedLocale === null) {
+        return;
+      }
+
       await mkdir(path.dirname(filePath), { recursive: true });
-      await writeFile(filePath, `${JSON.stringify({ locale }, null, 2)}\n`, 'utf-8');
+      await writeFile(filePath, `${JSON.stringify({ locale: normalizedLocale }, null, 2)}\n`, 'utf-8');
     },
   };
 }
