@@ -1,37 +1,38 @@
+import { useTranslation } from '@repo/i18n';
+
 import { Heart, RefreshCw, Shield } from 'lucide-react';
 
 import { ScrollReveal } from '../../../shared/ui/scroll-reveal';
 
-const highlights = [
-  {
-    icon: Shield,
-    title: '로컬 데이터',
-    description:
-      '서버 불필요. ~/.claude/ 디렉토리에서 직접 데이터를 읽어 분석합니다. 데이터는 당신의 컴퓨터에만 존재합니다.',
-  },
-  {
-    icon: RefreshCw,
-    title: '실시간 갱신',
-    description:
-      '파일 워처가 세션 변경을 감지해 즉시 반영합니다. 코딩하는 동안 비용이 실시간으로 업데이트됩니다.',
-  },
-  {
-    icon: Heart,
-    title: '완전 무료',
-    description: '100% 오픈소스, 로컬에서 실행. 구독료도, 계정 등록도 필요 없습니다.',
-  },
-];
-
 export function HighlightsSection() {
+  const { t } = useTranslation('web');
+  const highlights = [
+    {
+      icon: Shield,
+      title: t('highlights.items.localData.title'),
+      description: t('highlights.items.localData.description'),
+    },
+    {
+      icon: RefreshCw,
+      title: t('highlights.items.realtime.title'),
+      description: t('highlights.items.realtime.description'),
+    },
+    {
+      icon: Heart,
+      title: t('highlights.items.free.title'),
+      description: t('highlights.items.free.description'),
+    },
+  ] as const;
+
   return (
     <section className="py-24 px-6">
       <div className="mx-auto max-w-5xl">
         <ScrollReveal className="text-center mb-16">
           <p className="text-claude-orange-light text-sm font-medium uppercase tracking-wider mb-3">
-            차별점
+            {t('highlights.eyebrow')}
           </p>
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            왜 Claude Studio인가
+            {t('highlights.title')}
           </h2>
         </ScrollReveal>
 
@@ -44,7 +45,9 @@ export function HighlightsSection() {
                   <Icon className="w-6 h-6 text-claude-orange-light" />
                 </div>
                 <h3 className="text-lg font-semibold text-foreground mb-3">{item.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed break-keep">{item.description}</p>
+                <p className="text-muted-foreground text-sm leading-relaxed break-keep">
+                  {item.description}
+                </p>
               </ScrollReveal>
             );
           })}

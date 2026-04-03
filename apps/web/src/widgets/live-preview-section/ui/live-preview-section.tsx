@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { useTranslation } from '@repo/i18n';
+
 import { ScrollReveal } from '../../../shared/ui/scroll-reveal';
 
 const FRAME_W = 16;
@@ -423,6 +425,7 @@ function drawToolBubble(
 }
 
 export function LivePreviewSection() {
+  const { t } = useTranslation('web');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sheetsRef = useRef<HTMLImageElement[]>([]);
   const frameTimerRef = useRef(0);
@@ -566,17 +569,16 @@ export function LivePreviewSection() {
       <div className="mx-auto max-w-6xl">
         <ScrollReveal className="text-center mb-16">
           <p className="text-claude-orange-light text-sm font-medium uppercase tracking-wider mb-3">
-            라이브 Beta
+            {t('livePreview.eyebrow')}
           </p>
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Claude가 일하는 모습을 실시간으로
+            {t('livePreview.title')}
           </h2>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto break-keep">
-            JSONL 파일 변경을 감지해 에이전트 상태를 즉시 반영합니다. 도구 실행, 작업 완료, 세션
-            종료까지 픽셀 캐릭터로 표현됩니다.
+            {t('livePreview.description')}
           </p>
           <p className="mt-4 text-xs text-muted-foreground/60">
-            작업 중 ·{' '}
+            {t('livePreview.builtWith')}{' '}
             <a
               href="https://github.com/pablodelucca/pixel-agents"
               target="_blank"
@@ -595,11 +597,15 @@ export function LivePreviewSection() {
                 <span className="w-3 h-3 rounded-full bg-red-500/60" />
                 <span className="w-3 h-3 rounded-full bg-yellow-500/60" />
                 <span className="w-3 h-3 rounded-full bg-green-500/60" />
-                <span className="ml-3 text-xs text-muted-foreground">Claude Studio — 라이브</span>
+                <span className="ml-3 text-xs text-muted-foreground">
+                  {t('livePreview.windowTitle')}
+                </span>
               </div>
               <div className="flex items-center gap-1.5 text-xs text-emerald-400">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                {agents.filter((a) => a.state === 'working').length}명 작업 중
+                {t('livePreview.workingCount', {
+                  count: agents.filter((a) => a.state === 'working').length,
+                })}
               </div>
             </div>
 
@@ -630,7 +636,7 @@ export function LivePreviewSection() {
                   {agent.tool ? (
                     <span className="text-cyan-400 font-mono">{agent.tool}</span>
                   ) : (
-                    <span className="text-gray-500">대기 중</span>
+                    <span className="text-gray-500">{t('livePreview.idle')}</span>
                   )}
                 </div>
               ))}
@@ -640,9 +646,18 @@ export function LivePreviewSection() {
 
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
-            { label: '파일 변경 감지', desc: 'fs.watch로 JSONL 변경을 즉시 감지' },
-            { label: '멀티 에이전트', desc: '여러 세션이 동시에 오피스에서 활동' },
-            { label: '서브에이전트', desc: 'Task 도구 서브에이전트도 별도 캐릭터로' },
+            {
+              label: t('livePreview.cards.fileChanges.label'),
+              desc: t('livePreview.cards.fileChanges.description'),
+            },
+            {
+              label: t('livePreview.cards.multiAgent.label'),
+              desc: t('livePreview.cards.multiAgent.description'),
+            },
+            {
+              label: t('livePreview.cards.subagents.label'),
+              desc: t('livePreview.cards.subagents.description'),
+            },
           ].map((item, i) => (
             <ScrollReveal key={item.label} delay={i * 80}>
               <div className="rounded-xl border border-border/40 bg-card/30 px-4 py-3">

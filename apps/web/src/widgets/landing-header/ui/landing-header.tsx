@@ -1,10 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
+import { type AppLocale, SUPPORTED_LOCALES, useAppLocale, useTranslation } from '@repo/i18n';
 import { cn } from '@repo/ui';
 
 import { Github, Zap } from 'lucide-react';
 
 export function LandingHeader() {
+  const { isChanging, locale, setLocale } = useAppLocale();
+  const { t: tSettings } = useTranslation('settings');
+  const { t } = useTranslation('web');
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -21,7 +25,6 @@ export function LandingHeader() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // 단순 문자열 조합에 useMemo 적용
   const headerClassName = useMemo(
     () =>
       cn(
@@ -31,40 +34,69 @@ export function LandingHeader() {
     [scrolled],
   );
 
-  // 정적 문자열에 useMemo 적용
   const logoText = useMemo(() => 'Claude Studio', []);
-
-  // 정적 스타일 객체에 useMemo 적용
-  const logoIconStyle = useMemo(
-    () => ({
-      className: 'w-8 h-8 rounded-lg bg-claude-orange-light/20 flex items-center justify-center',
-    }),
-    [],
-  );
-
-  // href가 바뀌지 않는 링크 핸들러에 useCallback 적용
-  const handleGithubClick = useCallback(() => {
-    window.open('https://github.com/claude-studio/claude-studio', '_blank');
-  }, []);
+  const languageLabels: Record<AppLocale, string> = {
+    en: tSettings('english'),
+    ko: tSettings('korean'),
+  };
 
   return (
     <header className={headerClassName}>
       <div className="mx-auto max-w-7xl px-6 h-16 flex items-center justify-between">
-        {/* 로고 */}
         <div className="flex items-center gap-2">
-          <div className={logoIconStyle.className}>
+          <div className="w-8 h-8 rounded-lg bg-claude-orange-light/20 flex items-center justify-center">
             <Zap className="w-4 h-4 text-claude-orange-light" />
           </div>
           <span className="font-semibold text-foreground text-lg">{logoText}</span>
         </div>
 
-        {/* GitHub 링크 */}
-        <button
-          onClick={handleGithubClick}
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <Github className="w-5 h-5" />
-        </button>
+        <div className="flex items-center gap-2">
+          <div
+            role="group"
+            aria-label={t('header.languageLabel')}
+            className="inline-flex items-center rounded-full border border-border/60 bg-background/80 p-1 backdrop-blur"
+          >
+            {SUPPORTED_LOCALES.map((code) => {
+              const isActive = code === locale;
+
+              return (
+                <button
+                  key={code}
+                  type="button"
+                  lang={code}
+                  aria-pressed={isActive}
+                  disabled={isChanging}
+                  onClick={() => {
+                    if (isActive) {
+                      return;
+                    }
+
+                    void setLocale(code);
+                  }}
+                  className={cn(
+                    'rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
+                    isActive
+                      ? 'bg-claude-orange-light text-white'
+                      : 'text-muted-foreground hover:text-foreground',
+                    isChanging && 'opacity-70',
+                  )}
+                >
+                  {languageLabels[code]}
+                </button>
+              );
+            })}
+          </div>
+
+          <a
+            href="https://github.com/claude-studio/claude-studio"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={t('header.githubLabel')}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Github className="w-5 h-5" />
+          </a>
+        </div>
       </div>
     </header>
   );

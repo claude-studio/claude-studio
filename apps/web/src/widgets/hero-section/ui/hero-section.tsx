@@ -1,3 +1,4 @@
+import { useTranslation } from '@repo/i18n';
 import { Button } from '@repo/ui';
 
 import { Github } from 'lucide-react';
@@ -7,6 +8,8 @@ function fadeUp(delay: string): React.CSSProperties {
 }
 
 export function HeroSection() {
+  const { t } = useTranslation('web');
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* 배경 radial gradient */}
@@ -28,34 +31,29 @@ export function HeroSection() {
       />
 
       <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-        {/* 배지 */}
         <div
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-border/60 bg-card/50 text-muted-foreground text-sm mb-8"
           style={fadeUp('0ms')}
         >
           <span className="w-1.5 h-1.5 rounded-full bg-claude-orange-light animate-pulse" />
-          로컬 데이터 기반 · 무료 오픈소스
+          {t('hero.badge')}
         </div>
 
-        {/* 헤드라인 */}
         <h1
           className="text-3xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6 break-keep"
           style={fadeUp('0.1s')}
         >
-          Claude Code 사용량을, <span className="text-claude-orange-light">한눈에</span>
+          {t('hero.titlePrefix')}{' '}
+          <span className="text-claude-orange-light">{t('hero.titleHighlight')}</span>
         </h1>
 
-        {/* 서브라인 */}
         <p
           className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed"
           style={fadeUp('0.2s')}
         >
-          비용, 토큰, 프로젝트 — 로컬 데이터를 분석하고, 지금 이 순간 Claude Code가 무엇을 하는지{' '}
-          <span className="text-claude-orange-light font-medium">픽셀 오피스</span>로 실시간
-          확인하세요
+          {t('hero.description')}
         </p>
 
-        {/* CTA 버튼 */}
         <div className="flex items-center justify-center" style={fadeUp('0.3s')}>
           <a
             href="https://github.com/claude-studio/claude-studio"
@@ -67,13 +65,12 @@ export function HeroSection() {
               className="bg-claude-orange-light hover:bg-claude-orange text-white border-0 gap-2 px-8 shadow-lg shadow-claude-orange-light/20 hover:shadow-claude-orange-light/30 transition-all"
             >
               <Github className="w-4 h-4" />
-              GitHub에서 시작하기
+              {t('hero.cta')}
             </Button>
           </a>
         </div>
       </div>
 
-      {/* 하단 fade */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
     </section>
   );

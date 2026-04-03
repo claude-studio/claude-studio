@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { bootstrapI18n, createBrowserLocaleStorage, detectBrowserLocale } from '@repo/i18n';
+import { bootstrapI18n, createBrowserLocaleStorage } from '@repo/i18n';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 
 import ReactDOM from 'react-dom/client';
@@ -28,7 +28,6 @@ const root = document.getElementById('root')!;
 
 async function main() {
   const { i18n, initialLocale } = await bootstrapI18n({
-    detectLocale: detectBrowserLocale(),
     getSavedLocale: () => localeStorage.getSavedLocale(),
   });
 

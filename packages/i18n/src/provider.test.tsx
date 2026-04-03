@@ -40,6 +40,7 @@ describe('AppLocaleProvider', () => {
     );
 
     expect(latest.locale).toBe('en');
+    expect(document.documentElement.lang).toBe('en');
 
     await act(async () => {
       await i18n.changeLanguage('ko');
@@ -48,6 +49,7 @@ describe('AppLocaleProvider', () => {
     await waitFor(() => {
       expect(screen.getByTestId('locale').textContent).toBe('ko');
       expect(latest.locale).toBe('ko');
+      expect(document.documentElement.lang).toBe('ko');
     });
   });
 

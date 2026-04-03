@@ -17,6 +17,7 @@
     "@tanstack/react-query": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "react-i18next": "catalog:",
     "@fontsource/geist-sans": "catalog:",
     "@fontsource/geist-mono": "catalog:",
     "lucide-react": "catalog:",

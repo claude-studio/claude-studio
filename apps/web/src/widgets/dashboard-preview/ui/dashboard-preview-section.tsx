@@ -1,17 +1,11 @@
-import { useEffect, useMemo, useReducer, useRef } from 'react';
+import { useEffect, useReducer, useRef } from 'react';
+
+import { useTranslation } from '@repo/i18n';
 
 import { ScrollReveal } from '../../../shared/ui/scroll-reveal';
 
-const stats = [
-  { label: '이번 달 비용', value: '$12.48', sub: '₩16,420', color: 'text-claude-orange-light' },
-  { label: '총 토큰', value: '2.4M', sub: '입력 + 출력', color: 'text-foreground' },
-  { label: '세션 수', value: '347', sub: '이번 달', color: 'text-foreground' },
-  { label: '활성 프로젝트', value: '12', sub: '진행 중', color: 'text-foreground' },
-];
-
 const barHeights = [30, 55, 40, 70, 60, 85, 50, 75, 45, 90, 65, 80];
 
-// boolean 하나를 위한 reducer + action type
 type AnimationState = { animated: boolean };
 type AnimationAction = { type: 'START_ANIMATION' } | { type: 'RESET_ANIMATION' };
 
@@ -27,6 +21,7 @@ function animationReducer(state: AnimationState, action: AnimationAction): Anima
 }
 
 function AnimatedChart() {
+  const { t } = useTranslation('web');
   const ref = useRef<HTMLDivElement>(null);
   const [state, dispatch] = useReducer(animationReducer, { animated: false });
 
@@ -46,29 +41,34 @@ function AnimatedChart() {
     return () => observer.disconnect();
   }, []);
 
-  // 변하지 않는 외부 상수에 useMemo 적용
-  const heights = useMemo(() => barHeights, []);
+  const ticks = [
+    t('dashboardPreview.ticks.day1'),
+    t('dashboardPreview.ticks.day7'),
+    t('dashboardPreview.ticks.day14'),
+    t('dashboardPreview.ticks.day21'),
+    t('dashboardPreview.ticks.today'),
+  ];
 
   return (
     <div ref={ref} className="rounded-xl border border-border/40 bg-card/60 p-4">
-      <p className="text-xs text-muted-foreground mb-4">일별 비용 추이</p>
+      <p className="text-xs text-muted-foreground mb-4">{t('dashboardPreview.chartLabel')}</p>
       <div className="flex items-end gap-1.5 h-24">
-        {heights.map((h, i) => (
-          <div key={i} className="flex-1 h-full flex items-end">
+        {barHeights.map((height, index) => (
+          <div key={index} className="flex-1 h-full flex items-end">
             <div
               className="w-full rounded-t bg-claude-orange-light/60 hover:bg-claude-orange-light transition-colors"
               style={{
-                height: state.animated ? `${h}%` : '0%',
-                transition: `height 0.5s ease ${i * 40}ms`,
+                height: state.animated ? `${height}%` : '0%',
+                transition: `height 0.5s ease ${index * 40}ms`,
               }}
             />
           </div>
         ))}
       </div>
       <div className="flex justify-between mt-2">
-        {['1일', '7일', '14일', '21일', '오늘'].map((d) => (
-          <span key={d} className="text-[10px] text-muted-foreground">
-            {d}
+        {ticks.map((tick) => (
+          <span key={tick} className="text-[10px] text-muted-foreground">
+            {tick}
           </span>
         ))}
       </div>
@@ -77,18 +77,53 @@ function AnimatedChart() {
 }
 
 export function DashboardPreviewSection() {
+  const { t } = useTranslation('web');
+  const stats = [
+    {
+      label: t('dashboardPreview.stats.monthlyCost.label'),
+      value: '$12.48',
+      sub: t('dashboardPreview.stats.monthlyCost.sub'),
+      color: 'text-claude-orange-light',
+    },
+    {
+      label: t('dashboardPreview.stats.totalTokens.label'),
+      value: '2.4M',
+      sub: t('dashboardPreview.stats.totalTokens.sub'),
+      color: 'text-foreground',
+    },
+    {
+      label: t('dashboardPreview.stats.sessionCount.label'),
+      value: '347',
+      sub: t('dashboardPreview.stats.sessionCount.sub'),
+      color: 'text-foreground',
+    },
+    {
+      label: t('dashboardPreview.stats.activeProjects.label'),
+      value: '12',
+      sub: t('dashboardPreview.stats.activeProjects.sub'),
+      color: 'text-foreground',
+    },
+  ] as const;
+  const sidebarItems = [
+    { label: t('dashboardPreview.sidebar.overview'), active: true, badge: false },
+    { label: t('dashboardPreview.sidebar.projects'), active: false, badge: false },
+    { label: t('dashboardPreview.sidebar.live'), active: false, badge: true },
+    { label: t('dashboardPreview.sidebar.costs'), active: false, badge: false },
+    { label: t('dashboardPreview.sidebar.skills'), active: false, badge: false },
+  ] as const;
+
   return (
     <section className="py-24 px-6 bg-card/30">
       <div className="mx-auto max-w-6xl">
         <ScrollReveal className="text-center mb-16">
           <p className="text-claude-orange-light text-sm font-medium uppercase tracking-wider mb-3">
-            미리보기
+            {t('dashboardPreview.eyebrow')}
           </p>
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            대시보드 한눈에 보기
+            {t('dashboardPreview.title')}
           </h2>
           <p className="text-muted-foreground text-lg break-keep">
-            설치 후 바로 사용할 수 있는 직관적인 인터페이스
+            {t('dashboardPreview.description')}
           </p>
         </ScrollReveal>
 
@@ -97,16 +132,16 @@ export function DashboardPreviewSection() {
             className="relative rounded-2xl border border-border/50 bg-card overflow-hidden shadow-2xl shadow-black/40"
             style={{ perspective: '1000px', transform: 'rotateX(4deg)' }}
           >
-            {/* 상단 바 */}
             <div className="flex items-center gap-2 px-5 py-3 border-b border-border/50 bg-card/80">
               <span className="w-3 h-3 rounded-full bg-red-500/60" />
               <span className="w-3 h-3 rounded-full bg-yellow-500/60" />
               <span className="w-3 h-3 rounded-full bg-green-500/60" />
-              <span className="ml-4 text-xs text-muted-foreground">Claude Studio — 대시보드</span>
+              <span className="ml-4 text-xs text-muted-foreground">
+                {t('dashboardPreview.windowTitle')}
+              </span>
             </div>
 
             <div className="flex min-h-[320px] sm:min-h-[420px]">
-              {/* 사이드바 모킹 — 모바일에서 숨김 */}
               <div className="hidden sm:flex sm:flex-col w-14 border-r border-border/30 bg-card/50 flex-shrink-0">
                 <div className="h-[2px] w-full bg-claude-orange-light shrink-0" />
                 <div className="p-2 border-b border-border/30">
@@ -115,13 +150,7 @@ export function DashboardPreviewSection() {
                   </div>
                 </div>
                 <div className="flex-1 p-2 space-y-1">
-                  {[
-                    { label: '개요', active: true },
-                    { label: '프로젝트', active: false },
-                    { label: '라이브', badge: true },
-                    { label: '비용', active: false },
-                    { label: '스킬', active: false },
-                  ].map((item) => (
+                  {sidebarItems.map((item) => (
                     <div
                       key={item.label}
                       className={`relative w-full h-8 rounded-md flex items-center justify-center ${item.active ? 'bg-claude-orange-light/15' : 'hover:bg-muted/40'}`}
@@ -142,12 +171,13 @@ export function DashboardPreviewSection() {
                 </div>
                 <div className="p-2 border-t border-border/30">
                   <div className="w-full h-8 rounded-md flex items-center justify-center">
-                    <span className="text-[8px] text-muted-foreground">설정</span>
+                    <span className="text-[8px] text-muted-foreground">
+                      {t('dashboardPreview.sidebar.settings')}
+                    </span>
                   </div>
                 </div>
               </div>
 
-              {/* 메인 콘텐츠 */}
               <div className="flex-1 p-3 sm:p-6 min-w-0">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
                   {stats.map((stat) => (
@@ -172,7 +202,6 @@ export function DashboardPreviewSection() {
               </div>
             </div>
 
-            {/* 하단 페이드 */}
             <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-card/80 to-transparent pointer-events-none" />
           </div>
         </ScrollReveal>

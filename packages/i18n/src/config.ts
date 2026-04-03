@@ -5,7 +5,14 @@ export type AppLocale = (typeof SUPPORTED_LOCALES)[number];
 export const DEFAULT_LOCALE: AppLocale = 'en';
 export const WEB_LOCALE_STORAGE_KEY = 'claude-studio.locale';
 
-export const NAMESPACES = ['analytics', 'common', 'navigation', 'settings', 'studio'] as const;
+export const NAMESPACES = [
+  'analytics',
+  'common',
+  'navigation',
+  'settings',
+  'studio',
+  'web',
+] as const;
 
 export type AppNamespace = (typeof NAMESPACES)[number];
 

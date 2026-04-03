@@ -24,6 +24,11 @@ export function I18nProvider({ children, i18n }: I18nProviderProps) {
 }
 
 type LocalePersistenceHandler = (locale: AppLocale) => void | Promise<void>;
+type LocaleDocument = {
+  documentElement?: {
+    lang: string;
+  };
+};
 
 type AppLocaleContextValue = {
   isChanging: boolean;
@@ -66,6 +71,20 @@ export function AppLocaleProvider({
       i18n.off('languageChanged', syncLocale);
     };
   }, [i18n, initialLocale]);
+
+  useEffect(() => {
+    const documentRef = (
+      globalThis as typeof globalThis & {
+        document?: LocaleDocument;
+      }
+    ).document;
+
+    if (!documentRef?.documentElement) {
+      return;
+    }
+
+    documentRef.documentElement.lang = locale;
+  }, [locale]);
 
   const setLocale = useCallback(
     async (nextLocale: AppLocale) => {
