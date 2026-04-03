@@ -1,3 +1,4 @@
+import { useAppLocale, useTranslation } from '@repo/i18n';
 import type { ConversationStats } from '@repo/shared';
 import { formatDuration, formatTokens } from '@repo/shared';
 
@@ -6,42 +7,74 @@ interface ConversationStatsCardProps {
 }
 
 export function ConversationStatsCard({ data }: ConversationStatsCardProps) {
+  const { locale } = useAppLocale();
+  const { t } = useTranslation('analytics');
   const total = data.shortSessions + data.mediumSessions + data.longSessions;
 
   const bars = [
-    { label: '짧음 (<10분)', value: data.shortSessions, color: 'var(--chart-3)' },
-    { label: '보통 (10분~1시간)', value: data.mediumSessions, color: 'var(--chart-2)' },
-    { label: '긴 세션 (>1시간)', value: data.longSessions, color: 'var(--chart-1)' },
+    {
+      label: t('conversation.labels.shortSessions'),
+      value: data.shortSessions,
+      color: 'var(--chart-3)',
+    },
+    {
+      label: t('conversation.labels.mediumSessions'),
+      value: data.mediumSessions,
+      color: 'var(--chart-2)',
+    },
+    {
+      label: t('conversation.labels.longSessions'),
+      value: data.longSessions,
+      color: 'var(--chart-1)',
+    },
   ];
 
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div className="rounded-lg border border-border/50 p-3">
-          <p className="text-xs text-muted-foreground">평균 세션 길이</p>
-          <p className="text-lg font-semibold font-mono mt-1">{formatDuration(data.avgSessionDurationMs)}</p>
-        </div>
-        <div className="rounded-lg border border-border/50 p-3">
-          <p className="text-xs text-muted-foreground">세션당 평균 메시지</p>
-          <p className="text-lg font-semibold font-mono mt-1">{Math.round(data.avgMessagesPerSession)}개</p>
-        </div>
-        <div className="rounded-lg border border-border/50 p-3">
-          <p className="text-xs text-muted-foreground">입력 토큰/메시지</p>
+          <p className="text-xs text-muted-foreground">
+            {t('conversation.labels.averageSessionLength')}
+          </p>
           <p className="text-lg font-semibold font-mono mt-1">
-            {formatTokens(Math.round(data.avgInputTokensPerMessage))}
+            {formatDuration(data.avgSessionDurationMs, { locale })}
           </p>
         </div>
         <div className="rounded-lg border border-border/50 p-3">
-          <p className="text-xs text-muted-foreground">출력 토큰/메시지</p>
+          <p className="text-xs text-muted-foreground">
+            {t('conversation.labels.averageMessagesPerSession')}
+          </p>
           <p className="text-lg font-semibold font-mono mt-1">
-            {formatTokens(Math.round(data.avgOutputTokensPerMessage))}
+            {t('conversation.units.messagesCount', {
+              count: Math.round(data.avgMessagesPerSession).toLocaleString(
+                locale === 'ko' ? 'ko-KR' : 'en-US',
+              ),
+            })}
+          </p>
+        </div>
+        <div className="rounded-lg border border-border/50 p-3">
+          <p className="text-xs text-muted-foreground">
+            {t('conversation.labels.inputTokensPerMessage')}
+          </p>
+          <p className="text-lg font-semibold font-mono mt-1">
+            {formatTokens(Math.round(data.avgInputTokensPerMessage), { locale })}
+          </p>
+        </div>
+        <div className="rounded-lg border border-border/50 p-3">
+          <p className="text-xs text-muted-foreground">
+            {t('conversation.labels.outputTokensPerMessage')}
+          </p>
+          <p className="text-lg font-semibold font-mono mt-1">
+            {formatTokens(Math.round(data.avgOutputTokensPerMessage), { locale })}
           </p>
         </div>
       </div>
 
       {/* 세션 길이 분포 */}
       <div className="space-y-2">
-        <p className="text-xs text-muted-foreground">세션 길이 분포</p>
+        <p className="text-xs text-muted-foreground">
+          {t('conversation.labels.sessionLengthDistribution')}
+        </p>
         <div className="grid grid-cols-1 gap-2 lg:grid-cols-3">
           {bars.map((bar) => (
             <div key={bar.label} className="flex items-center gap-2">

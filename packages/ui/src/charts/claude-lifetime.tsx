@@ -1,3 +1,4 @@
+import { useAppLocale, useTranslation } from '@repo/i18n';
 import type { ClaudeLifetime } from '@repo/shared';
 import { formatDate, formatDuration, formatNumber } from '@repo/shared';
 
@@ -12,26 +13,37 @@ export function ClaudeLifetimeCard({
   totalMessages,
   totalToolCalls,
 }: ClaudeLifetimeCardProps) {
+  const { locale } = useAppLocale();
+  const { t } = useTranslation('analytics');
   const items = [
     {
-      label: '사용 시작일',
-      value: data.firstSessionDate ? formatDate(data.firstSessionDate) : '-',
-      sub: data.firstSessionDate ? `D+${data.daysActive}` : '',
+      label: t('lifetime.labels.startedOn'),
+      value: data.firstSessionDate ? formatDate(data.firstSessionDate, { locale }) : '-',
+      sub: data.firstSessionDate
+        ? t('lifetime.sublabels.dayCount', { count: data.daysActive })
+        : '',
     },
     {
-      label: '역대 최장 세션',
+      label: t('lifetime.labels.longestSession'),
       value:
-        data.longestSessionDurationMs > 0 ? formatDuration(data.longestSessionDurationMs) : '-',
-      sub: data.longestSessionMessageCount > 0 ? `${data.longestSessionMessageCount}개 메시지` : '',
+        data.longestSessionDurationMs > 0
+          ? formatDuration(data.longestSessionDurationMs, { locale })
+          : '-',
+      sub:
+        data.longestSessionMessageCount > 0
+          ? t('lifetime.sublabels.messageCount', {
+              count: formatNumber(data.longestSessionMessageCount, { locale }),
+            })
+          : '',
     },
     {
-      label: '총 메시지 수',
-      value: formatNumber(totalMessages),
+      label: t('lifetime.labels.totalMessages'),
+      value: formatNumber(totalMessages, { locale }),
       sub: '',
     },
     {
-      label: '총 툴 호출 수',
-      value: formatNumber(totalToolCalls),
+      label: t('lifetime.labels.totalToolCalls'),
+      value: formatNumber(totalToolCalls, { locale }),
       sub: '',
     },
   ];

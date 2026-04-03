@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
+import { useAppLocale } from '@repo/i18n';
 import type { ModelUsage } from '@repo/shared';
-import { formatCostKrw, formatTokens } from '@repo/shared';
+import { formatCost, formatTokens } from '@repo/shared';
 
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts';
 
@@ -16,6 +17,7 @@ export function ModelBreakdown({
   view: externalView,
   onViewChange: _onViewChange,
 }: ModelBreakdownProps) {
+  const { locale } = useAppLocale();
   const [internalView] = useState<'cost' | 'tokens'>('cost');
   const view = externalView ?? internalView;
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -69,7 +71,9 @@ export function ModelBreakdown({
               <span className="text-muted-foreground text-xs">{m.displayName}</span>
             </div>
             <span className="text-xs font-medium">
-              {view === 'cost' ? formatCostKrw(m.cost) : formatTokens(m.totalTokens)}
+              {view === 'cost'
+                ? formatCost(m.cost, { locale })
+                : formatTokens(m.totalTokens, { locale })}
             </span>
           </div>
         ))}

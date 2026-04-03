@@ -1,22 +1,21 @@
+import { useAppLocale, useTranslation } from '@repo/i18n';
 import type { PeakHour } from '@repo/shared';
+import { formatNumber } from '@repo/shared';
 
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+
+import { formatHourLabel } from './lib/locale';
 
 interface PeakHoursProps {
   data: PeakHour[];
 }
 
 export function PeakHours({ data }: PeakHoursProps) {
+  const { locale } = useAppLocale();
+  const { t } = useTranslation('analytics');
   const chartData = data.map((d) => ({
     ...d,
-    label:
-      d.hour === 0
-        ? '12am'
-        : d.hour === 12
-          ? '12pm'
-          : d.hour < 12
-            ? `${d.hour}am`
-            : `${d.hour - 12}pm`,
+    label: formatHourLabel(d.hour, locale),
   }));
 
   return (
@@ -36,7 +35,7 @@ export function PeakHours({ data }: PeakHoursProps) {
           tickLine={false}
           width={35}
           tickCount={5}
-          tickFormatter={(v: number) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v))}
+          tickFormatter={(v: number) => formatNumber(v, { locale })}
         />
         <Tooltip
           contentStyle={{
@@ -49,6 +48,7 @@ export function PeakHours({ data }: PeakHoursProps) {
           }}
           labelStyle={{ color: 'var(--popover-foreground)', fontWeight: 600 }}
           itemStyle={{ color: 'var(--popover-foreground)' }}
+          formatter={(value: number) => [formatNumber(value, { locale }), t('peakHours.messages')]}
         />
         <Bar dataKey="messages" fill="var(--chart-1)" radius={[3, 3, 0, 0]} />
       </BarChart>

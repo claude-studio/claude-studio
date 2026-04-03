@@ -5,6 +5,10 @@ const common = {
   language: 'Language',
   save: 'Save',
   cancel: 'Cancel',
+  close: 'Close',
+  sidebar: 'Sidebar',
+  toggleSidebar: 'Toggle sidebar',
+  mobileSidebarDescription: 'Displays the mobile sidebar.',
 } as const;
 
 export default common;

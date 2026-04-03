@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
+import { useAppLocale, useTranslation } from '@repo/i18n';
 import type { DailyUsage } from '@repo/shared';
-import { formatCostKrw, formatDateShort } from '@repo/shared';
 
 import {
   Area,
@@ -13,32 +13,35 @@ import {
   YAxis,
 } from 'recharts';
 
+import { formatChartCostValue, formatChartDateLabel, formatChartMetricValue } from './lib/locale';
+
 interface UsageOverTimeProps {
   data: DailyUsage[];
 }
 
 type MetricKey = 'messages' | 'sessions' | 'toolCalls' | 'cost';
 
-const METRICS: { key: MetricKey; label: string; color: string }[] = [
-  { key: 'messages', label: '메시지', color: 'var(--chart-1)' },
-  { key: 'sessions', label: '세션', color: 'var(--chart-2)' },
-  { key: 'toolCalls', label: '툴 호출', color: 'var(--chart-3)' },
-  { key: 'cost', label: '비용 (₩)', color: 'var(--chart-4)' },
-];
-
 export function UsageOverTime({ data }: UsageOverTimeProps) {
+  const { locale } = useAppLocale();
+  const { t } = useTranslation('analytics');
   const [activeMetric, setActiveMetric] = useState<MetricKey>('messages');
+  const metrics: { key: MetricKey; label: string; color: string }[] = [
+    { key: 'messages', label: t('usageOverTime.metrics.messages'), color: 'var(--chart-1)' },
+    { key: 'sessions', label: t('usageOverTime.metrics.sessions'), color: 'var(--chart-2)' },
+    { key: 'toolCalls', label: t('usageOverTime.metrics.toolCalls'), color: 'var(--chart-3)' },
+    { key: 'cost', label: t('usageOverTime.metrics.cost'), color: 'var(--chart-4)' },
+  ];
 
-  const metric = METRICS.find((m) => m.key === activeMetric)!;
+  const metric = metrics.find((m) => m.key === activeMetric)!;
   const chartData = data.map((d) => ({
     ...d,
-    date: formatDateShort(new Date(d.date)),
+    date: formatChartDateLabel(d.date, locale),
   }));
 
   return (
     <div className="space-y-4">
       <div className="flex gap-2 flex-wrap justify-end">
-        {METRICS.map((m) => (
+        {metrics.map((m) => (
           <button
             key={m.key}
             onClick={() => setActiveMetric(m.key)}
@@ -73,7 +76,11 @@ export function UsageOverTime({ data }: UsageOverTimeProps) {
             axisLine={false}
             tickLine={false}
             width={activeMetric === 'cost' ? 60 : 40}
-            tickFormatter={(v: number) => (activeMetric === 'cost' ? formatCostKrw(v) : String(v))}
+            tickFormatter={(v: number) =>
+              activeMetric === 'cost'
+                ? formatChartCostValue(v, locale)
+                : formatChartMetricValue(v, locale)
+            }
           />
           <Tooltip
             contentStyle={{
@@ -87,7 +94,9 @@ export function UsageOverTime({ data }: UsageOverTimeProps) {
             labelStyle={{ color: 'var(--popover-foreground)', fontWeight: 600 }}
             itemStyle={{ color: 'var(--popover-foreground)' }}
             formatter={(v: number) => [
-              activeMetric === 'cost' ? formatCostKrw(v) : v,
+              activeMetric === 'cost'
+                ? formatChartCostValue(v, locale)
+                : formatChartMetricValue(v, locale),
               metric.label,
             ]}
           />

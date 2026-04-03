@@ -1,5 +1,5 @@
+import { useAppLocale } from '@repo/i18n';
 import type { DailyUsage } from '@repo/shared';
-import { formatCostKrw, formatDateShort } from '@repo/shared';
 
 import {
   Area,
@@ -10,6 +10,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+
+import { formatChartCostValue, formatChartDateLabel } from './lib/locale';
 
 interface CostChartProps {
   data: DailyUsage[];
@@ -24,12 +26,13 @@ const MODEL_COLORS: string[] = [
 ];
 
 export function CostChart({ data }: CostChartProps) {
+  const { locale } = useAppLocale();
   const models = Array.from(new Set(data.flatMap((d) => Object.keys(d.modelCosts))));
 
   const chartData = data.map((d) => {
     const defaults = Object.fromEntries(models.map((m) => [m, 0]));
     return {
-      date: formatDateShort(new Date(d.date)),
+      date: formatChartDateLabel(d.date, locale),
       cost: d.cost,
       ...defaults,
       ...d.modelCosts,
@@ -52,7 +55,7 @@ export function CostChart({ data }: CostChartProps) {
             axisLine={false}
             tickLine={false}
             width={50}
-            tickFormatter={(v: number) => formatCostKrw(v)}
+            tickFormatter={(v: number) => formatChartCostValue(v, locale)}
           />
           <Tooltip
             contentStyle={{
@@ -65,7 +68,7 @@ export function CostChart({ data }: CostChartProps) {
             }}
             labelStyle={{ color: 'var(--popover-foreground)', fontWeight: 600 }}
             itemStyle={{ color: 'var(--popover-foreground)' }}
-            formatter={(v: number) => formatCostKrw(v)}
+            formatter={(v: number) => formatChartCostValue(v, locale)}
           />
           <Area
             type="monotone"
@@ -96,7 +99,7 @@ export function CostChart({ data }: CostChartProps) {
           axisLine={false}
           tickLine={false}
           width={50}
-          tickFormatter={(v: number) => formatCostKrw(v)}
+          tickFormatter={(v: number) => formatChartCostValue(v, locale)}
         />
         <Tooltip
           contentStyle={{
@@ -109,7 +112,7 @@ export function CostChart({ data }: CostChartProps) {
           }}
           labelStyle={{ color: 'var(--popover-foreground)', fontWeight: 600 }}
           itemStyle={{ color: 'var(--popover-foreground)' }}
-          formatter={(v: number) => formatCostKrw(v)}
+          formatter={(v: number) => formatChartCostValue(v, locale)}
         />
         {models.map((model, i) => (
           <Area

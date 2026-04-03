@@ -14,7 +14,8 @@
   "scripts": {
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "test": "vitest run"
   },
   "dependencies": {
     "zod": "catalog:"
@@ -24,6 +25,7 @@
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^25.3.3",
     "eslint": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }

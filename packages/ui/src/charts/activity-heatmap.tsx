@@ -1,5 +1,9 @@
 import { type CSSProperties, useEffect, useRef, useState } from 'react';
 
+import { useAppLocale, useTranslation } from '@repo/i18n';
+
+import { formatChartDateTitle, formatChartMetricValue, toLocalDateKey } from './lib/locale';
+
 interface ActivityData {
   date: string;
   count: number;
@@ -21,6 +25,8 @@ function getIntensityStyle(count: number, max: number): CSSProperties {
 }
 
 export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
+  const { locale } = useAppLocale();
+  const { t } = useTranslation('analytics');
   const containerRef = useRef<HTMLDivElement>(null);
   const [cell, setCell] = useState(16);
 
@@ -39,6 +45,7 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
   }, []);
 
   const max = Math.max(...data.map((d) => d.count), 1);
+  const dataByDate = new Map(data.map((item) => [item.date, item.count]));
 
   const today = new Date();
   const weeks: { date: string; count: number }[][] = [];
@@ -47,9 +54,8 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
     for (let d = 0; d < 7; d++) {
       const date = new Date(today);
       date.setDate(today.getDate() - (w * 7 + (6 - d)));
-      const dateStr = date.toISOString().split('T')[0]!;
-      const entry = data.find((item) => item.date === dateStr);
-      week.push({ date: dateStr, count: entry?.count ?? 0 });
+      const dateStr = toLocalDateKey(date);
+      week.push({ date: dateStr, count: dataByDate.get(dateStr) ?? 0 });
     }
     weeks.push(week);
   }
@@ -64,7 +70,10 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
               {week.map((day) => (
                 <div
                   key={day.date}
-                  title={`${day.date}: ${day.count}개 메시지`}
+                  title={t('activityHeatmap.cellTitle', {
+                    date: formatChartDateTitle(day.date, locale),
+                    count: formatChartMetricValue(day.count, locale),
+                  })}
                   className="rounded-sm transition-colors w-full"
                   style={{ height: cell, ...getIntensityStyle(day.count, max) }}
                 />
@@ -76,7 +85,7 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
 
       {/* 범례 */}
       <div className="flex items-center justify-end gap-1 text-[10px] text-muted-foreground">
-        <span>적음</span>
+        <span>{t('activityHeatmap.less')}</span>
         {([0, 25, 45, 60, 78, 100] as const).map((pct) => (
           <div
             key={pct}
@@ -92,7 +101,7 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
             }}
           />
         ))}
-        <span>많음</span>
+        <span>{t('activityHeatmap.more')}</span>
       </div>
     </div>
   );

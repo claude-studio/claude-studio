@@ -1,3 +1,4 @@
+import { useAppLocale, useTranslation } from '@repo/i18n';
 import { formatCost } from '@repo/shared';
 
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
@@ -13,6 +14,8 @@ interface ProjectCostChartProps {
 }
 
 export function ProjectCostChart({ data }: ProjectCostChartProps) {
+  const { locale } = useAppLocale();
+  const { t } = useTranslation('analytics');
   if (data.length === 0) return null;
 
   return (
@@ -24,7 +27,7 @@ export function ProjectCostChart({ data }: ProjectCostChartProps) {
           tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
           axisLine={false}
           tickLine={false}
-          tickFormatter={(v: number) => formatCost(v)}
+          tickFormatter={(v: number) => formatCost(v, { locale })}
         />
         <YAxis
           type="category"
@@ -46,8 +49,8 @@ export function ProjectCostChart({ data }: ProjectCostChartProps) {
           labelStyle={{ color: 'var(--popover-foreground)', fontWeight: 600 }}
           itemStyle={{ color: 'var(--popover-foreground)' }}
           formatter={(v: number, _name: string, props: { payload?: ProjectCostItem }) => [
-            formatCost(v),
-            props.payload?.fullName ?? props.payload?.name ?? '비용',
+            formatCost(v, { locale }),
+            props.payload?.fullName ?? props.payload?.name ?? t('cost.fallbackLabel'),
           ]}
         />
         <Bar dataKey="cost" fill="var(--chart-1)" radius={[0, 4, 4, 0]} />
