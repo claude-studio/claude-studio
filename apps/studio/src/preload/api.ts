@@ -1,3 +1,4 @@
+import type { AppLocale } from '@repo/i18n';
 import type {
   ClaudeSettings,
   DashboardStats,
@@ -27,6 +28,8 @@ export const electronAPI = {
   // Settings
   getClaudeSettings: createInvoker<ClaudeSettings>('settings:get'),
   getSkills: createInvoker<SkillInfo[]>('skills:get'),
+  getAppLocale: createInvoker<AppLocale | null>('app-locale:get'),
+  setAppLocale: createInvoker<void, [AppLocale]>('app-locale:set'),
 
   // Data source
   getDataSource: createInvoker<DataSource>('data-source:get'),

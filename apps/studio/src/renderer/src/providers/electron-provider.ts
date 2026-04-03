@@ -1,3 +1,4 @@
+import type { AppLocale } from '@repo/i18n';
 import type { PixelAgentEvent } from '@repo/pixel-agents';
 import type {
   ClaudeSettings,
@@ -23,6 +24,8 @@ declare global {
       onDataChanged: (callback: (source: DataChangeSource) => void) => () => void;
       getClaudeSettings: () => Promise<ClaudeSettings>;
       getSkills: () => Promise<SkillInfo[]>;
+      getAppLocale: () => Promise<AppLocale | null>;
+      setAppLocale: (locale: AppLocale) => Promise<void>;
       getCharacterSprites: () => Promise<unknown>;
       getWallSprites: () => Promise<unknown>;
       getActiveAgents: () => Promise<
