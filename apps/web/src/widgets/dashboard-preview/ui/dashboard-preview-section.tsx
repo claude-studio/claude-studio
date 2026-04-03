@@ -1,6 +1,6 @@
 import { useEffect, useReducer, useRef } from 'react';
 
-import { useTranslation } from '@repo/i18n';
+import { useAppLocale, useTranslation } from '@repo/i18n';
 
 import { ScrollReveal } from '../../../shared/ui/scroll-reveal';
 
@@ -77,11 +77,12 @@ function AnimatedChart() {
 }
 
 export function DashboardPreviewSection() {
+  const { locale } = useAppLocale();
   const { t } = useTranslation('web');
   const stats = [
     {
       label: t('dashboardPreview.stats.monthlyCost.label'),
-      value: '$12.48',
+      value: locale === 'ko' ? '₩16,420' : '$12.48',
       sub: t('dashboardPreview.stats.monthlyCost.sub'),
       color: 'text-claude-orange-light',
     },

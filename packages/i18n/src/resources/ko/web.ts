@@ -86,7 +86,7 @@ const web = {
     stats: {
       monthlyCost: {
         label: '이번 달 비용',
-        sub: '이 기기에 저장됨',
+        sub: 'USD $12.48',
       },
       totalTokens: {
         label: '총 토큰',

@@ -88,7 +88,7 @@ const web = {
     stats: {
       monthlyCost: {
         label: 'Cost this month',
-        sub: 'Saved on this device',
+        sub: 'Approx. ₩16,420',
       },
       totalTokens: {
         label: 'Total tokens',
