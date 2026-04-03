@@ -9,6 +9,8 @@ export enum IpcChannel {
   GetCostAnalysis = 'costs:get',
   GetClaudeSettings = 'settings:get',
   GetSkills = 'skills:get',
+  GetAppLocale = 'app-locale:get',
+  SetAppLocale = 'app-locale:set',
   LiveGetActiveAgents = 'live:get-active-agents',
   LiveStartWatching = 'live:start-watching',
   LiveStopWatching = 'live:stop-watching',

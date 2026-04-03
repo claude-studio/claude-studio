@@ -1,7 +1,11 @@
+import { type AppLocale, useAppLocale } from '@repo/i18n';
 import { type ClaudeSettings } from '@repo/shared';
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@repo/ui';
+import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@repo/ui';
 
 import { Bot, Download, Puzzle, ShieldCheck, Trash2, Wifi } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
+import { LanguageSwitcher } from '../../widgets/language-switcher';
 
 interface DataPageProps {
   settings: ClaudeSettings | undefined;
@@ -11,12 +15,6 @@ interface DataPageProps {
   onUninstallPlugin?: () => void;
 }
 
-const modeLabel: Record<string, string> = {
-  acceptEdits: '자동 수락',
-  default: '기본',
-  bypassPermissions: '권한 우회',
-};
-
 export function DataPage({
   settings,
   pluginInstalled,
@@ -24,6 +22,13 @@ export function DataPage({
   onInstallPlugin,
   onUninstallPlugin,
 }: DataPageProps) {
+  const { locale } = useAppLocale();
+  const { t: tSettings } = useTranslation('settings');
+  const { t: tStudio } = useTranslation('studio');
+  const languageLabels: Record<AppLocale, string> = {
+    en: tSettings('english'),
+    ko: tSettings('korean'),
+  };
   const plugins = settings?.enabledPlugins
     ? Object.entries(settings.enabledPlugins)
         .filter(([, v]) => v)
@@ -37,7 +42,7 @@ export function DataPage({
           <CardHeader className="px-5 pt-5 pb-3">
             <CardTitle className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               <Bot className="h-4 w-4" />
-              현재 모델
+              {tStudio('data.currentModel')}
             </CardTitle>
           </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
@@ -49,13 +54,15 @@ export function DataPage({
           <CardHeader className="px-5 pt-5 pb-3">
             <CardTitle className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               <ShieldCheck className="h-4 w-4" />
-              권한 모드
+              {tStudio('data.permissionMode')}
             </CardTitle>
           </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
             <p className="text-base font-semibold">
               {settings?.permissions?.defaultMode
-                ? (modeLabel[settings.permissions.defaultMode] ?? settings.permissions.defaultMode)
+                ? tStudio(`permissions.${settings.permissions.defaultMode}`, {
+                    defaultValue: settings.permissions.defaultMode,
+                  })
                 : '-'}
             </p>
           </CardContent>
@@ -65,7 +72,7 @@ export function DataPage({
           <CardHeader className="px-5 pt-5 pb-3">
             <CardTitle className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               <Puzzle className="h-4 w-4" />
-              활성화된 플러그인
+              {tStudio('data.enabledPlugins')}
             </CardTitle>
           </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
@@ -78,8 +85,31 @@ export function DataPage({
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">활성화된 플러그인 없음</p>
+              <p className="text-sm text-muted-foreground">{tStudio('data.noEnabledPlugins')}</p>
             )}
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-2 xl:col-span-3">
+          <CardHeader className="px-5 pt-5 pb-3">
+            <CardTitle className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              {tStudio('data.languageTitle')}
+            </CardTitle>
+            <CardDescription className="text-sm leading-relaxed">
+              {tStudio('data.languageDescription')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="px-5 pb-5 pt-0 space-y-4">
+            <div className="rounded-lg border border-border/70 bg-muted/20 px-4 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                {tStudio('data.currentLanguageLabel')}
+              </p>
+              <p className="mt-2 text-sm font-semibold" lang={locale}>
+                {languageLabels[locale]}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">{tStudio('language.helper')}</p>
+            </div>
+            <LanguageSwitcher mode="settings" />
           </CardContent>
         </Card>
 
@@ -87,7 +117,7 @@ export function DataPage({
           <CardHeader className="px-5 pt-5 pb-3">
             <CardTitle className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               <Wifi className="h-4 w-4" />
-              라이브 모니터링 플러그인
+              {tStudio('data.liveMonitoringPlugin')}
             </CardTitle>
           </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
@@ -95,13 +125,11 @@ export function DataPage({
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
                   <Badge variant={pluginInstalled ? 'default' : 'secondary'} className="text-xs">
-                    {pluginInstalled ? '설치됨' : '미설치'}
+                    {pluginInstalled ? tStudio('data.installed') : tStudio('data.notInstalled')}
                   </Badge>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Claude Code Hooks를 통해 실시간 세션 정보를 수신합니다.
-                  <br />
-                  설치 후 Claude Code를 재시작하면 라이브 모니터링이 활성화됩니다.
+                  {tStudio('data.liveMonitoringDescription')}
                 </p>
               </div>
               <div className="shrink-0">
@@ -114,7 +142,7 @@ export function DataPage({
                     className="gap-1.5"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
-                    제거
+                    {tStudio('data.remove')}
                   </Button>
                 ) : (
                   <Button
@@ -124,7 +152,7 @@ export function DataPage({
                     className="gap-1.5"
                   >
                     <Download className="h-3.5 w-3.5" />
-                    설치
+                    {tStudio('data.install')}
                   </Button>
                 )}
               </div>

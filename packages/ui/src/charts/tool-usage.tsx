@@ -1,12 +1,18 @@
+import { useAppLocale, useTranslation } from '@repo/i18n';
 import type { ToolUsageItem } from '@repo/shared';
+import { formatNumber } from '@repo/shared';
 
 interface ToolUsageChartProps {
   data: ToolUsageItem[];
 }
 
 export function ToolUsageChart({ data }: ToolUsageChartProps) {
+  const { locale } = useAppLocale();
+  const { t } = useTranslation('analytics');
   if (data.length === 0) {
-    return <p className="text-sm text-muted-foreground text-center py-8">데이터 없음</p>;
+    return (
+      <p className="text-sm text-muted-foreground text-center py-8">{t('toolUsage.noData')}</p>
+    );
   }
 
   const top = data.slice(0, 7);
@@ -28,7 +34,7 @@ export function ToolUsageChart({ data }: ToolUsageChartProps) {
             />
           </div>
           <span className="text-xs font-medium text-muted-foreground w-16 text-right shrink-0">
-            {item.count.toLocaleString()}회
+            {t('toolUsage.countSuffix', { count: formatNumber(item.count, { locale }) })}
           </span>
         </div>
       ))}

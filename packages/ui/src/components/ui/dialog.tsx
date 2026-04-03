@@ -8,6 +8,8 @@ import {
   useEffect,
 } from 'react';
 
+import { useTranslation } from '@repo/i18n';
+
 import { X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
@@ -61,6 +63,7 @@ DialogOverlay.displayName = 'DialogOverlay';
 const DialogContent = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, children, ...props }, ref) => {
     const { onClose } = useContext(DialogContext);
+    const { t } = useTranslation('common');
 
     return createPortal(
       <div className="fixed inset-0 z-[200]">
@@ -77,7 +80,7 @@ const DialogContent = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>
           <button
             onClick={onClose}
             className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity"
-            aria-label="닫기"
+            aria-label={t('close')}
           >
             <X className="h-4 w-4" />
           </button>

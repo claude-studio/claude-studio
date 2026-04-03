@@ -36,6 +36,7 @@ import {
   Wand2,
   Zap,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface NavItem {
   href: string;
@@ -45,20 +46,6 @@ interface NavItem {
   pulse?: boolean;
 }
 
-const navItems: NavItem[] = [
-  { href: '/', label: '개요', icon: <LayoutDashboard className="h-4 w-4" /> },
-  { href: '/projects', label: '프로젝트', icon: <FolderOpen className="h-4 w-4" /> },
-  {
-    href: '/live',
-    label: '라이브',
-    icon: <Radio className="h-4 w-4" />,
-    badge: 'Beta',
-    pulse: true,
-  },
-  { href: '/costs', label: '비용', icon: <DollarSign className="h-4 w-4" /> },
-  { href: '/skills', label: '스킬', icon: <Wand2 className="h-4 w-4" /> },
-];
-
 const dashboardRoutes = ['/', '/projects', '/live', '/costs', '/skills', '/data'];
 
 function AppSidebarInner() {
@@ -66,11 +53,39 @@ function AppSidebarInner() {
   const currentPath = routerState.location.pathname;
   const { theme, toggle, toggleRef } = useTheme();
   const { open } = useSidebar();
+  const { t: tNavigation } = useTranslation('navigation');
+  const { t: tStudio } = useTranslation('studio');
+
+  const navItems: NavItem[] = [
+    {
+      href: '/',
+      label: tNavigation('overview'),
+      icon: <LayoutDashboard className="h-4 w-4" />,
+    },
+    {
+      href: '/projects',
+      label: tNavigation('projects'),
+      icon: <FolderOpen className="h-4 w-4" />,
+    },
+    {
+      href: '/live',
+      label: tNavigation('live'),
+      icon: <Radio className="h-4 w-4" />,
+      badge: 'Beta',
+      pulse: true,
+    },
+    {
+      href: '/costs',
+      label: tNavigation('costs'),
+      icon: <DollarSign className="h-4 w-4" />,
+    },
+    { href: '/skills', label: tNavigation('skills'), icon: <Wand2 className="h-4 w-4" /> },
+  ];
 
   const isDashboard = dashboardRoutes.some((r) =>
     r === '/' ? currentPath === '/' : currentPath.startsWith(r),
   );
-  const activeMenuLabel = isDashboard ? '대시보드' : 'Analytics';
+  const activeMenuLabel = isDashboard ? tStudio('shell.dashboard') : tStudio('shell.analytics');
 
   return (
     <Sidebar collapsible="icon" className="h-svh border-r border-sidebar-border">
@@ -105,7 +120,7 @@ function AppSidebarInner() {
                 sideOffset={4}
               >
                 <DropdownMenuLabel className="text-xs text-muted-foreground px-2 py-1.5">
-                  메뉴
+                  {tStudio('shell.menu')}
                 </DropdownMenuLabel>
                 <DropdownMenuItem asChild>
                   <Link
@@ -117,7 +132,7 @@ function AppSidebarInner() {
                     )}
                   >
                     <LayoutDashboard className="h-4 w-4" />
-                    대시보드
+                    {tStudio('shell.dashboard')}
                     {isDashboard && (
                       <span className="ml-auto relative flex h-1.5 w-1.5 shrink-0">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-60" />
@@ -128,9 +143,9 @@ function AppSidebarInner() {
                 </DropdownMenuItem>
                 <DropdownMenuItem disabled className="gap-2">
                   <Users className="h-4 w-4" />
-                  커뮤니티
+                  {tStudio('shell.community')}
                   <span className="ml-auto text-[9px] font-semibold px-1.5 py-0.5 rounded-sm bg-muted text-muted-foreground leading-none">
-                    작업중
+                    {tStudio('shell.inProgress')}
                   </span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -197,7 +212,7 @@ function AppSidebarInner() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
-                  tooltip="설정"
+                  tooltip={tNavigation('settings')}
                   isActive={currentPath.startsWith('/data')}
                   className={cn(
                     'relative',
@@ -209,7 +224,7 @@ function AppSidebarInner() {
                     <span className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-0.5 rounded-full bg-primary" />
                   )}
                   <Settings className="h-4 w-4" />
-                  <span className="tracking-tight">설정</span>
+                  <span className="tracking-tight">{tNavigation('settings')}</span>
                   <ChevronsUpDown className="ml-auto h-4 w-4 text-muted-foreground" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
@@ -222,14 +237,14 @@ function AppSidebarInner() {
                 <DropdownMenuItem asChild>
                   <Link to="/data" className="gap-2">
                     <Settings className="h-4 w-4" />
-                    Claude Settings
+                    {tStudio('shell.claudeSettings')}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <button ref={toggleRef} onClick={toggle} className="w-full gap-2">
                     {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                    {theme === 'dark' ? '라이트 모드' : '다크 모드'}
+                    {theme === 'dark' ? tStudio('shell.lightMode') : tStudio('shell.darkMode')}
                   </button>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>

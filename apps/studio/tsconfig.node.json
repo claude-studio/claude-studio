@@ -4,6 +4,7 @@
     "composite": true,
     "incremental": true,
     "outDir": "out",
+    "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]

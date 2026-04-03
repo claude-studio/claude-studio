@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { bootstrapI18n } from '@repo/i18n';
 import { createHashHistory, createRouter, RouterProvider } from '@tanstack/react-router';
 
 import ReactDOM from 'react-dom/client';
@@ -23,10 +24,19 @@ declare module '@tanstack/react-router' {
 }
 
 const root = document.getElementById('root')!;
-ReactDOM.createRoot(root).render(
-  <React.StrictMode>
-    <Providers>
-      <RouterProvider router={router} />
-    </Providers>
-  </React.StrictMode>,
-);
+
+async function main() {
+  const { i18n, initialLocale } = await bootstrapI18n({
+    getSavedLocale: () => window.electronAPI.getAppLocale(),
+  });
+
+  ReactDOM.createRoot(root).render(
+    <React.StrictMode>
+      <Providers i18n={i18n} initialLocale={initialLocale}>
+        <RouterProvider router={router} />
+      </Providers>
+    </React.StrictMode>,
+  );
+}
+
+void main();

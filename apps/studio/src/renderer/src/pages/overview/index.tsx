@@ -20,10 +20,11 @@ import {
 } from '@repo/ui';
 
 import { ChevronRight, FolderOpen } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-function getDateRangeDesc(dailyUsage: DailyUsage[]): string {
+function getDateRangeDesc(dailyUsage: DailyUsage[], emptyLabel: string): string {
   const dates = dailyUsage.map((d) => d.date).sort();
-  if (dates.length === 0) return '데이터 없음';
+  if (dates.length === 0) return emptyLabel;
   if (dates.length === 1) return formatDateShort(dates[0]!);
   return `${formatDateShort(dates[0]!)} ~ ${formatDateShort(dates[dates.length - 1]!)}`;
 }
@@ -35,6 +36,7 @@ const CL = ({ children }: { children: React.ReactNode }) => (
 );
 
 function SessionTreeView({ sessions }: { sessions: SessionInfo[] }) {
+  const { t } = useTranslation('studio');
   const filtered = sessions.filter((s) => s.cost > 0);
 
   const groups = filtered.reduce<Record<string, SessionInfo[]>>((acc, s) => {
@@ -52,7 +54,9 @@ function SessionTreeView({ sessions }: { sessions: SessionInfo[] }) {
   const toggle = (name: string) => setExpanded((prev) => ({ ...prev, [name]: !prev[name] }));
 
   if (filtered.length === 0) {
-    return <p className="text-muted-foreground text-sm text-center py-4">세션이 없습니다</p>;
+    return (
+      <p className="text-muted-foreground text-sm text-center py-4">{t('overview.noSessions')}</p>
+    );
   }
 
   return (
@@ -96,7 +100,7 @@ function SessionTreeView({ sessions }: { sessions: SessionInfo[] }) {
                       {timeAgo(new Date(session.lastTime))}
                     </span>
                     <span className="text-[11px] text-muted-foreground/70 shrink-0">
-                      {session.messageCount}개
+                      {t('overview.messages', { count: session.messageCount })}
                     </span>
                     <span className="text-[12px] font-mono font-medium shrink-0 tabular-nums">
                       <CostDisplay cost={session.cost} />
@@ -113,6 +117,7 @@ function SessionTreeView({ sessions }: { sessions: SessionInfo[] }) {
 }
 
 export function OverviewPage() {
+  const { t } = useTranslation('studio');
   const { data: stats, isLoading } = useStats();
   const [modelView, setModelView] = useState<'cost' | 'tokens'>('cost');
 
@@ -123,9 +128,9 @@ export function OverviewPage() {
       </div>
     );
   }
-  if (!stats) return <div className="text-muted-foreground">데이터가 없습니다</div>;
+  if (!stats) return <div className="text-muted-foreground">{t('overview.noData')}</div>;
 
-  const dateRangeDesc = getDateRangeDesc(stats.dailyUsage);
+  const dateRangeDesc = getDateRangeDesc(stats.dailyUsage, t('overview.noDateRange'));
 
   return (
     <div className="space-y-3">
@@ -133,7 +138,7 @@ export function OverviewPage() {
         <div style={{ gridColumn: 'span 3' }}>
           <StatCard
             featured
-            title="총 비용"
+            title={t('overview.totalCost')}
             value={<CostDisplay cost={stats.totalCost} />}
             description={
               stats.lifetime?.firstSessionDate
@@ -144,29 +149,34 @@ export function OverviewPage() {
         </div>
         <div style={{ gridColumn: 'span 3' }}>
           <StatCard
-            title="총 토큰"
+            title={t('overview.totalTokens')}
             value={formatTokens(stats.totalTokens)}
-            description={`입력 ${formatTokens(stats.inputTokens)} / 출력 ${formatTokens(stats.outputTokens)}`}
+            description={t('overview.tokenBreakdown', {
+              input: formatTokens(stats.inputTokens),
+              output: formatTokens(stats.outputTokens),
+            })}
           />
         </div>
         <div style={{ gridColumn: 'span 3' }}>
           <StatCard
-            title="세션"
+            title={t('overview.sessions')}
             value={formatNumber(stats.totalSessions)}
-            description={`${stats.totalProjects}개 프로젝트`}
+            description={t('overview.projectCount', { count: stats.totalProjects })}
           />
         </div>
         <div style={{ gridColumn: 'span 3' }}>
           <StatCard
-            title="메시지"
+            title={t('overview.messageCount')}
             value={formatNumber(stats.totalMessages)}
-            description={`툴 호출 ${formatNumber(stats.totalToolCalls)}회`}
+            description={t('overview.toolCalls', {
+              count: formatNumber(stats.totalToolCalls),
+            })}
           />
         </div>
 
         <Card style={{ gridColumn: 'span 8' }}>
           <CardHeader className="px-5 pt-5 pb-3">
-            <CL>시간별 사용량</CL>
+            <CL>{t('overview.usageOverTime')}</CL>
           </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
             <UsageOverTime data={stats.dailyUsage} />
@@ -175,7 +185,7 @@ export function OverviewPage() {
 
         <Card style={{ gridColumn: 'span 4' }}>
           <CardHeader className="px-5 pt-5 pb-3">
-            <CL>피크 시간대</CL>
+            <CL>{t('overview.peakHours')}</CL>
           </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
             <PeakHours data={stats.peakHours} />
@@ -184,7 +194,7 @@ export function OverviewPage() {
 
         <Card style={{ gridColumn: 'span 7' }}>
           <CardHeader className="px-5 pt-5 pb-3">
-            <CL>활동 히트맵</CL>
+            <CL>{t('overview.activityHeatmap')}</CL>
           </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
             <ActivityHeatmap data={stats.activityData} />
@@ -194,7 +204,7 @@ export function OverviewPage() {
         <Card style={{ gridColumn: 'span 5' }}>
           <CardHeader className="px-5 pt-5 pb-3">
             <div className="flex items-center justify-between">
-              <CL>모델별 분석</CL>
+              <CL>{t('overview.modelBreakdown')}</CL>
               <div className="flex gap-0.5 rounded border border-border p-0.5">
                 {(['cost', 'tokens'] as const).map((v) => (
                   <button
@@ -206,7 +216,7 @@ export function OverviewPage() {
                         : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    {v === 'cost' ? '비용' : '토큰'}
+                    {v === 'cost' ? t('overview.cost') : t('overview.tokens')}
                   </button>
                 ))}
               </div>
@@ -223,7 +233,7 @@ export function OverviewPage() {
 
         <Card style={{ gridColumn: 'span 8' }}>
           <CardHeader className="px-5 pt-5 pb-3">
-            <CL>모델별 일별 비용</CL>
+            <CL>{t('overview.dailyModelCost')}</CL>
           </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
             <CostChart data={stats.dailyUsage} />
@@ -232,7 +242,7 @@ export function OverviewPage() {
 
         <Card style={{ gridColumn: 'span 4' }}>
           <CardHeader className="px-5 pt-5 pb-3">
-            <CL>툴 사용 순위</CL>
+            <CL>{t('overview.toolUsageRanking')}</CL>
           </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
             <ToolUsageChart data={stats.toolUsage} />
@@ -241,7 +251,7 @@ export function OverviewPage() {
 
         <Card style={{ gridColumn: 'span 4' }}>
           <CardHeader className="px-5 pt-5 pb-3">
-            <CL>캐시 절약 현황</CL>
+            <CL>{t('overview.cacheSavings')}</CL>
           </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
             <CacheStatsCard data={stats.cacheStats} />
@@ -250,7 +260,7 @@ export function OverviewPage() {
 
         <Card style={{ gridColumn: 'span 8' }}>
           <CardHeader className="px-5 pt-5 pb-3">
-            <CL>대화 패턴 분석</CL>
+            <CL>{t('overview.conversationPatterns')}</CL>
           </CardHeader>
           <CardContent className="px-5 pb-5 pt-0">
             <ConversationStatsCard data={stats.conversationStats} />
@@ -259,7 +269,7 @@ export function OverviewPage() {
 
         <Card style={{ gridColumn: 'span 12' }}>
           <CardHeader className="px-5 pt-5 pb-3">
-            <CL>최근 세션</CL>
+            <CL>{t('overview.recentSessions')}</CL>
           </CardHeader>
           <CardContent className="px-4 pb-4 pt-0">
             <SessionTreeView sessions={stats.recentSessions} />
