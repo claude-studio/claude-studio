@@ -6,9 +6,10 @@ import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin({ exclude: ['@repo/shared', 'pngjs'] })],
+    plugins: [externalizeDepsPlugin({ exclude: ['@repo/i18n', '@repo/shared', 'pngjs'] })],
     resolve: {
       alias: {
+        '@repo/i18n': resolve('../../packages/i18n/src'),
         '@repo/shared': resolve('../../packages/shared/src'),
       },
     },
@@ -19,9 +20,10 @@ export default defineConfig({
     },
   },
   preload: {
-    plugins: [externalizeDepsPlugin({ exclude: ['@repo/shared'] })],
+    plugins: [externalizeDepsPlugin({ exclude: ['@repo/i18n', '@repo/shared'] })],
     resolve: {
       alias: {
+        '@repo/i18n': resolve('../../packages/i18n/src'),
         '@repo/shared': resolve('../../packages/shared/src'),
       },
     },
@@ -57,6 +59,7 @@ export default defineConfig({
     resolve: {
       alias: {
         '@renderer': resolve('src/renderer/src'),
+        '@repo/i18n': resolve('../../packages/i18n/src'),
         '@repo/ui': resolve('../../packages/ui/src'),
         '@repo/shared': resolve('../../packages/shared/src'),
         '@repo/pixel-agents': resolve('../../packages/pixel-agents/src'),
