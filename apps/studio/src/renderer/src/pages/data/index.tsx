@@ -1,4 +1,4 @@
-import { useAppLocale } from '@repo/i18n';
+import { type AppLocale, useAppLocale } from '@repo/i18n';
 import { type ClaudeSettings } from '@repo/shared';
 import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@repo/ui';
 
@@ -25,6 +25,10 @@ export function DataPage({
   const { locale } = useAppLocale();
   const { t: tSettings } = useTranslation('settings');
   const { t: tStudio } = useTranslation('studio');
+  const languageLabels: Record<AppLocale, string> = {
+    en: tSettings('english'),
+    ko: tSettings('korean'),
+  };
   const plugins = settings?.enabledPlugins
     ? Object.entries(settings.enabledPlugins)
         .filter(([, v]) => v)
@@ -101,7 +105,7 @@ export function DataPage({
                 {tStudio('data.currentLanguageLabel')}
               </p>
               <p className="mt-2 text-sm font-semibold" lang={locale}>
-                {locale === 'en' ? tSettings('english') : tSettings('korean')}
+                {languageLabels[locale]}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">{tStudio('language.helper')}</p>
             </div>

@@ -33,4 +33,27 @@ describe('LanguageSwitcher', () => {
       expect(screen.getByRole('button', { name: /English/i }).textContent).toBe('English');
     });
   });
+
+  it('renders settings mode as a selectable language group', async () => {
+    const i18n = await initI18n('en');
+    const persistLocale = vi.fn(async () => {});
+
+    render(
+      <AppLocaleProvider i18n={i18n} initialLocale="en" onLocaleChange={persistLocale}>
+        <LanguageSwitcher mode="settings" />
+      </AppLocaleProvider>,
+    );
+
+    const group = screen.getByRole('radiogroup', { name: /Language/i });
+    const englishOption = screen.getByRole('radio', { name: /Current language: English/i });
+    const koreanOption = screen.getByRole('radio', { name: /Switch to 한국어/i });
+
+    expect(group.contains(englishOption)).toBe(true);
+    expect(group.contains(koreanOption)).toBe(true);
+    expect(englishOption.getAttribute('aria-checked')).toBe('true');
+    expect(koreanOption.getAttribute('aria-checked')).toBe('false');
+
+    englishOption.focus();
+    expect(document.activeElement).toBe(englishOption);
+  });
 });

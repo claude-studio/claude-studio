@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { useAppLocale } from '@repo/i18n';
+import { type AppLocale, DEFAULT_LOCALE, SUPPORTED_LOCALES, useAppLocale } from '@repo/i18n';
 import { Button, cn } from '@repo/ui';
 
 import { useTranslation } from 'react-i18next';
@@ -9,37 +9,38 @@ type LanguageSwitcherProps = {
   mode?: 'compact' | 'settings';
 };
 
-type SupportedLocale = 'en' | 'ko';
-
-function getLanguageName(locale: SupportedLocale) {
-  return locale === 'en' ? 'English' : '한국어';
-}
-
-function getLanguageTag(locale: SupportedLocale) {
-  return locale === 'en' ? 'en' : 'ko';
-}
-
 export function LanguageSwitcher({ mode = 'compact' }: LanguageSwitcherProps) {
   const { isChanging, locale, setLocale } = useAppLocale();
   const { t: tSettings } = useTranslation('settings');
   const { t: tStudio } = useTranslation('studio');
+  const languageLabels = useMemo<Record<AppLocale, string>>(
+    () => ({
+      en: tSettings('english'),
+      ko: tSettings('korean'),
+    }),
+    [tSettings],
+  );
 
   const options = useMemo(
     () =>
-      (['en', 'ko'] as const).map((code) => ({
+      SUPPORTED_LOCALES.map((code) => ({
         code,
         description:
           code === 'en'
             ? tStudio('language.englishDescription')
             : tStudio('language.koreanDescription'),
-        label: code === 'en' ? tSettings('english') : tSettings('korean'),
+        label: languageLabels[code],
       })),
-    [tSettings, tStudio],
+    [languageLabels, tStudio],
   );
 
   if (mode === 'settings') {
     return (
-      <div className="grid gap-2 sm:grid-cols-2">
+      <div
+        role="radiogroup"
+        aria-label={tStudio('data.languageTitle')}
+        className="grid gap-2 sm:grid-cols-2"
+      >
         {options.map((option) => {
           const isCurrent = option.code === locale;
 
@@ -47,16 +48,25 @@ export function LanguageSwitcher({ mode = 'compact' }: LanguageSwitcherProps) {
             <button
               key={option.code}
               type="button"
-              lang={getLanguageTag(option.code)}
-              disabled={isChanging || isCurrent}
-              onClick={() => void setLocale(option.code)}
+              role="radio"
+              aria-checked={isCurrent}
+              aria-current={isCurrent ? 'true' : undefined}
+              aria-disabled={isChanging ? 'true' : undefined}
+              lang={option.code}
+              onClick={() => {
+                if (isChanging || isCurrent) {
+                  return;
+                }
+
+                void setLocale(option.code);
+              }}
               aria-label={
                 isCurrent
                   ? tStudio('shell.currentLanguage', {
-                      language: getLanguageName(option.code),
+                      language: languageLabels[option.code],
                     })
                   : tStudio('language.switchTo', {
-                      language: getLanguageName(option.code),
+                      language: languageLabels[option.code],
                     })
               }
               className={cn(
@@ -64,7 +74,7 @@ export function LanguageSwitcher({ mode = 'compact' }: LanguageSwitcherProps) {
                 isCurrent
                   ? 'border-primary bg-primary/5'
                   : 'border-border hover:border-primary/40 hover:bg-muted/40',
-                (isChanging || isCurrent) && 'disabled:cursor-default disabled:opacity-100',
+                isChanging && 'opacity-70',
               )}
             >
               <div className="flex items-start justify-between gap-3">
@@ -92,15 +102,15 @@ export function LanguageSwitcher({ mode = 'compact' }: LanguageSwitcherProps) {
     );
   }
 
-  const nextLocale = locale === 'en' ? 'ko' : 'en';
-  const nextLanguage = getLanguageName(nextLocale);
+  const nextLocale = SUPPORTED_LOCALES.find((code) => code !== locale) ?? DEFAULT_LOCALE;
+  const nextLanguage = languageLabels[nextLocale];
 
   return (
     <Button
       type="button"
       variant="outline"
       size="sm"
-      lang={getLanguageTag(nextLocale)}
+      lang={nextLocale}
       disabled={isChanging}
       onClick={() => void setLocale(nextLocale)}
       aria-label={tStudio('shell.changeLanguage', { language: nextLanguage })}
