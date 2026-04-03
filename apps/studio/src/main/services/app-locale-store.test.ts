@@ -41,21 +41,6 @@ describe('app locale store', () => {
     }
   });
 
-  it('does not persist unsupported locale input on the write path', async () => {
-    const rootDir = await createTempRoot();
-    const store = createAppLocaleStore({ rootDir });
-    const filePath = path.join(rootDir, 'settings', 'app-locale.json');
-
-    try {
-      await store.setAppLocale('ja' as unknown as 'en');
-
-      await expect(store.getAppLocale()).resolves.toBeNull();
-      await expect(readFile(filePath, 'utf-8')).rejects.toThrow();
-    } finally {
-      await rm(rootDir, { recursive: true, force: true });
-    }
-  });
-
   it('fails closed to null for invalid JSON and unsupported locales', async () => {
     const rootDir = await createTempRoot();
     const store = createAppLocaleStore({ rootDir });

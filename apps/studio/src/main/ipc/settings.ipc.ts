@@ -22,7 +22,7 @@ export function registerSettingsHandlers(): void {
     const normalizedLocale = typeof locale === 'string' ? normalizeLocale(locale) : null;
 
     if (normalizedLocale === null) {
-      return;
+      throw new Error('Unsupported app locale');
     }
 
     await appLocaleStore.setAppLocale(normalizedLocale);
